@@ -1,6 +1,9 @@
 import 'package:chat/resources/Constants.dart';
 import 'package:chat/resources/Shared_Preferences.dart';
+import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/auth/login_screen.dart';
+import 'package:chat/screens/ui/homeScreen.dart';
+import 'package:chat/services/auth_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +16,7 @@ Future<void> main() async {
             apiKey: Constants.apiKey,
             appId: Constants.appId,
             messagingSenderId: Constants.messagingSenderId,
-            projectId: Constants.projectId)
-    );
+            projectId: Constants.projectId));
   }
   await Firebase.initializeApp();
   runApp(const MyApp());
@@ -28,7 +30,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool isLogin=false;
+  bool isLogin = false;
+
   // This widget is the root of your application.
   @override
   void initState() {
@@ -36,18 +39,15 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     isUserLogin();
   }
+
   isUserLogin() async {
     await SharedPref.isUserLogin().then((value) {
-      if(value != null)
-        {
-
-          isLogin = value;
-
-        }
-
+      if (value != null) {
+        isLogin = value;
+      }
     });
-
   }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -64,23 +64,8 @@ class _MyAppState extends State<MyApp> {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home:isLogin ? Homepage() : LoginPage(),
-    );
-  }
-}
-
-class Homepage extends StatefulWidget {
-  const Homepage({Key? key}) : super(key: key);
-
-  @override
-  State<Homepage> createState() => _HomepageState();
-}
-
-class _HomepageState extends State<Homepage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(child: Text("Homepage"),),
+      debugShowCheckedModeBanner: false,
+      home: isLogin ? HomeScreen() : LoginPage(),
     );
   }
 }

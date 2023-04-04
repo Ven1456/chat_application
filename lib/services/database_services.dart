@@ -81,6 +81,10 @@ class DatabaseServices {
   Future getSearchByName(String groupName) async {
     return groupCollection.where("groupName", isEqualTo: groupName).get();
   }
+  Future searchByNameNotFound(String groupName) async {
+    return groupCollection.where("groupName", isNotEqualTo: groupName).get();
+  }
+
 
   Future<bool> isUserJoined(
       String groupName, String groupId, String userName) async {
@@ -120,4 +124,14 @@ class DatabaseServices {
         });
       }
   }
+
+  // send message
+sendMessage(String groupId,Map<String,dynamic> chatMessageData) async {
+    groupCollection.doc(groupId).collection("messages").add(chatMessageData);
+    groupCollection.doc(groupId).update({
+      "recentMessage":chatMessageData["message"],
+      "recentMessageSender":chatMessageData["sender"],
+      "recentMessageTime":chatMessageData["time"].toString(),
+    });
+}
 }

@@ -16,7 +16,7 @@ borderSide: BorderSide(color: Colors.red),
 
 );
 
-void nextPage (context,page){
+ nextPage (context,page){
   Navigator.push(context, MaterialPageRoute(builder: (context) => page));
 }
 void replaceScreen (context,page){
@@ -30,6 +30,7 @@ void showSnackbar(context, color , message ) {
     backgroundColor : color,
     action: SnackBarAction(
       label: "close",
+      disabledTextColor: Colors.white,
       onPressed: () {},
 
     ),

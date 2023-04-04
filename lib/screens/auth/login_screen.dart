@@ -1,4 +1,3 @@
-import 'package:chat/main.dart';
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/auth/RegisterPage.dart';
@@ -9,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -26,15 +26,18 @@ class _LoginPageState extends State<LoginPage> {
   String email = "";
   bool _isLoading = false;
   AuthService authService= AuthService();
+/*  TextEditingController emailTextEditingController = TextEditingController();
+  TextEditingController passTextEditingController = TextEditingController();*/
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
+            ?Center(child: SizedBox(
+            height: 250,
+            width: 150,
+            child: Lottie.network("https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")))
             : SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 65.0),
@@ -90,8 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                         SizedBox(
                           width: 350,
                           child: TextFormField(
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
+                            autovalidateMode: AutovalidateMode.onUserInteraction,
                             obscureText: true,
                             // key: _passkey,
                             decoration: textInputDecoration.copyWith(
@@ -114,14 +116,14 @@ class _LoginPageState extends State<LoginPage> {
                           height: 15,
                         ),
 
-                        Padding(
+                       /* Padding(
                           padding: const EdgeInsets.only(left:200.0),
                           child: GestureDetector(
                               onTap: (){
 
                               },
-                              child: Text("Forgot Password ? ",style: TextStyle(fontWeight: FontWeight.bold),)),
-                        ),
+                              child: const Text("Forgot Password ? ",style: TextStyle(fontWeight: FontWeight.bold),)),
+                        ),*/
                         const SizedBox(
                           height: 15,
                         ),
@@ -136,20 +138,20 @@ class _LoginPageState extends State<LoginPage> {
                               },
                               child: const Text("Sign in ")),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 15,
                         ),
                         Text.rich(TextSpan(
                             text: "Don't Have An Account? ",
-                            style: TextStyle(color: Colors.black, fontSize: 14),
+                            style: const TextStyle(color: Colors.black, fontSize: 14),
                             children: <TextSpan>[
                               TextSpan(
                                   text: "Register ",
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       color: Colors.black, fontSize: 14),
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
-                                      nextPage(context, RegisterPage());
+                                      nextPage(context, const RegisterPage());
                                     })
                             ]))
                       ],
@@ -161,7 +163,33 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void login() async {
+  // login() async {
+  //   if (formKey.currentState!.validate()) {
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //     await authService
+  //         .loginWithUsernamePassword(email, password)
+  //         .then((value) async {
+  //       if (value == true) {
+  //         QuerySnapshot snapshot =
+  //         await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
+  //             .gettingUserEmail(email);
+  //         // saving the values to our shared preferences
+  //         await SharedPref.saveUserLoginStatus(true);
+  //         await SharedPref.saveUserEmail(email);
+  //         await SharedPref.saveUserName(snapshot.docs[0]['fullName']);
+  //         nextPage(context, HomeScreen());
+  //       } else {
+  //         showSnackbar(context, Colors.red, value);
+  //         setState(() {
+  //           _isLoading = false;
+  //         });
+  //       }
+  //     });
+  //   }
+  // }
+   login() async {
     if (formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
@@ -175,7 +203,8 @@ class _LoginPageState extends State<LoginPage> {
         await SharedPref.saveUserName(
           snapshot.docs[0]["fullName"]
         );
-          nextPage(context, HomeScreen());
+        await nextPage(context, HomeScreen());
+
         }
         else
           {

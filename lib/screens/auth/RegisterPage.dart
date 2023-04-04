@@ -6,6 +6,7 @@ import 'package:chat/screens/ui/homeScreen.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -13,7 +14,7 @@ class RegisterPage extends StatefulWidget {
   @override
   State<RegisterPage> createState() => _RegisterPageState();
 }
-final formKey = GlobalKey<FormState>();
+
 // GlobalKey<FormState> _registerFormKey = GlobalKey<FormState>();
 //  GlobalKey<FormFieldState<String>> _eKey = GlobalKey<FormFieldState<String>>();
 //  GlobalKey<FormFieldState<String>> _passwordKey = GlobalKey<FormFieldState<String>>();
@@ -24,15 +25,19 @@ String fullName = "";
 bool _isLoading = false;
 AuthService authService = AuthService();
 class _RegisterPageState extends State<RegisterPage> {
+  final registerFormKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _isLoading ? const Center(child: CircularProgressIndicator()) : SingleChildScrollView(
+      body: _isLoading ?  Center(child: SizedBox(
+          height: 150,
+          width: 100,
+          child: Lottie.network("https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json"))) : SingleChildScrollView(
         child: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 65.0),
             child: Form(
-              key: formKey,
+              key: registerFormKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -69,7 +74,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         });
                       },
                       validator: (val) {
-                        if (val!.isNotEmpty) {
+                        if (val!.isNotEmpty && val.length >2) {
                           return null;
                         } else {
                           return "Please Enter Your Full Name ";
@@ -166,7 +171,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void register() async{
-    if (formKey.currentState!.validate()) {
+    if (registerFormKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });

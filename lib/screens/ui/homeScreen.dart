@@ -9,6 +9,7 @@ import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key? key}) : super(key: key);
@@ -24,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
   AuthService authService = AuthService();
   bool _isLoading = false;
   String groupName = "";
+  bool _validate = false;
 
   @override
   initState() {
@@ -60,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     });
   }
-
+  final ValformKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -177,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      body: groupList(),
+      body:groupList(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           popUpDialog(context);
@@ -233,35 +235,50 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               content: ConstrainedBox(
                 constraints: const BoxConstraints(
-                  minHeight: 40,
-                  maxHeight: 60,
+                  minHeight: 35,
+                  maxHeight: 85,
                   maxWidth: 150,
                 ),
                 child: Column(
                   children: [
                     _isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : TextField(
-                            onChanged: (val) {
-                              setState(() {
-                                groupName = val;
-                              });
-                            },
-                            decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(21),
-                                  borderSide:
-                                      const BorderSide(color: Colors.blue)),
-                              errorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(21),
-                                  borderSide:
-                                      const BorderSide(color: Colors.red)),
-                              focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(21),
-                                  borderSide:
-                                      const BorderSide(color: Colors.blue)),
-                            ),
+                        ? Center(
+                            child: SizedBox(
+                                height: 50,
+                                width: 50,
+                                child: Lottie.network(
+                                    "https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")),
                           )
+                        : Form(
+                      key: ValformKey,
+                          child: TextFormField(
+                              onChanged: (val) {
+                                setState(() {
+                                  groupName = val;
+                                });
+                              },
+                      validator: (val) {
+                          return val!.length<2
+                              ? "Please Enter AtLeast 2 Characters"
+                              : null;
+                      },
+                              decoration: InputDecoration(
+                                errorText: _validate?"please Create Group First" : null,
+                                enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(21),
+                                    borderSide:
+                                        const BorderSide(color: Colors.blue)),
+                                errorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(21),
+                                    borderSide:
+                                        const BorderSide(color: Colors.red)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(21),
+                                    borderSide:
+                                        const BorderSide(color: Colors.blue)),
+                              ),
+                            ),
+                        )
                   ],
                 ),
               ),
@@ -277,23 +294,30 @@ class _HomeScreenState extends State<HomeScreen> {
                     )),
                 ElevatedButton(
                     onPressed: () {
-                      if (groupName != "" || groupName.isNotEmpty) {
+                      if (ValformKey.currentState!.validate() && groupName != "" || groupName.isNotEmpty &&   groupName.length>=2) {
                         setState(() {
+                        groupName.toString().isEmpty ?_validate=true : _validate=false;
                           _isLoading = true;
+
                         });
-                        DatabaseServices(
-                                uid: FirebaseAuth.instance.currentUser!.uid)
+
+                        DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
                             .createGroup(
                                 username,
                                 FirebaseAuth.instance.currentUser!.uid,
                                 groupName)
                             .whenComplete(() {
                           _isLoading = false;
+                          groupName = "";
                         });
                         Navigator.pop(context);
                         showSnackbar(context, Colors.green,
                             "Group Created Successfully");
                       }
+                    /*  if (groupName.isEmpty) {
+                        return showSnackbar(
+                            context, Colors.green, "Please Create Your Group");
+                      }*/
                     },
                     child: const Text(
                       "Create",

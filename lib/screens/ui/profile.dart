@@ -5,24 +5,25 @@ import 'package:chat/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
 class Profile extends StatefulWidget {
-  String? username ;
-  String? email ;
-   Profile({Key? key, this.username,this.email}) : super(key: key);
+  String? username;
+
+  String? email;
+
+  Profile({Key? key, this.username, this.email}) : super(key: key);
 
   @override
   State<Profile> createState() => _ProfileState();
 }
 
 class _ProfileState extends State<Profile> {
-  AuthService authService =AuthService();
+  AuthService authService = AuthService();
 
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("profile"),
-
       ),
-      drawer:Drawer(
+      drawer: Drawer(
         child: ListView(
           children: [
             const Icon(
@@ -52,9 +53,7 @@ class _ProfileState extends State<Profile> {
               ),
             ),
             ListTile(
-              onTap: () {
-              },
-
+              onTap: () {},
               leading: const Icon(Icons.person),
               title: const Text(
                 "Profile",
@@ -95,8 +94,9 @@ class _ProfileState extends State<Profile> {
                                 Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => const LoginPage()),
-                                        (route) => false);
+                                        builder: (context) =>
+                                            const LoginPage()),
+                                    (route) => false);
                               },
                               icon: const Icon(
                                 Icons.done,
@@ -117,28 +117,77 @@ class _ProfileState extends State<Profile> {
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
-
         children: [
-          const SizedBox(height: 75,),
-          const Icon(Icons.account_circle,size: 180,),
-          const SizedBox(height: 20,),
+          const SizedBox(
+            height: 75,
+          ),
+          const Icon(
+            Icons.account_circle,
+            size: 180,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text("Username",style: TextStyle(fontWeight: FontWeight.bold),),
-      const SizedBox(width: 20,),
-              Text(widget.username!,style: const TextStyle(fontWeight: FontWeight.bold),),
+              SizedBox(
+                width: 50,
+              ),
+              Text(
+                "Username",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(
+                height: 33,
+              ),
             ],
           ),
-          const SizedBox(height: 20,),
+          Container(
+            height: 60,
+            width: 350,
+            decoration: BoxDecoration(
+              color: Colors.blueGrey,
+              borderRadius: BorderRadius.circular(21),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+            child: Text(
+              widget.username!,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
             children: [
-              Text("Email",style: TextStyle(fontWeight: FontWeight.bold),),
-              const SizedBox(width: 20,),
-              Text(widget.email!,style: const TextStyle(fontWeight: FontWeight.bold),),
+              SizedBox(
+                width: 50,
+              ),
+              Text(
+                "Email",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(
+                height: 33,
+              ),
+
             ],
-          )
+
+          ),
+          Container(
+            height: 60,
+            width: 350,
+            decoration: BoxDecoration(
+              color: Colors.blueGrey,
+              borderRadius: BorderRadius.circular(21),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+            child:  Text(
+              widget.email!,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
         ],
       ),
     );

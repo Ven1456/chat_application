@@ -16,7 +16,7 @@ class SharedPref{
   }
   static Future<bool?> saveUserEmail(String isUserEmail) async{
     SharedPreferences sharedPreferences =await SharedPreferences.getInstance();
-    sharedPreferences.setString(userEmail,isUserEmail);
+   return await sharedPreferences.setString(userEmail,isUserEmail);
   }
 
   static Future <bool?> isUserLogin() async {

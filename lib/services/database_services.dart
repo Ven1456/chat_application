@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 
 class DatabaseServices {
   final String? uid;
@@ -22,7 +21,7 @@ class DatabaseServices {
       "uid": uid,
     });
   }
-
+  // getting user email data
   Future gettingUserEmail(String email) async {
     QuerySnapshot snapshot =
         await userCollection.where("email", isEqualTo: email).get();
@@ -46,7 +45,7 @@ class DatabaseServices {
       "recentMessage": "",
       "recentMessageSender": "",
     });
-
+    // update the members
     await groupDocumentReference.update({
       "members": FieldValue.arrayUnion(["{$uid}_$username"]),
       "groupId": groupDocumentReference.id,
@@ -77,10 +76,11 @@ class DatabaseServices {
   Future getGroupMembers(String groupId) async {
     return groupCollection.doc(groupId).snapshots();
   }
-
+  // search group name
   Future getSearchByName(String groupName) async {
     return groupCollection.where("groupName", isEqualTo: groupName).get();
   }
+  // search group not found
   Future searchByNameNotFound(String groupName) async {
     return groupCollection.where("groupName", isNotEqualTo: groupName).get();
   }

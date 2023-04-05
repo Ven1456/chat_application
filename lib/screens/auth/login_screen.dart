@@ -194,7 +194,7 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         _isLoading = true;
       });
-      await authService.loginWithUsernamePassword(email, password).then((value) async{
+      await authService.loginWithUsernamePassword(email, pass).then((value) async{
         if(value==true){
         QuerySnapshot snapshot = await DatabaseServices(uid:FirebaseAuth.instance.currentUser!.uid).gettingUserEmail(email);
 
@@ -203,7 +203,7 @@ class _LoginPageState extends State<LoginPage> {
         await SharedPref.saveUserName(
           snapshot.docs[0]["fullName"]
         );
-        await nextPage(context, HomeScreen());
+        nextPage(context, HomeScreen());
 
         }
         else

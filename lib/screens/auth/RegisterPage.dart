@@ -19,12 +19,13 @@ class RegisterPage extends StatefulWidget {
 //  GlobalKey<FormFieldState<String>> _eKey = GlobalKey<FormFieldState<String>>();
 //  GlobalKey<FormFieldState<String>> _passwordKey = GlobalKey<FormFieldState<String>>();
 //  GlobalKey<FormFieldState<String>> _fullNameKey = GlobalKey<FormFieldState<String>>();
-String email = "";
-String password = "";
-String fullName = "";
-bool _isLoading = false;
-AuthService authService = AuthService();
+
 class _RegisterPageState extends State<RegisterPage> {
+  String email = "";
+  String password = "";
+  String fullName = "";
+  bool _isLoading = false;
+  AuthService authService = AuthService();
   final registerFormKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {

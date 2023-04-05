@@ -1,12 +1,16 @@
+import 'dart:async';
+
 import 'package:chat/resources/Constants.dart';
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/auth/login_screen.dart';
 import 'package:chat/screens/ui/homeScreen.dart';
+import 'package:chat/screens/ui/splash_screen.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,22 +38,23 @@ class _MyAppState extends State<MyApp> {
 
   // This widget is the root of your application.
   @override
-  void initState() {
+  /*void initState() {
     // TODO: implement initState
     super.initState();
     isUserLogin();
-  }
+  }*/
 
-  isUserLogin() async {
+  /*isUserLogin() async {
     await SharedPref.isUserLogin().then((value) {
       if (value != null) {
         isLogin = value;
       }
     });
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -65,7 +70,8 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: isLogin ? HomeScreen() : LoginPage(),
+     home: const SplashScreen(),
+     /* home: isLogin ? HomeScreen() : LoginPage(),*/
     );
   }
 }

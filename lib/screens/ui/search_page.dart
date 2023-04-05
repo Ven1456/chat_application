@@ -23,6 +23,7 @@ class _SearchState extends State<Search> {
   User? user;
   bool noData = false;
   bool isUserJoined = false;
+  bool isTextFieldEmpty = true;
 
   @override
   void initState() {
@@ -69,15 +70,23 @@ class _SearchState extends State<Search> {
                       hintText: "Search Groups Here....",
                       hintStyle: TextStyle(color: Colors.white),
                     ),
+                        onChanged: (value){
+                          setState(() {
+                            isTextFieldEmpty = value.isEmpty;
+                          });
+                        },
                   )),
                   GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        hasUserSearched = true;
-                      });
-                      hasUserSearched ? initiateSearchMethod():
-                      dataNotFound();
+                        onTap: () {
+                       if(!isTextFieldEmpty){
+                         setState(() {
+                           hasUserSearched = true;
+                         });
+                         hasUserSearched ? initiateSearchMethod():
+                         dataNotFound();
+                       }
                       },
+
                     child: Container(
                       width: 40,
                       height: 40,

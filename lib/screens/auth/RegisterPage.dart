@@ -61,7 +61,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     height: 15,
                   ),
                   SizedBox(
-                    width: 350,
+                    width: 310,
                     child: TextFormField(
                       autovalidateMode: AutovalidateMode.onUserInteraction,
 
@@ -87,7 +87,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     height: 15,
                   ),
                   SizedBox(
-                    width: 350,
+                    width: 310,
                     child: TextFormField(
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       decoration: textInputDecoration.copyWith(
@@ -112,7 +112,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     height: 15,
                   ),
                   SizedBox(
-                    width: 350,
+                    width: 310,
                     child: TextFormField(
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       obscureText: true,
@@ -137,7 +137,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     height: 15,
                   ),
                   SizedBox(
-                    width: 350,
+                    width: 310,
                     child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(

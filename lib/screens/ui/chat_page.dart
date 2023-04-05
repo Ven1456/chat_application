@@ -4,6 +4,7 @@ import 'package:chat/screens/ui/message_tlle.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ChatPage extends StatefulWidget {
   String username;
@@ -72,6 +73,7 @@ class _ChatPageState extends State<ChatPage> {
       body: Stack(
         children: <Widget>[
           chatMessages(),
+
           Container(
             alignment: Alignment.bottomCenter,
             width: MediaQuery.of(context).size.width,
@@ -110,7 +112,7 @@ class _ChatPageState extends State<ChatPage> {
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -121,15 +123,20 @@ class _ChatPageState extends State<ChatPage> {
         stream: chats,
         builder: (context, AsyncSnapshot snapshot) {
           return snapshot.hasData
-              ? ListView.builder(
-                  itemCount: snapshot.data.docs.length,
-                  itemBuilder: (context, index) {
-                    return MessageTile(
-                        message: snapshot.data.docs[index]["message"],
-                        sendByMe: widget.username ==
-                            snapshot.data.docs[index]["sender"],
-                        sender: snapshot.data.docs[index]["sender"]);
-                  })
+              ? Padding(
+                padding: const EdgeInsets.only(bottom: 40.0),
+                child: ListView.builder(
+                    itemCount: snapshot.data.docs.length,
+                    itemBuilder: (context, index) {
+                      return MessageTile(
+                          message: snapshot.data.docs[index]["message"],
+                          sendByMe: widget.username ==
+                              snapshot.data.docs[index]["sender"],
+                          sender: snapshot.data.docs[index]["sender"],
+                        time:  snapshot.data.docs[index]["time"].toString(),
+                      );
+                    }),
+              )
               : Container();
         });
   }
@@ -139,7 +146,7 @@ class _ChatPageState extends State<ChatPage> {
       Map<String,dynamic> chatMessageMap = {
         "message":messageController.text,
         "sender":widget.username,
-        "time":DateTime.now().microsecondsSinceEpoch,
+        "time":DateFormat("hh:mm:ss a").format(DateTime.now())
       };
       DatabaseServices().sendMessage(widget.groupId, chatMessageMap);
       setState(() {

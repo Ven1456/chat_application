@@ -144,7 +144,7 @@ class _ProfileState extends State<Profile> {
           ),
           Container(
             height: 60,
-            width: 350,
+            width: 250,
             decoration: BoxDecoration(
               color: Colors.blueGrey,
               borderRadius: BorderRadius.circular(21),
@@ -177,7 +177,7 @@ class _ProfileState extends State<Profile> {
           ),
           Container(
             height: 60,
-            width: 350,
+            width: 250,
             decoration: BoxDecoration(
               color: Colors.blueGrey,
               borderRadius: BorderRadius.circular(21),

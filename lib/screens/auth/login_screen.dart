@@ -64,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
                           height: 350,
                         ),
                         SizedBox(
-                          width: 350,
+                          width: 310,
                           child: TextFormField(
                             autovalidateMode:
                                 AutovalidateMode.onUserInteraction,
@@ -91,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                           height: 15,
                         ),
                         SizedBox(
-                          width: 350,
+                          width: 310,
                           child: TextFormField(
                             autovalidateMode: AutovalidateMode.onUserInteraction,
                             obscureText: true,
@@ -128,7 +128,7 @@ class _LoginPageState extends State<LoginPage> {
                           height: 15,
                         ),
                         SizedBox(
-                          width: 350,
+                          width: 310,
                           child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                   shape: RoundedRectangleBorder(

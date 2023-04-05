@@ -122,8 +122,9 @@ class _SearchState extends State<Search> {
   }
 
   groupList() {
+
     return hasUserSearched
-        ? ListView.builder(
+        ? searchSnapshot?.docs.length != 0 ? ListView.builder(
             shrinkWrap: true,
             itemCount: searchSnapshot!.docs.length,
             itemBuilder: (context, index) {
@@ -132,7 +133,14 @@ class _SearchState extends State<Search> {
                   searchSnapshot!.docs[index]["groupId"],
                   searchSnapshot!.docs[index]["groupName"],
                   searchSnapshot!.docs[index]["admin"]);
-            })
+            }):const SizedBox(
+        height: 650,
+        child: Center(
+          child: Text(
+            "NO DATA FOUND",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ))
         : searchController.text.isEmpty
             ? const SizedBox(
                 height: 650,
@@ -141,15 +149,15 @@ class _SearchState extends State<Search> {
                     "SEARCH YOUR GROUP",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
-                )): Container();
-            /* const SizedBox(
-                height: 650,
-                child: Center(
-                  child: Text(
-                    "NO DATA FOUND",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                ))*/
+                ))  :  const SizedBox(
+        height: 650,
+        child: Center(
+          child: Text(
+            "NO DATA FOUND",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ));
+
   }
   joinedOrNot(
       String username, String groupId, String groupName, String admin) async {
@@ -260,9 +268,11 @@ class _SearchState extends State<Search> {
           .getSearchByName(searchController.text)
           .then((value) {
         setState(() {
+
           searchSnapshot = value;
           _isLoading = false;
           hasUserSearched = true;
+
         });
       });
     }

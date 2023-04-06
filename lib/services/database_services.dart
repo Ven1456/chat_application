@@ -65,6 +65,13 @@ class DatabaseServices {
         .orderBy("time")
         .snapshots();
   }
+  // delete user data
+  Future deleteUserData(String uid) async {
+    await userCollection.doc(uid).update({
+      "fullName": FieldValue.delete(),
+      "groups": FieldValue.delete(),
+    });
+  }
 
   Future getGroupAdmin(String groupId) async {
     DocumentReference documentReference = groupCollection.doc(groupId);

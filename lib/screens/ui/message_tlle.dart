@@ -44,7 +44,7 @@ class _MessageTileState extends State<MessageTile> {
         ),
         Column(
           children: [
-            Text(getDateForChat(widget.time)),
+           // Text(getDateForChat(widget.time)),
             Container(
               padding: EdgeInsets.only(
                 top: 4,
@@ -86,7 +86,7 @@ class _MessageTileState extends State<MessageTile> {
                           fontSize: 14,
                           color: Colors.white),
                     ),
-                    const SizedBox(
+                   const SizedBox(
                       height: 20,
                     ),
                   ],
@@ -96,7 +96,7 @@ class _MessageTileState extends State<MessageTile> {
 
             Padding(
               padding: widget.sendByMe ? const EdgeInsets.only(left: 240.0) :const EdgeInsets.only(right: 240.0) ,
-              child: Text(widget.time),
+              child: Text(getDateForChat(widget.time)),
             )
           ],
         ),
@@ -113,10 +113,26 @@ class _MessageTileState extends State<MessageTile> {
           ),
         ) : Container(),
 
+        SizedBox(height: 50,),
+
       ],
     );
   }
   static String getDateForChat(String datetime) {
+
+    double time = int.parse(datetime) / 1000;
+    // Create a DateTime object from the millisecond timestamp
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(time.toInt());
+
+// Format the DateTime object to display only the time in jm format
+    String formattedTime = DateFormat.jm().format(date);
+
+// Print the formatted time
+
+    return formattedTime;
+  }
+
+ /* static String getDateForChat(String datetime) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = DateTime(now.year, now.month, now.day - 1);
@@ -132,5 +148,5 @@ class _MessageTileState extends State<MessageTile> {
     } else {
       return DateFormat('dd-MM-yyyy').format(dateToCheck);
     }
-  }
+  }*/
 }

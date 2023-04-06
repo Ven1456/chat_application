@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/ui/group_info.dart';
 import 'package:chat/screens/ui/message_tlle.dart';
@@ -23,15 +25,28 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  final ScrollController _scrollController = ScrollController();
   Stream<QuerySnapshot>? chats;
   String adminName = "";
+  bool isLoadingAnimation = false;
   final TextEditingController messageController = TextEditingController();
 
   @override
   void initState() {
     getChatAndAdminName();
+
     // TODO: implement initState
     super.initState();
+      setState(() {
+        isLoadingAnimation = true;
+
+      });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void getChatAndAdminName() {
@@ -64,53 +79,49 @@ class _ChatPageState extends State<ChatPage> {
                         groupName: widget.groupName,
                         groupId: widget.groupId));
               },
-              child: Icon(Icons.info)),
-          SizedBox(
+              child: const Icon(Icons.info)),
+          const SizedBox(
             width: 20,
           ),
         ],
       ),
-      body: Stack(
-        children: <Widget>[
-          chatMessages(),
-
+      body: Column(
+        children: [
+          Expanded(
+            child: chatMessages(),
+          ),
           Container(
-            alignment: Alignment.bottomCenter,
-            width: MediaQuery.of(context).size.width,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-              width: MediaQuery.of(context).size.width,
-              color: Colors.grey[500],
-              child: Row(
-                children: [
-                  Expanded(
-                      child: TextFormField(
-                    controller: messageController,
-                    style: TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      hintText: "Send a Message",
-                      border: InputBorder.none,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            color: Colors.grey[500],
+            child: Row(
+              children: [
+                Expanded(
+                    child: TextFormField(
+                  controller: messageController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                    hintText: "Send a Message",
+                    border: InputBorder.none,
+                  ),
+                )),
+                GestureDetector(
+                  onTap: () {
+                    sendMessages();
+                  },
+                  child: Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(21),
+                      color: Colors.blue,
                     ),
-                  )),
-                  GestureDetector(
-                    onTap: () {
-                      sendMessages();
-                    },
-                    child: Container(
-                      height: 50,
-                      width: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(21),
-                        color: Colors.blue,
-                      ),
-                      child: Icon(
-                        Icons.send,
-                        color: Colors.white,
-                      ),
+                    child: const Icon(
+                      Icons.send,
+                      color: Colors.white,
                     ),
-                  )
-                ],
-              ),
+                  ),
+                )
+              ],
             ),
           ),
         ],
@@ -118,7 +129,122 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  // function to convert time stamp to date
+  static DateTime returnDateAndTimeFormat(String time) {
+    var dt = DateTime.fromMicrosecondsSinceEpoch(int.parse(time));
+    var originalDate = DateFormat('MM/dd/yyyy').format(dt);
+    return DateTime(dt.year, dt.month, dt.day);
+  }
+
+  // function to return date if date changes based on your local date and time
+  static String groupMessageDateAndTime(String time) {
+    var dt = DateTime.fromMicrosecondsSinceEpoch(int.parse(time.toString()));
+    var originalDate = DateFormat('MM/dd/yyyy').format(dt);
+
+    final todayDate = DateTime.now();
+
+    final today = DateTime(todayDate.year, todayDate.month, todayDate.day);
+    final yesterday =
+        DateTime(todayDate.year, todayDate.month, todayDate.day - 1);
+    String difference = '';
+    final aDate = DateTime(dt.year, dt.month, dt.day);
+
+    if (aDate == today) {
+      difference = "Today";
+    } else if (aDate == yesterday) {
+      difference = "Yesterday";
+    } else {
+      difference = DateFormat.yMMMd().format(dt).toString();
+    }
+
+    return difference;
+  }
+
   chatMessages() {
+    return StreamBuilder(
+      stream: chats,
+      builder: (context, AsyncSnapshot snapshot) {
+        isLoadingAnimation ? WidgetsBinding.instance.addPostFrameCallback((_) async {
+          // Scroll to the last item in the list
+          if (_scrollController.hasClients) {
+            Timer(
+                const Duration(seconds: 2),
+                () => _scrollController
+                    .jumpTo(_scrollController.position.maxScrollExtent));
+          }
+        }) : "";
+        return snapshot.hasData
+            ? Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                        padding: const EdgeInsets.only(bottom: 28.0),
+                        controller: _scrollController,
+                        itemCount: snapshot.data.docs.length,
+                        itemBuilder: (context, index) {
+                          bool isSameDate = false;
+                          String? newDate = '';
+
+                          final DateTime date = returnDateAndTimeFormat(
+                              snapshot.data.docs[index]["time"].toString());
+
+                          if (index == 0) {
+                            newDate = groupMessageDateAndTime(snapshot
+                                    .data.docs[index]["time"]
+                                    .toString())
+                                .toString();
+                          } else {
+                            final DateTime date = returnDateAndTimeFormat(
+                                snapshot.data.docs[index]["time"].toString());
+                            final DateTime prevDate = returnDateAndTimeFormat(
+                                snapshot.data.docs[index - 1]["time"]
+                                    .toString());
+                            isSameDate = date.isAtSameMomentAs(prevDate);
+
+                            newDate = isSameDate
+                                ? ''
+                                : groupMessageDateAndTime(snapshot
+                                        .data.docs[index]["time"]
+                                        .toString())
+                                    .toString();
+                          }
+                          return Column(
+                            children: [
+                              if (newDate.isNotEmpty)
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 10),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.lightGreen,
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(newDate),
+                                    ),
+                                  ),
+                                ),
+                              MessageTile(
+                                message: snapshot.data.docs[index]["message"],
+                                sendByMe: widget.username ==
+                                    snapshot.data.docs[index]["sender"],
+                                sender: snapshot.data.docs[index]["sender"],
+                                time: snapshot.data.docs[index]["time"]
+                                    .toString(),
+                              ),
+                            ],
+                          );
+                        }),
+                  ),
+                ],
+              )
+            : Container();
+      },
+    );
+  }
+
+/*  chatMessages() {
     return StreamBuilder(
         stream: chats,
         builder: (context, AsyncSnapshot snapshot) {
@@ -128,25 +254,65 @@ class _ChatPageState extends State<ChatPage> {
                 child: ListView.builder(
                     itemCount: snapshot.data.docs.length,
                     itemBuilder: (context, index) {
-                      return MessageTile(
-                          message: snapshot.data.docs[index]["message"],
-                          sendByMe: widget.username ==
+                      print(":${snapshot.data.docs.length}");
+                      bool isSameDate = false;
+                      String? newDate = '';
+
+                      final DateTime date = returnDateAndTimeFormat(snapshot.data.docs[index]["time"].toString());
+
+
+                      if(index == 0  && snapshot.data.docs.length ==  1){
+                        newDate =  groupMessageDateAndTime(snapshot.data.docs[index]["time"].toString()).toString();
+                      }else if(index == snapshot.data.docs.length - 1){
+                        newDate =  groupMessageDateAndTime(snapshot.data.docs[index]["time"].toString()).toString();
+                      }else {
+
+                        final DateTime date = returnDateAndTimeFormat(snapshot.data.docs[index]["time"].toString());
+                        final DateTime prevDate = returnDateAndTimeFormat(snapshot.data.docs[index + 1]["time"].toString());
+                        isSameDate = date.isAtSameMomentAs(prevDate);
+
+                        newDate =  isSameDate ?  "": groupMessageDateAndTime(snapshot.data.docs[index-1]["time"].toString()).toString() ;
+                      }
+
+                      return Column(
+                        children: [
+                          if(newDate.isNotEmpty)
+                            Center(child:
+                            Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.lightGreen,
+                                    borderRadius: BorderRadius.circular(20)
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(newDate),
+                                ))),
+                          MessageTile(
+                              message: snapshot.data.docs[index]["message"],
+                              sendByMe: widget.username ==
                               snapshot.data.docs[index]["sender"],
-                          sender: snapshot.data.docs[index]["sender"],
-                        time:  snapshot.data.docs[index]["time"].toString(),
+                              sender: snapshot.data.docs[index]["sender"],
+                              time:  snapshot.data.docs[index]["time"].toString(),
+                          ),
+                        ],
                       );
                     }),
               )
               : Container();
         });
-  }
+  }*/
 
   sendMessages() {
-    if(messageController.text.isNotEmpty){
-      Map<String,dynamic> chatMessageMap = {
-        "message":messageController.text,
-        "sender":widget.username,
-        "time":DateFormat("hh:mm:ss a").format(DateTime.now())
+    if (messageController.text.isNotEmpty) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+      Map<String, dynamic> chatMessageMap = {
+        "message": messageController.text,
+        "sender": widget.username,
+        "time": DateTime.now().microsecondsSinceEpoch
       };
       DatabaseServices().sendMessage(widget.groupId, chatMessageMap);
       setState(() {

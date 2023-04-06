@@ -1,5 +1,10 @@
+import 'dart:async';
+
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/ui/chat_page.dart';
+import 'package:chat/services/auth_service.dart';
+import 'package:chat/services/database_services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class GroupTile extends StatefulWidget {
@@ -19,11 +24,37 @@ class GroupTile extends StatefulWidget {
 }
 
 class _GroupTileState extends State<GroupTile> {
+  AuthService authService = AuthService();
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-        nextPage(context, ChatPage(username: widget.username, groupName: widget.groupName, groupId: widget.groupId));
+         nextPage(context, ChatPage(username: widget.username, groupName: widget.groupName, groupId: widget.groupId));
+      },
+      onLongPressStart: ( details) {
+        final offset = details.globalPosition;
+        showMenu(context: context, position:  RelativeRect.fromLTRB(
+          offset.dx,
+          offset.dy,
+          offset.dx + 1,
+          offset.dy + 1,
+        ), items: [
+          PopupMenuItem(
+            onTap: (){
+            /*  DatabaseServices().deleteUserData(FirebaseAuth.instance.currentUser!.uid).then((value)
+
+              {
+              });*/
+            },
+            child: Text("Delete"),
+          ),
+
+          PopupMenuItem(
+            child: Text("Close"),
+          ),
+
+
+        ]);
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
@@ -40,4 +71,26 @@ class _GroupTileState extends State<GroupTile> {
       ),
     );
   }
+  final List<String> options = ['Option 1', 'Option 2', 'Option 3'];
+
+  void _showMenu(BuildContext context, Offset position) async {
+    final RenderBox overlay = Overlay.of(context)!.context.findRenderObject() as RenderBox;
+
+    final selected = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromRect(
+        Rect.fromPoints(position, position),
+        Offset.zero & overlay.size,
+      ),
+      items: options.map((String option) {
+        return PopupMenuItem<String>(
+          value: option,
+          child: Text(option),
+        );
+      }).toList(),
+    );
+
+   
+  }
+
 }

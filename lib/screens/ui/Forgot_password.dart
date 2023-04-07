@@ -8,14 +8,14 @@ class ForgetPassword extends StatefulWidget {
   State<ForgetPassword> createState() => _ForgetPasswordState();
 }
 class _ForgetPasswordState extends State<ForgetPassword> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
-  bool isloading = false;
+  bool isLoading = false;
   var emailController = TextEditingController();
   var passTextController = TextEditingController();
   var nameController = TextEditingController();
   String? userEmail = FirebaseAuth.instance.currentUser?.email;
-  bool isemail = false;
+  bool isEmail = false;
   @override
   void initState() {
     // TODO: implement initState
@@ -102,7 +102,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
   Future<void> _CreateanaccountBuildMethod(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       setState(() {
-        isloading = true;
+        isLoading = true;
       });
       // await _signup.Signupservice(
       //     email: emailController.text,
@@ -110,7 +110,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
       //     name: nameController.text,
       //     context: context);
       setState(() {
-        isloading = false;
+        isLoading = false;
       });
     }
   }

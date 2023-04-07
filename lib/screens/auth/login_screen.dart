@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:toast/toast.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -35,8 +36,8 @@ class _LoginPageState extends State<LoginPage> {
       body: Center(
         child: _isLoading
             ?Center(child: SizedBox(
-            height: 250,
-            width: 150,
+            height: 150,
+            width: 100,
             child: Lottie.network("https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")))
             : SingleChildScrollView(
                 child: Padding(
@@ -80,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
                             },
                             validator: (val) {
                               return RegExp(
-                                          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                          r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
                                       .hasMatch(val!)
                                   ? null
                                   : "Please Enter Correct Email";
@@ -203,12 +204,22 @@ class _LoginPageState extends State<LoginPage> {
         await SharedPref.saveUserName(
           snapshot.docs[0]["fullName"]
         );
-        nextPage(context, HomeScreen());
+        nextPage(context, const HomeScreen());
 
         }
         else
           {
-            showSnackbar(context, Colors.red, value);
+            ToastContext toastContext = ToastContext();
+            toastContext.init(context);
+            Toast.show(
+              value,
+              duration: Toast.lengthShort,
+              rootNavigator: true,
+              gravity: Toast.bottom,
+              webShowClose: true,
+              backgroundColor: Colors.red,
+            );
+          /*  showSnackbar(context, Colors.red, value);*/
             setState(() {
               _isLoading =false;
             });

@@ -168,7 +168,7 @@ class _ChatPageState extends State<ChatPage> {
           // Scroll to the last item in the list
           if (_scrollController.hasClients) {
             Timer(
-                const Duration(seconds: 2),
+                const Duration(milliseconds: 2),
                 () => _scrollController
                     .jumpTo(_scrollController.position.maxScrollExtent));
           }

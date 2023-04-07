@@ -1,10 +1,7 @@
-import 'dart:async';
 
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/ui/chat_page.dart';
 import 'package:chat/services/auth_service.dart';
-import 'package:chat/services/database_services.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class GroupTile extends StatefulWidget {
@@ -46,10 +43,10 @@ class _GroupTileState extends State<GroupTile> {
               {
               });*/
             },
-            child: Text("Delete"),
+            child: const Text("Delete"),
           ),
 
-          PopupMenuItem(
+          const PopupMenuItem(
             child: Text("Close"),
           ),
 
@@ -63,34 +60,12 @@ class _GroupTileState extends State<GroupTile> {
               child: Text(
             widget.groupName.substring(0, 2).toUpperCase(),
             textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           )),
-          title: Text(widget.groupName.toString(), style: TextStyle(fontWeight: FontWeight.bold),),
-          subtitle: Text("Join the Conversation as the ${widget.username.toString()}" ,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13)),
+          title: Text(widget.groupName.toString(), style: const TextStyle(fontWeight: FontWeight.bold),),
+          subtitle: Text("Join the Conversation as the ${widget.username.toString()}" ,style: const TextStyle(fontWeight: FontWeight.bold,fontSize: 13)),
         ),
       ),
     );
   }
-  final List<String> options = ['Option 1', 'Option 2', 'Option 3'];
-
-  void _showMenu(BuildContext context, Offset position) async {
-    final RenderBox overlay = Overlay.of(context)!.context.findRenderObject() as RenderBox;
-
-    final selected = await showMenu<String>(
-      context: context,
-      position: RelativeRect.fromRect(
-        Rect.fromPoints(position, position),
-        Offset.zero & overlay.size,
-      ),
-      items: options.map((String option) {
-        return PopupMenuItem<String>(
-          value: option,
-          child: Text(option),
-        );
-      }).toList(),
-    );
-
-   
-  }
-
 }

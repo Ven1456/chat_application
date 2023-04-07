@@ -18,6 +18,7 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   AuthService authService = AuthService();
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -44,7 +45,7 @@ class _ProfileState extends State<Profile> {
             ),
             ListTile(
               onTap: () {
-                replaceScreen(context, HomeScreen());
+                replaceScreen(context, const HomeScreen());
               },
               leading: const Icon(Icons.group),
               title: const Text(
@@ -129,7 +130,7 @@ class _ProfileState extends State<Profile> {
             height: 20,
           ),
           Row(
-            children: [
+            children: const [
               SizedBox(
                 width: 50,
               ),
@@ -137,7 +138,7 @@ class _ProfileState extends State<Profile> {
                 "Username",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              const SizedBox(
+              SizedBox(
                 height: 33,
               ),
             ],
@@ -149,7 +150,7 @@ class _ProfileState extends State<Profile> {
               color: Colors.blueGrey,
               borderRadius: BorderRadius.circular(21),
             ),
-            padding: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
             child: Text(
               widget.username!,
               style: const TextStyle(fontWeight: FontWeight.bold),
@@ -160,7 +161,7 @@ class _ProfileState extends State<Profile> {
           ),
           Row(
 
-            children: [
+            children: const [
               SizedBox(
                 width: 50,
               ),
@@ -168,7 +169,7 @@ class _ProfileState extends State<Profile> {
                 "Email",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              const SizedBox(
+              SizedBox(
                 height: 33,
               ),
 
@@ -182,7 +183,7 @@ class _ProfileState extends State<Profile> {
               color: Colors.blueGrey,
               borderRadius: BorderRadius.circular(21),
             ),
-            padding: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
             child:  Text(
               widget.email!,
               style: const TextStyle(fontWeight: FontWeight.bold),

@@ -7,6 +7,7 @@ import 'package:chat/services/auth_service.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:toast/toast.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -187,7 +188,16 @@ class _RegisterPageState extends State<RegisterPage> {
         else
           {
         setState(() {
-          showSnackbar(context, Colors.red, value);
+          ToastContext toastContext = ToastContext();
+          toastContext.init(context);
+          Toast.show(
+            value,
+            duration: Toast.lengthShort,
+            rootNavigator: true,
+            gravity: Toast.bottom,
+            webShowClose: true,
+            backgroundColor: Colors.red,
+          );
           _isLoading = false;
         });
           }

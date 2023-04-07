@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:toast/toast.dart';
 
 class Search extends StatefulWidget {
   const Search({Key? key}) : super(key: key);
@@ -30,6 +31,12 @@ class _SearchState extends State<Search> {
     // TODO: implement initState
     super.initState();
     getCurrentUserIdAndName();
+    searchController.addListener(() {
+      if (searchController.text.isNotEmpty) {
+        initiateSearchMethod();
+      }
+    });
+
   }
 
   getCurrentUserIdAndName() async {
@@ -41,6 +48,13 @@ class _SearchState extends State<Search> {
 
   String getName(String res) {
     return res.substring(res.indexOf("_") + 1);
+  }
+  @override
+  void dispose() {
+   if(searchController.text.isEmpty){
+     searchController.removeListener(initiateSearchMethod);
+   }
+    super.dispose();
   }
 
   @override
@@ -73,6 +87,9 @@ class _SearchState extends State<Search> {
                         onChanged: (value){
                           setState(() {
                             isTextFieldEmpty = value.isEmpty;
+                            if(isTextFieldEmpty){
+                              _isLoading = false;
+                            }
                           });
                         },
                   )),
@@ -122,7 +139,6 @@ class _SearchState extends State<Search> {
   }
 
   groupList() {
-
     return hasUserSearched
         ? searchSnapshot?.docs.length != 0 ? ListView.builder(
             shrinkWrap: true,
@@ -198,8 +214,18 @@ class _SearchState extends State<Search> {
             setState(() {
               isUserJoined = !isUserJoined;
             });
-            showSnackbar(context, Colors.green, "Successfully Joined Group");
-            Future.delayed(const Duration(seconds: 1), () {
+            ToastContext toastContext = ToastContext();
+            toastContext.init(context);
+            Toast.show(
+              "Successfully Joined Group",
+              duration: Toast.lengthShort,
+              rootNavigator: true,
+              gravity: Toast.bottom,
+              webShowClose: true,
+              backgroundColor: Colors.green,
+            );
+        /*showSnackbar(context, Colors.green, "Successfully Joined Group");*/
+            Future.delayed(const Duration(milliseconds: 1), () {
               nextPage(
                   context,
                   ChatPage(
@@ -210,7 +236,17 @@ class _SearchState extends State<Search> {
           } else {
             setState(() {
               isUserJoined = !isUserJoined;
-              showSnackbar(context, Colors.red, "Left the  Group $groupName");
+              ToastContext toastContext = ToastContext();
+              toastContext.init(context);
+              Toast.show(
+                "Left the  Group $groupName",
+                duration: Toast.lengthShort,
+                rootNavigator: true,
+                gravity: Toast.bottom,
+                webShowClose: true,
+                backgroundColor: Colors.red,
+              );
+             /* showSnackbar(context, Colors.red, "Left the  Group $groupName");*/
             });
           }
         },
@@ -219,8 +255,8 @@ class _SearchState extends State<Search> {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.blue,
-                    boxShadow: [
-                      const BoxShadow(
+                    boxShadow: const [
+                      BoxShadow(
                         color: Colors.white,
                         offset: Offset(0.0, 0.0),
                         blurRadius: 0.0,
@@ -241,8 +277,8 @@ class _SearchState extends State<Search> {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.blue,
-                    boxShadow: [
-                      const BoxShadow(
+                    boxShadow: const [
+                      BoxShadow(
                         color: Colors.white,
                         offset: Offset(0.0, 0.0),
                         blurRadius: 0.0,
@@ -260,39 +296,36 @@ class _SearchState extends State<Search> {
   }
 
   initiateSearchMethod() async {
-    if (searchController.text.isNotEmpty) {
+    setState(() {
+      _isLoading = true;
+    });
+    String query = searchController.text.trim();
+    if (query.isEmpty) {
       setState(() {
-        _isLoading = true;
+        searchSnapshot = null;
+        _isLoading = false;
+        hasUserSearched = false;
       });
-      await DatabaseServices()
-          .getSearchByName(searchController.text)
-          .then((value) {
-        setState(() {
-
-          searchSnapshot = value;
-          _isLoading = false;
-          hasUserSearched = true;
-
-        });
-      });
+      return;
     }
-    /*else if{
-      print("ddd");
-      noData ? const Center(child: Text("No Data Found"),) : const SizedBox();
-    }*/
-    /*  else if (searchController.text.isEmpty) {
-      await DatabaseServices()
-          .getSearchByName(searchController.text)
-          .then((value) {
-        setState(() {
-          searchSnapshot = value;
-          _isLoading = false;
-          hasUserSearched = true;
-        });
+    await DatabaseServices()
+        .getSearchByTextFieldName(query)
+        .then((value) {
+      if (searchController.text.trim() != query) {
+        // The query has changed since we started searching, so discard the results
+        return;
+      }
+      setState(() {
+        searchSnapshot = value;
+        _isLoading = false;
+        hasUserSearched = true;
       });
-      Center(child: Text("No Data Found"));
-    }*/
+    });
   }
+
+
+
+
 
   dataNotFound() async {
     if (searchController.text.length > 1) {

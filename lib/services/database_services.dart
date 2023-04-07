@@ -36,6 +36,13 @@ class DatabaseServices {
 
 // creating Group Collection
   Future createGroup(String username, String id, String groupName) async {
+    QuerySnapshot querySnapshot = await groupCollection
+        .where("groupName", isEqualTo: groupName)
+        .get();
+    if (querySnapshot.docs.isNotEmpty) {
+      // A group with the same name already exists, so return null to indicate failure
+      return null;
+    }
     DocumentReference groupDocumentReference = await groupCollection.add({
       "groupName": groupName,
       "groupIcon": "",
@@ -47,15 +54,16 @@ class DatabaseServices {
     });
     // update the members
     await groupDocumentReference.update({
-      "members": FieldValue.arrayUnion(["{$uid}_$username"]),
+      "members": FieldValue.arrayUnion(["${id}_$username"]),
       "groupId": groupDocumentReference.id,
     });
-    DocumentReference userDocumentReference = userCollection.doc(uid);
+    DocumentReference userDocumentReference = userCollection.doc(id);
     return await userDocumentReference.update({
       "groups":
-          FieldValue.arrayUnion(["${groupDocumentReference.id}_$groupName"])
+      FieldValue.arrayUnion(["${groupDocumentReference.id}_$groupName"])
     });
   }
+
 
 // GETTING CHARTS
   Future getCharts(String groupId) async {
@@ -65,6 +73,7 @@ class DatabaseServices {
         .orderBy("time")
         .snapshots();
   }
+
   // delete user data
   Future deleteUserData(String uid) async {
     await userCollection.doc(uid).update({
@@ -83,13 +92,23 @@ class DatabaseServices {
   Future getGroupMembers(String groupId) async {
     return groupCollection.doc(groupId).snapshots();
   }
+
   // search group name
   Future getSearchByName(String groupName) async {
     return groupCollection.where("groupName", isEqualTo: groupName).get();
   }
+
   // search group not found
   Future searchByNameNotFound(String groupName) async {
     return groupCollection.where("groupName", isNotEqualTo: groupName).get();
+  }
+  // search groups
+  Future<QuerySnapshot> getSearchByTextFieldName(String searchField) async {
+    return await FirebaseFirestore.instance
+        .collection("groups")
+        .where("groupName", isGreaterThanOrEqualTo: searchField)
+        .where("groupName", isLessThan: '$searchField\uf8ff')
+        .get();
   }
 
 
@@ -120,25 +139,23 @@ class DatabaseServices {
       await groupDocumentReference.update({
         "members": FieldValue.arrayRemove(["${uid}_$userName"])
       });
+    } else {
+      await userDocumentReference.update({
+        "groups": FieldValue.arrayUnion(["${groupId}_$groupName"])
+      });
+      await groupDocumentReference.update({
+        "members": FieldValue.arrayUnion(["${uid}_$userName"])
+      });
     }
-    else
-      {
-        await userDocumentReference.update({
-          "groups": FieldValue.arrayUnion(["${groupId}_$groupName"])
-        });
-        await groupDocumentReference.update({
-          "members": FieldValue.arrayUnion(["${uid}_$userName"])
-        });
-      }
   }
 
   // send message
-sendMessage(String groupId,Map<String,dynamic> chatMessageData) async {
+  sendMessage(String groupId, Map<String, dynamic> chatMessageData) async {
     groupCollection.doc(groupId).collection("messages").add(chatMessageData);
     groupCollection.doc(groupId).update({
-      "recentMessage":chatMessageData["message"],
-      "recentMessageSender":chatMessageData["sender"],
-      "recentMessageTime":chatMessageData["time"].toString(),
+      "recentMessage": chatMessageData["message"],
+      "recentMessageSender": chatMessageData["sender"],
+      "recentMessageTime": chatMessageData["time"].toString(),
     });
-}
+  }
 }

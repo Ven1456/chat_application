@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import "package:flutter/foundation.dart";
 
 class MessageTile extends StatefulWidget {
   String message;
@@ -55,9 +56,9 @@ class _MessageTileState extends State<MessageTile> {
               child: Container(
                 width: 240,
                 margin: widget.sendByMe
-                    ? EdgeInsets.only(left: 120)
-                    : EdgeInsets.only(right: 120),
-                padding: EdgeInsets.only(top: 17, left: 20, right: 20),
+                    ? const EdgeInsets.only(left: 55) //120 default value
+                    : const EdgeInsets.only(right: 55), //120 default value
+                padding: const EdgeInsets.only(top: 17, left: 20, right: 20),
                 decoration: BoxDecoration(
                     borderRadius: widget.sendByMe
                         ? const BorderRadius.only(
@@ -113,7 +114,7 @@ class _MessageTileState extends State<MessageTile> {
           ),
         ) : Container(),
 
-        SizedBox(height: 50,),
+        const SizedBox(height: 50,),
 
       ],
     );

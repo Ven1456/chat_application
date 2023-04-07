@@ -1,18 +1,20 @@
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/widget.dart';
-import 'package:chat/screens/auth/RegisterPage.dart';
 import 'package:chat/screens/auth/login_screen.dart';
 import 'package:chat/screens/ui/group_Tile.dart';
 import 'package:chat/screens/ui/profile.dart';
 import 'package:chat/screens/ui/search_page.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/database_services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import 'package:lottie/lottie.dart';
+import 'package:toast/toast.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -22,10 +24,11 @@ class _HomeScreenState extends State<HomeScreen> {
   String username = "";
   String email = "";
   Stream? groups;
+  QuerySnapshot? searchSnapshot;
   AuthService authService = AuthService();
   bool _isLoading = false;
   String groupName = "";
-  bool _validate = false;
+  final TextEditingController textEditingController = TextEditingController();
 
   @override
   initState() {
@@ -62,7 +65,10 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     });
   }
-  final ValformKey = GlobalKey<FormState>();
+
+  final valFormKey = GlobalKey<FormState>();
+  bool isGroup = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,8 +165,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            const LoginPage()),
-                                    (route) => false);
+                                        const LoginPage()),
+                                        (route) => false);
                               },
                               icon: const Icon(
                                 Icons.done,
@@ -179,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      body:groupList(),
+      body: groupList(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           popUpDialog(context);
@@ -201,9 +207,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemCount: snapshot.data["groups"].length,
                   itemBuilder: (BuildContext context, int index) {
                     // reverse the index value
-                    int reverseIndex = snapshot.data["groups"].length-index- 1;
+                    int reverseIndex = snapshot.data["groups"].length - index -
+                        1;
                     return GroupTile(
-                        groupName: getName(snapshot.data["groups"][reverseIndex]),
+                        groupName: getName(
+                            snapshot.data["groups"][reverseIndex]),
                         username: snapshot.data["fullName"],
                         groupId: getId(snapshot.data["groups"][reverseIndex]));
                   },
@@ -227,6 +235,8 @@ class _HomeScreenState extends State<HomeScreen> {
         barrierDismissible: false,
         context: context,
         builder: (context) {
+          textEditingController.clear();
+          _isLoading=false;
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
               title: const Text(
@@ -243,42 +253,44 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     _isLoading
                         ? Center(
-                            child: SizedBox(
-                                height: 50,
-                                width: 50,
-                                child: Lottie.network(
-                                    "https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")),
-                          )
+                      child: SizedBox(
+                          height: 50,
+                          width: 50,
+                          child: Lottie.network(
+                              "https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")),
+                    )
                         : Form(
-                      key: ValformKey,
-                          child: TextFormField(
-                              onChanged: (val) {
-                                setState(() {
-                                  groupName = val;
-                                });
-                              },
-                      validator: (val) {
-                          return val!.length<2
-                              ? "Please Enter AtLeast 2 Characters"
-                              : null;
-                      },
-                              decoration: InputDecoration(
-                                errorText: _validate?"please Create Group First" : null,
-                                enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(21),
-                                    borderSide:
-                                        const BorderSide(color: Colors.blue)),
-                                errorBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(21),
-                                    borderSide:
-                                        const BorderSide(color: Colors.red)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(21),
-                                    borderSide:
-                                        const BorderSide(color: Colors.blue)),
-                              ),
-                            ),
-                        )
+                      key: valFormKey,
+                      child: TextFormField(
+                        controller: textEditingController,
+                        onChanged: (val) {
+                          setState(() {
+                            groupName = val;
+                          });
+                        },
+                        validator: (val) {
+                          if (val!.length < 2) {
+                            return "Please Enter AtLeast 2 Characters";
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          /*     errorText: isGroup ? _groupNameError : null,*/
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(21),
+                              borderSide:
+                              const BorderSide(color: Colors.blue)),
+                          errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(21),
+                              borderSide:
+                              const BorderSide(color: Colors.red)),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(21),
+                              borderSide:
+                              const BorderSide(color: Colors.blue)),
+                        ),
+                      ),
+                    )
                   ],
                 ),
               ),
@@ -290,39 +302,72 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: const Text(
                       "Cancel",
                       style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     )),
                 ElevatedButton(
-                    onPressed: () {
-                      if (ValformKey.currentState!.validate() && groupName != "" || groupName.isNotEmpty &&   groupName.length>=2) {
+                    onPressed: () async {
+                      if (valFormKey.currentState!.validate() &&
+                          groupName != "" && groupName.isNotEmpty &&
+                          groupName.length >= 2) {
                         setState(() {
-                        groupName.toString().isEmpty ?_validate=true : _validate=false;
+                          /*groupName.toString().isEmpty ?_validate=true : _validate=false;*/
                           _isLoading = true;
-
                         });
 
-                        DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
-                            .createGroup(
-                                username,
-                                FirebaseAuth.instance.currentUser!.uid,
-                                groupName)
-                            .whenComplete(() {
-                          _isLoading = false;
-                          groupName = "";
-                        });
+                        QuerySnapshot querySnapshot = await DatabaseServices()
+                            .groupCollection
+                            .where("groupName", isEqualTo: groupName)
+                            .get();
+                        if (querySnapshot.docs.isNotEmpty) {
+                          ToastContext toastContext = ToastContext();
+                          toastContext.init(context);
+                          Toast.show(
+                            "Group with the same name already exists",
+                            duration: Toast.lengthShort,
+                            rootNavigator: true,
+                            gravity: Toast.bottom,
+                            webShowClose: true,
+                            backgroundColor: Colors.red
+                            ,
+                          );
+                          // A group with the same name already exists, so show error message
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          return;
+                        }
+
+                          DatabaseServices(
+                              uid: FirebaseAuth.instance.currentUser!.uid)
+                              .createGroup(
+                              username,
+                              FirebaseAuth.instance.currentUser!.uid,
+                              groupName)
+                              .whenComplete(() {
+                            _isLoading = false;
+                            groupName = "";
+                          });
+                        //
+                        ToastContext toastContext = ToastContext();
+                        toastContext.init(context);
+                        Toast.show(
+                          "Group Created Successfully",
+                          duration: Toast.lengthShort,
+                          rootNavigator: true,
+                          gravity: Toast.bottom,
+                          webShowClose: true,
+                          backgroundColor: Colors.green,
+                        );
                         Navigator.pop(context);
+                       /*
                         showSnackbar(context, Colors.green,
-                            "Group Created Successfully");
+                            "Group Created Successfully");*/
                       }
-                    /*  if (groupName.isEmpty) {
-                        return showSnackbar(
-                            context, Colors.green, "Please Create Your Group");
-                      }*/
                     },
                     child: const Text(
                       "Create",
                       style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     )),
               ],
             );

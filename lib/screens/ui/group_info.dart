@@ -68,7 +68,7 @@ class _GroupInfoState extends State<GroupInfo> {
                           ),
                         ),
                         content: const Text(
-                          "Are you sure you want Logout this Group",
+                          "Are you sure you want Exit this Group",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
@@ -89,7 +89,7 @@ class _GroupInfoState extends State<GroupInfo> {
                                     .toggleGroupJoin(
                                     widget.groupId, getName(widget.adminName),
                                     widget.groupName).whenComplete(() {
-                                      nextPage(context, HomeScreen());
+                                      nextPage(context, const HomeScreen());
 
                                 });
                               },
@@ -172,7 +172,8 @@ class _GroupInfoState extends State<GroupInfo> {
                                 style: const TextStyle(
                                     fontSize: 15, fontWeight: FontWeight.bold)),
                             subtitle: Text(
-                              getId(snapshot.data["members"][index]),
+                               "Your Are In ${widget.groupName} Group" ,
+                           /*   getId(snapshot.data["members"][index]),*/
                               style: const TextStyle(
                                   fontSize: 12, fontWeight: FontWeight.bold),
                             )),

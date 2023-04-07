@@ -22,12 +22,12 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     isUserLogin();
     Timer(
-        Duration(seconds: 3),
+        const Duration(seconds: 3),
             () => Navigator.pushReplacement(
             context,
             MaterialPageRoute(
                 builder: (context) =>
-                isLogin ? HomeScreen() : const LoginPage())));
+                isLogin ? const HomeScreen() : const LoginPage())));
   }
   isUserLogin() async {
     await SharedPref.isUserLogin().then((value) {

@@ -1,6 +1,7 @@
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/auth/RegisterPage.dart';
+import 'package:chat/screens/ui/Forgot_Password_screen.dart';
 import 'package:chat/screens/ui/homeScreen.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/database_services.dart';
@@ -26,19 +27,23 @@ class _LoginPageState extends State<LoginPage> {
   String pass = "";
   String email = "";
   bool _isLoading = false;
-  AuthService authService= AuthService();
-/*  TextEditingController emailTextEditingController = TextEditingController();
-  TextEditingController passTextEditingController = TextEditingController();*/
+  AuthService authService = AuthService();
+  bool _passwordVisible = false;
+
+  TextEditingController emailTextEditingController = TextEditingController();
+  TextEditingController passTextEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: _isLoading
-            ?Center(child: SizedBox(
-            height: 150,
-            width: 100,
-            child: Lottie.network("https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")))
+            ? Center(
+                child: SizedBox(
+                    height: 150,
+                    width: 100,
+                    child: Lottie.network(
+                        "https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")))
             : SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 65.0),
@@ -67,6 +72,7 @@ class _LoginPageState extends State<LoginPage> {
                         SizedBox(
                           width: 310,
                           child: TextFormField(
+                            controller: emailTextEditingController,
                             autovalidateMode:
                                 AutovalidateMode.onUserInteraction,
                             // key: _emailKey,
@@ -94,13 +100,27 @@ class _LoginPageState extends State<LoginPage> {
                         SizedBox(
                           width: 310,
                           child: TextFormField(
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
-                            obscureText: true,
+                            controller: passTextEditingController,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            obscureText: !_passwordVisible,
                             // key: _passkey,
                             decoration: textInputDecoration.copyWith(
-                              labelText: "Password",
-                              prefixIcon: const Icon(Icons.security),
-                            ),
+                                labelText: "Password",
+                                prefixIcon: const Icon(Icons.security),
+                                suffixIcon: InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      _passwordVisible = !_passwordVisible;
+                                    });
+                                  },
+                                  child: Icon(
+                                    _passwordVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: Colors.grey,
+                                  ),
+                                )),
                             onChanged: (val) {
                               setState(() {
                                 pass = val;
@@ -117,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                           height: 15,
                         ),
 
-                       /* Padding(
+                        /* Padding(
                           padding: const EdgeInsets.only(left:200.0),
                           child: GestureDetector(
                               onTap: (){
@@ -126,7 +146,23 @@ class _LoginPageState extends State<LoginPage> {
                               child: const Text("Forgot Password ? ",style: TextStyle(fontWeight: FontWeight.bold),)),
                         ),*/
                         const SizedBox(
-                          height: 15,
+                          height: 5,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            nextPage(context, const ForgotPasswordScreen());
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.only(left: 180.0),
+                            child: Text.rich(TextSpan(
+                              text: "Forgot Password? ",
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 14),
+                            )),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 5,
                         ),
                         SizedBox(
                           width: 310,
@@ -140,11 +176,12 @@ class _LoginPageState extends State<LoginPage> {
                               child: const Text("Sign in ")),
                         ),
                         const SizedBox(
-                          height: 15,
+                          height: 5,
                         ),
                         Text.rich(TextSpan(
                             text: "Don't Have An Account? ",
-                            style: const TextStyle(color: Colors.black, fontSize: 14),
+                            style: const TextStyle(
+                                color: Colors.black, fontSize: 14),
                             children: <TextSpan>[
                               TextSpan(
                                   text: "Register ",
@@ -190,40 +227,39 @@ class _LoginPageState extends State<LoginPage> {
   //     });
   //   }
   // }
-   login() async {
+  login() async {
     if (formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
-      await authService.loginWithUsernamePassword(email, pass).then((value) async{
-        if(value==true){
-        QuerySnapshot snapshot = await DatabaseServices(uid:FirebaseAuth.instance.currentUser!.uid).gettingUserEmail(email);
+      await authService
+          .loginWithUsernamePassword(email, pass)
+          .then((value) async {
+        if (value == true) {
+          QuerySnapshot snapshot = await DatabaseServices(
+                  uid: FirebaseAuth.instance.currentUser!.uid)
+              .gettingUserEmail(email);
 
-        await SharedPref.saveUserLoginStatus(true);
-        await SharedPref.saveUserEmail(email);
-        await SharedPref.saveUserName(
-          snapshot.docs[0]["fullName"]
-        );
-        nextPage(context, const HomeScreen());
-
-        }
-        else
-          {
-            ToastContext toastContext = ToastContext();
-            toastContext.init(context);
-            Toast.show(
-              value,
-              duration: Toast.lengthShort,
-              rootNavigator: true,
-              gravity: Toast.bottom,
-              webShowClose: true,
-              backgroundColor: Colors.red,
-            );
+          await SharedPref.saveUserLoginStatus(true);
+          await SharedPref.saveUserEmail(email);
+          await SharedPref.saveUserName(snapshot.docs[0]["fullName"]);
+          nextPage(context, const HomeScreen());
+        } else {
+          ToastContext toastContext = ToastContext();
+          toastContext.init(context);
+          Toast.show(
+            value,
+            duration: Toast.lengthShort,
+            rootNavigator: true,
+            gravity: Toast.bottom,
+            webShowClose: true,
+            backgroundColor: Colors.red,
+          );
           /*  showSnackbar(context, Colors.red, value);*/
-            setState(() {
-              _isLoading =false;
-            });
-          }
+          setState(() {
+            _isLoading = false;
+          });
+        }
       });
     }
   }

@@ -28,6 +28,7 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _isLoading = false;
   AuthService authService = AuthService();
   final registerFormKey = GlobalKey<FormState>();
+  bool _passwordVisible = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,12 +117,26 @@ class _RegisterPageState extends State<RegisterPage> {
                     width: 310,
                     child: TextFormField(
                       autovalidateMode: AutovalidateMode.onUserInteraction,
-                      obscureText: true,
+                      obscureText: !_passwordVisible,
                       decoration: textInputDecoration.copyWith(
                         labelText: "Password",
 
                         prefixIcon: const Icon(Icons.security),
-                      ),
+                          suffixIcon: InkWell(
+                            onTap: () {
+                              setState(() {
+                                _passwordVisible = !_passwordVisible;
+                              });
+                            },
+                            child: Icon(
+                              _passwordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Colors.grey,
+                            ),
+                          )),
+
+
                       onChanged: (val) {
                         setState(() {
                           password = val;

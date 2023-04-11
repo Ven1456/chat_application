@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/ui/chat_page.dart';
@@ -23,8 +25,10 @@ class _SearchState extends State<Search> {
   String username = "";
   User? user;
   bool noData = false;
+  bool isButtonDisabled = false;
   bool isUserJoined = false;
   bool isTextFieldEmpty = true;
+  bool _isPressedFlyer = false;
 
   @override
   void initState() {
@@ -36,7 +40,6 @@ class _SearchState extends State<Search> {
         initiateSearchMethod();
       }
     });
-
   }
 
   getCurrentUserIdAndName() async {
@@ -49,11 +52,12 @@ class _SearchState extends State<Search> {
   String getName(String res) {
     return res.substring(res.indexOf("_") + 1);
   }
+
   @override
   void dispose() {
-   if(searchController.text.isEmpty){
-     searchController.removeListener(initiateSearchMethod);
-   }
+    if (searchController.text.isEmpty) {
+      searchController.removeListener(initiateSearchMethod);
+    }
     super.dispose();
   }
 
@@ -77,33 +81,33 @@ class _SearchState extends State<Search> {
                 children: [
                   Expanded(
                       child: TextField(
-                    cursorColor: Colors.white,
-                    controller: searchController,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(
-                      hintText: "Search Groups Here....",
-                      hintStyle: TextStyle(color: Colors.white),
-                    ),
-                        onChanged: (value){
+                        cursorColor: Colors.white,
+                        controller: searchController,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: const InputDecoration(
+                          hintText: "Search Groups Here....",
+                          hintStyle: TextStyle(color: Colors.white),
+                        ),
+                        onChanged: (value) {
                           setState(() {
                             isTextFieldEmpty = value.isEmpty;
-                            if(isTextFieldEmpty){
+                            if (isTextFieldEmpty) {
                               _isLoading = false;
                             }
                           });
                         },
-                  )),
+                      )),
                   GestureDetector(
-                        onTap: () {
-                       if(!isTextFieldEmpty){
-                         setState(() {
-                           hasUserSearched = true;
-                         });
-                         hasUserSearched ? initiateSearchMethod():
-                         dataNotFound();
-                       }
-                      },
-
+                    onTap: () {
+                      if (!isTextFieldEmpty) {
+                        setState(() {
+                          hasUserSearched = true;
+                        });
+                        hasUserSearched
+                            ? initiateSearchMethod()
+                            : dataNotFound();
+                      }
+                    },
                     child: Container(
                       width: 40,
                       height: 40,
@@ -121,16 +125,16 @@ class _SearchState extends State<Search> {
             ),
             _isLoading
                 ? SizedBox(
-                    height: 650,
-                    child: Center(
-                      child: SizedBox(
-                          height: 150,
-                          width: 100,
-                          child: Lottie.network(
-                              "https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")),
-                      // child: CircularProgressIndicator(),
-                    ),
-                  )
+              height: 650,
+              child: Center(
+                child: SizedBox(
+                    height: 150,
+                    width: 100,
+                    child: Lottie.network(
+                        "https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")),
+                // child: CircularProgressIndicator(),
+              ),
+            )
                 : groupList()
           ],
         ),
@@ -140,16 +144,18 @@ class _SearchState extends State<Search> {
 
   groupList() {
     return hasUserSearched
-        ? searchSnapshot?.docs.length != 0 ? ListView.builder(
-            shrinkWrap: true,
-            itemCount: searchSnapshot!.docs.length,
-            itemBuilder: (context, index) {
-              return groupTile(
-                  username,
-                  searchSnapshot!.docs[index]["groupId"],
-                  searchSnapshot!.docs[index]["groupName"],
-                  searchSnapshot!.docs[index]["admin"]);
-            }):const SizedBox(
+        ? searchSnapshot?.docs.length != 0
+        ? ListView.builder(
+        shrinkWrap: true,
+        itemCount: searchSnapshot!.docs.length,
+        itemBuilder: (context, index) {
+          return groupTile(
+              username,
+              searchSnapshot!.docs[index]["groupId"],
+              searchSnapshot!.docs[index]["groupName"],
+              searchSnapshot!.docs[index]["admin"]);
+        })
+        : const SizedBox(
         height: 650,
         child: Center(
           child: Text(
@@ -158,14 +164,15 @@ class _SearchState extends State<Search> {
           ),
         ))
         : searchController.text.isEmpty
-            ? const SizedBox(
-                height: 650,
-                child: Center(
-                  child: Text(
-                    "SEARCH YOUR GROUP",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                ))  :  const SizedBox(
+        ? const SizedBox(
+        height: 650,
+        child: Center(
+          child: Text(
+            "SEARCH YOUR GROUP",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ))
+        : const SizedBox(
         height: 650,
         child: Center(
           child: Text(
@@ -173,10 +180,10 @@ class _SearchState extends State<Search> {
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
         ));
-
   }
-  joinedOrNot(
-      String username, String groupId, String groupName, String admin) async {
+
+  joinedOrNot(String username, String groupId, String groupName,
+      String admin) async {
     await DatabaseServices(uid: user!.uid)
         .isUserJoined(groupName, groupId, username)
         .then((value) {
@@ -186,9 +193,11 @@ class _SearchState extends State<Search> {
     });
   }
 
+
   Widget groupTile(
       String username, String groupId, String groupName, String admin) {
     joinedOrNot(username, groupId, groupName, admin);
+
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       leading: CircleAvatar(
@@ -210,11 +219,16 @@ class _SearchState extends State<Search> {
         onTap: () async {
           await DatabaseServices(uid: user!.uid)
               .toggleGroupJoin(groupId, username, groupName);
+
           if (isUserJoined) {
             setState(() {
               isUserJoined = !isUserJoined;
-            });
+          });
+          /*  setState(() {
+              isUserJoined = !isUserJoined;
+            });*/
             ToastContext toastContext = ToastContext();
+            // ignore: use_build_context_synchronously
             toastContext.init(context);
             Toast.show(
               "Successfully Joined Group",
@@ -224,18 +238,20 @@ class _SearchState extends State<Search> {
               webShowClose: true,
               backgroundColor: Colors.green,
             );
-        /*showSnackbar(context, Colors.green, "Successfully Joined Group");*/
-            Future.delayed(const Duration(milliseconds: 1), () {
+
+
+              // ignore: use_build_context_synchronously
               nextPage(
                   context,
                   ChatPage(
                       username: username,
                       groupName: groupName,
                       groupId: groupId));
-            });
-          } else {
+
+          }
+          else {
             setState(() {
-              isUserJoined = !isUserJoined;
+            isUserJoined = !isUserJoined;
               ToastContext toastContext = ToastContext();
               toastContext.init(context);
               Toast.show(
@@ -246,11 +262,11 @@ class _SearchState extends State<Search> {
                 webShowClose: true,
                 backgroundColor: Colors.red,
               );
-             /* showSnackbar(context, Colors.red, "Left the  Group $groupName");*/
+
             });
           }
         },
-        child: isUserJoined
+        child:isUserJoined
             ? Container(
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
@@ -308,9 +324,7 @@ class _SearchState extends State<Search> {
       });
       return;
     }
-    await DatabaseServices()
-        .getSearchByTextFieldName(query)
-        .then((value) {
+    await DatabaseServices().getSearchByTextFieldName(query).then((value) {
       if (searchController.text.trim() != query) {
         // The query has changed since we started searching, so discard the results
         return;
@@ -322,10 +336,6 @@ class _SearchState extends State<Search> {
       });
     });
   }
-
-
-
-
 
   dataNotFound() async {
     if (searchController.text.length > 1) {
@@ -342,4 +352,5 @@ class _SearchState extends State<Search> {
       });
     }
   }
+
 }

@@ -55,9 +55,11 @@ class _MessageTileState extends State<MessageTile> {
               ),
               child: Container(
                 width: 240,
+              /*  margin:  widget.sendByMe ? MediaQuery.of(context).size.width < 2500 ? EdgeInsets.only(left: 0) :  EdgeInsets.only(right: 0) :
+                MediaQuery.of(context).size.width < 2500 ? EdgeInsets.only(left: 0) :  EdgeInsets.only(right: 0),*/
                 margin: widget.sendByMe
-                    ? const EdgeInsets.only(left: 120) //120 default value
-                    : const EdgeInsets.only(right: 120), //120 default value
+                    ? const EdgeInsets.only(left: 110) //120 default value
+                    : const EdgeInsets.only(right: 110), //120 default value
                 padding: const EdgeInsets.only(top: 17, left: 20, right: 20),
                 decoration: BoxDecoration(
                     borderRadius: widget.sendByMe

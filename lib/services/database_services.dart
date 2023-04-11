@@ -27,6 +27,11 @@ class DatabaseServices {
         await userCollection.where("email", isEqualTo: email).get();
     return snapshot;
   }
+  //setting user profile picture
+  Future setUserProfilePicture(String profilePic) async{
+    QuerySnapshot snapshot = await userCollection.where("profilePic",isEqualTo: profilePic).get();
+    return snapshot;
+  }
 
   // get user groups
 

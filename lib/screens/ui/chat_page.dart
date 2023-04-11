@@ -30,6 +30,9 @@ class _ChatPageState extends State<ChatPage> {
   String adminName = "";
   bool isLoadingAnimation = false;
   final TextEditingController messageController = TextEditingController();
+  double minHeight = 60;
+  double maxHeight = 150;
+
 
   @override
   void initState() {
@@ -47,6 +50,12 @@ class _ChatPageState extends State<ChatPage> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+  void resetHeight() {
+    setState(() {
+      minHeight = 60;
+      maxHeight = 150;
+    });
   }
 
   void getChatAndAdminName() {
@@ -92,21 +101,63 @@ class _ChatPageState extends State<ChatPage> {
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-            color: Colors.grey[500],
+            color: Colors.lightBlue,
             child: Row(
               children: [
                 Expanded(
-                    child: TextFormField(
+                    child: Container(
+                      constraints: BoxConstraints(
+                        minHeight: minHeight,
+                        maxHeight: maxHeight,
+
+                      ),
+
+                      child: TextFormField(
+                        maxLines: null,
+                  keyboardType: TextInputType.multiline,
                   controller: messageController,
                   style: const TextStyle(color: Colors.white),
+                        onChanged: (value) {
+                          final lines = value.split('\n').length;
+                          if (lines < 2) {
+                            setState(() {
+                              minHeight = 60;
+                              maxHeight = 150;
+                            });
+                          } else if (lines < 6) {
+                            setState(() {
+                              minHeight = 66;
+                              maxHeight = 150;
+                            });
+                          } else if (lines <= 7) {
+                            setState(() {
+                              minHeight = 60 + (5 - 1) * 20;
+                              maxHeight = 150 + (lines - 5) * 20;
+                            });
+                          } else {
+                            final newLines = value.split('\n').sublist(0, 10);
+                            final newValue = newLines.join('\n');
+                            messageController.value = TextEditingValue(
+                              text: newValue,
+                              selection: TextSelection.collapsed(offset: newValue.length),
+                            );
+                            setState(() {
+                              minHeight = 60 + (5 - 1) * 20;
+                              maxHeight = 150 + (10 - 5) * 20;
+                            });
+                          }
+                        },
                   decoration: const InputDecoration(
-                    hintText: "Send a Message",
-                    border: InputBorder.none,
+                      hintText: "Send a Message",
+                      border: InputBorder.none,
                   ),
-                )),
+                ),
+                    )),
                 GestureDetector(
                   onTap: () {
                     sendMessages();
+                    resetHeight();
+
                   },
                   child: Container(
                     height: 50,
@@ -129,12 +180,14 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+
   // function to convert time stamp to date
   static DateTime returnDateAndTimeFormat(String time) {
     var dt = DateTime.fromMicrosecondsSinceEpoch(int.parse(time));
     var originalDate = DateFormat('MM/dd/yyyy').format(dt);
     return DateTime(dt.year, dt.month, dt.day);
   }
+
 
   // function to return date if date changes based on your local date and time
   static String groupMessageDateAndTime(String time) {

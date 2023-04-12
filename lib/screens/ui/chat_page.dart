@@ -1,13 +1,14 @@
 import 'dart:async';
-
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/ui/group_info.dart';
 import 'package:chat/screens/ui/message_tlle.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
+// ignore: must_be_immutable
 class ChatPage extends StatefulWidget {
   String username;
   String groupName;
@@ -32,6 +33,7 @@ class _ChatPageState extends State<ChatPage> {
   final TextEditingController messageController = TextEditingController();
   double minHeight = 60;
   double maxHeight = 150;
+  int maxLines =10;
 
 
   @override
@@ -45,7 +47,6 @@ class _ChatPageState extends State<ChatPage> {
 
       });
   }
-
   @override
   void dispose() {
     _scrollController.dispose();
@@ -70,7 +71,7 @@ class _ChatPageState extends State<ChatPage> {
       });
     });
   }
-
+  final chatFromKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,88 +95,108 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: chatMessages(),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-            color: Colors.lightBlue,
-            child: Row(
-              children: [
-                Expanded(
-                    child: Container(
-                      constraints: BoxConstraints(
-                        minHeight: minHeight,
-                        maxHeight: maxHeight,
-
-                      ),
-
-                      child: TextFormField(
-                        maxLines: null,
-                  keyboardType: TextInputType.multiline,
-                  controller: messageController,
-                  style: const TextStyle(color: Colors.white),
-                        onChanged: (value) {
-                          final lines = value.split('\n').length;
-                          if (lines < 2) {
-                            setState(() {
-                              minHeight = 60;
-                              maxHeight = 150;
-                            });
-                          } else if (lines < 6) {
-                            setState(() {
-                              minHeight = 66;
-                              maxHeight = 150;
-                            });
-                          } else if (lines <= 7) {
-                            setState(() {
-                              minHeight = 60 + (5 - 1) * 20;
-                              maxHeight = 150 + (lines - 5) * 20;
-                            });
-                          } else {
-                            final newLines = value.split('\n').sublist(0, 10);
-                            final newValue = newLines.join('\n');
-                            messageController.value = TextEditingValue(
-                              text: newValue,
-                              selection: TextSelection.collapsed(offset: newValue.length),
-                            );
-                            setState(() {
-                              minHeight = 60 + (5 - 1) * 20;
-                              maxHeight = 150 + (10 - 5) * 20;
-                            });
-                          }
-                        },
-                  decoration: const InputDecoration(
-                      hintText: "Send a Message",
-                      border: InputBorder.none,
-                  ),
-                ),
-                    )),
-                GestureDetector(
-                  onTap: () {
-                    sendMessages();
-                    resetHeight();
-
-                  },
-                  child: Container(
-                    height: 50,
-                    width: 50,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(21),
-                      color: Colors.blue,
-                    ),
-                    child: const Icon(
-                      Icons.send,
-                      color: Colors.white,
-                    ),
-                  ),
-                )
-              ],
+      body: Form(
+        key: chatFromKey,
+        child: Column(
+          children: [
+            Expanded(
+              child: chatMessages(),
             ),
-          ),
-        ],
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              color: Colors.lightBlue,
+              child: Row(
+                children: [
+                  Expanded(
+                      child: Container(
+                        constraints: BoxConstraints(
+                          minHeight: minHeight,
+                          maxHeight: maxHeight,
+
+                        ),
+
+                        child: TextFormField(
+                          maxLines:null ,
+                    inputFormatters: [
+                      TrimTextFormatter(),
+                      NewLineTrimTextFormatter(),
+                    ],
+                    cursorColor: Colors.white  ,
+                    keyboardType: TextInputType.multiline,
+                    controller: messageController,
+
+                    style: const TextStyle(color: Colors.white),
+                     /*     validator: (val) {
+                            if (val!.trim().isEmpty) {
+                              return "Please Enter A Message Without Spaces";
+
+                            } else if (val.trim().replaceAll(' ', '').isEmpty) {
+                              return "Please Enter A Message That Contains Text";
+
+                            }
+                            return null;
+
+                          },*/
+
+                          onChanged: (value) {
+
+                            final lines = value.split('\n').length;
+                            if (lines < 2) {
+                              setState(() {
+                                minHeight = 60;
+                                maxHeight = 150;
+                              });
+                            } else if (lines < 6) {
+                              setState(() {
+                                minHeight = 66;
+                                maxHeight = 150;
+                              });
+                            } else if (lines <= 10) {
+                              setState(() {
+                                minHeight = 60 + (5 - 1) * 20;
+                                maxHeight = 150 + (lines - 5) * 20;
+                                maxLines = lines;
+                              });
+                            } else {
+                              setState(() {
+                                maxLines = maxLines;
+                              });
+                            }
+                          },
+                    decoration: const InputDecoration(
+                        hintText: "Send a Message",
+                        hintStyle: TextStyle(color: Colors.white),
+                        border: InputBorder.none,
+                      errorStyle: TextStyle(color: Colors.white,fontSize: 15),
+                    ),
+                  ),
+                      )),
+                  GestureDetector(
+                    onTap: () {
+                      if (chatFromKey.currentState!.validate()) {
+                        sendMessages();
+                        resetHeight();
+                      }
+
+                    },
+                    child: Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(21),
+                        color: Colors.blue,
+                      ),
+                      child: const Icon(
+                        Icons.send,
+                        color: Colors.white,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -184,7 +205,7 @@ class _ChatPageState extends State<ChatPage> {
   // function to convert time stamp to date
   static DateTime returnDateAndTimeFormat(String time) {
     var dt = DateTime.fromMicrosecondsSinceEpoch(int.parse(time));
-    var originalDate = DateFormat('MM/dd/yyyy').format(dt);
+   /* var originalDate = DateFormat('MM/dd/yyyy').format(dt);*/
     return DateTime(dt.year, dt.month, dt.day);
   }
 
@@ -192,7 +213,7 @@ class _ChatPageState extends State<ChatPage> {
   // function to return date if date changes based on your local date and time
   static String groupMessageDateAndTime(String time) {
     var dt = DateTime.fromMicrosecondsSinceEpoch(int.parse(time.toString()));
-    var originalDate = DateFormat('MM/dd/yyyy').format(dt);
+  /*  var originalDate = DateFormat('MM/dd/yyyy').format(dt);*/
 
     final todayDate = DateTime.now();
 
@@ -238,8 +259,8 @@ class _ChatPageState extends State<ChatPage> {
                           bool isSameDate = false;
                           String? newDate = '';
 
-                          final DateTime date = returnDateAndTimeFormat(
-                              snapshot.data.docs[index]["time"].toString());
+                          /*final DateTime date = returnDateAndTimeFormat(
+                              snapshot.data.docs[index]["time"].toString());*/
 
                           if (index == 0) {
                             newDate = groupMessageDateAndTime(snapshot
@@ -363,7 +384,7 @@ class _ChatPageState extends State<ChatPage> {
         curve: Curves.easeOut,
       );
       Map<String, dynamic> chatMessageMap = {
-        "message": messageController.text,
+        "message": messageController.text.trim(),
         "sender": widget.username,
         "time": DateTime.now().microsecondsSinceEpoch
       };

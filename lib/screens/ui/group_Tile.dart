@@ -4,6 +4,7 @@ import 'package:chat/screens/ui/chat_page.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class GroupTile extends StatefulWidget {
   String groupId;
   String username;

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/ui/chat_page.dart';
@@ -28,7 +26,8 @@ class _SearchState extends State<Search> {
   bool isButtonDisabled = false;
   bool isUserJoined = false;
   bool isTextFieldEmpty = true;
-  bool _isPressedFlyer = false;
+  bool _isJoined = false;
+  bool _isPressed = false;
 
   @override
   void initState() {
@@ -60,7 +59,7 @@ class _SearchState extends State<Search> {
     }
     super.dispose();
   }
-
+  final searchFromKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,72 +70,92 @@ class _SearchState extends State<Search> {
         ),
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
-              color: Colors.blue,
-              child: Row(
-                children: [
-                  Expanded(
-                      child: TextField(
-                        cursorColor: Colors.white,
-                        controller: searchController,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: const InputDecoration(
-                          hintText: "Search Groups Here....",
-                          hintStyle: TextStyle(color: Colors.white),
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            isTextFieldEmpty = value.isEmpty;
-                            if (isTextFieldEmpty) {
-                              _isLoading = false;
-                            }
-                          });
-                        },
-                      )),
-                  GestureDetector(
-                    onTap: () {
-                      if (!isTextFieldEmpty) {
-                        setState(() {
-                          hasUserSearched = true;
-                        });
-                        hasUserSearched
-                            ? initiateSearchMethod()
-                            : dataNotFound();
-                      }
-                    },
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(21)),
-                      child: const Icon(
-                        Icons.search,
-                        color: Colors.white,
+      body: Form(
+        key: searchFromKey,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
+                color: Colors.blue,
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: TextFormField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                      cursorColor: Colors.white,
+                      controller: searchController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        errorStyle: TextStyle(color: Colors.white),
+                        hintText: "Search Groups Here....",
+                        hintStyle: TextStyle(color: Colors.white),
                       ),
-                    ),
-                  )
-                ],
+                          validator: (val) {
+                            if (val!.isEmpty) {
+                              return "Please Enter AtLeast 1 Characters";
+                            }
+                            else if (val.trim().isEmpty) {
+                              return "Please Search A Group Without Spaces";
+                            } else if (val.trim().replaceAll(' ', '').isEmpty) {
+                              return "Please Search A Group That Contains Text";
+                            }
+                            return null;
+                          },
+
+                      onChanged: (value) {
+                        setState(() {
+                          isTextFieldEmpty = value.isEmpty;
+                          if (isTextFieldEmpty) {
+                            _isLoading = false;
+                          }
+                        });
+                      },
+                    )),
+                    GestureDetector(
+                      onTap: () {
+                        if (searchFromKey.currentState!.validate()){
+                          if (!isTextFieldEmpty) {
+                            setState(() {
+                              hasUserSearched = true;
+                            });
+                            hasUserSearched
+                                ? initiateSearchMethod()
+                                : dataNotFound();
+                          }
+                        }
+
+                      },
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(21)),
+                        child: const Icon(
+                          Icons.search,
+                          color: Colors.white,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
-            _isLoading
-                ? SizedBox(
-              height: 650,
-              child: Center(
-                child: SizedBox(
-                    height: 150,
-                    width: 100,
-                    child: Lottie.network(
-                        "https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")),
-                // child: CircularProgressIndicator(),
-              ),
-            )
-                : groupList()
-          ],
+              _isLoading
+                  ? SizedBox(
+                      height: 650,
+                      child: Center(
+                        child: SizedBox(
+                            height: 150,
+                            width: 100,
+                            child: Lottie.network(
+                                "https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")),
+                        // child: CircularProgressIndicator(),
+                      ),
+                    )
+                  : groupList()
+            ],
+          ),
         ),
       ),
     );
@@ -145,54 +164,53 @@ class _SearchState extends State<Search> {
   groupList() {
     return hasUserSearched
         ? searchSnapshot?.docs.length != 0
-        ? ListView.builder(
-        shrinkWrap: true,
-        itemCount: searchSnapshot!.docs.length,
-        itemBuilder: (context, index) {
-          return groupTile(
-              username,
-              searchSnapshot!.docs[index]["groupId"],
-              searchSnapshot!.docs[index]["groupName"],
-              searchSnapshot!.docs[index]["admin"]);
-        })
-        : const SizedBox(
-        height: 650,
-        child: Center(
-          child: Text(
-            "NO DATA FOUND",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-        ))
+            ? ListView.builder(
+                shrinkWrap: true,
+                itemCount: searchSnapshot!.docs.length,
+                itemBuilder: (context, index) {
+                  return groupTile(
+                      username,
+                      searchSnapshot!.docs[index]["groupId"],
+                      searchSnapshot!.docs[index]["groupName"],
+                      searchSnapshot!.docs[index]["admin"]);
+                })
+            : const SizedBox(
+                height: 650,
+                child: Center(
+                  child: Text(
+                    "NO DATA FOUND",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ))
         : searchController.text.isEmpty
-        ? const SizedBox(
-        height: 650,
-        child: Center(
-          child: Text(
-            "SEARCH YOUR GROUP",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-        ))
-        : const SizedBox(
-        height: 650,
-        child: Center(
-          child: Text(
-            "NO DATA FOUND",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-        ));
+            ? const SizedBox(
+                height: 650,
+                child: Center(
+                  child: Text(
+                    "SEARCH YOUR GROUP",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ))
+            : const SizedBox(
+                height: 650,
+                child: Center(
+                  child: Text(
+                    "NO DATA FOUND",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ));
   }
 
-  joinedOrNot(String username, String groupId, String groupName,
-      String admin) async {
+  joinedOrNot(
+      String username, String groupId, String groupName, String admin) async {
     await DatabaseServices(uid: user!.uid)
         .isUserJoined(groupName, groupId, username)
         .then((value) {
       setState(() {
-        isUserJoined = value;
+        _isJoined = value;
       });
     });
   }
-
 
   Widget groupTile(
       String username, String groupId, String groupName, String admin) {
@@ -219,12 +237,50 @@ class _SearchState extends State<Search> {
         onTap: () async {
           await DatabaseServices(uid: user!.uid)
               .toggleGroupJoin(groupId, username, groupName);
+          /*if (_isPressedFlyer) {
+        setState(() {
+          isUserJoined = !isUserJoined;
+        });
+
+        ToastContext toastContext = ToastContext();
+        // ignore: use_build_context_synchronously
+        toastContext.init(context);
+        Toast.show(
+          "Successfully Joined Group",
+          duration: Toast.lengthShort,
+          rootNavigator: true,
+          gravity: Toast.bottom,
+          webShowClose: true,
+          backgroundColor: Colors.green,
+        );
+        // ignore: use_build_context_synchronously
+        nextPage(
+            context,
+            ChatPage(
+                username: username,
+                groupName: groupName,
+                groupId: groupId));
+      setState(() {
+        _isPressedFlyer = true;
+        Future.delayed(const Duration(seconds: 3), () {
+          _isPressedFlyer = false;
+        });
+      });
+    }*/
+          if (_isPressed) {
+            return;
+          }
+          _isPressed = true;
+          Future.delayed(const Duration(seconds: 2), () {
+            _isPressed = false;
+          });
 
           if (isUserJoined) {
             setState(() {
               isUserJoined = !isUserJoined;
-          });
-          /*  setState(() {
+            });
+
+            /*setState(() {
               isUserJoined = !isUserJoined;
             });*/
             ToastContext toastContext = ToastContext();
@@ -239,19 +295,16 @@ class _SearchState extends State<Search> {
               backgroundColor: Colors.green,
             );
 
-
-              // ignore: use_build_context_synchronously
-              nextPage(
-                  context,
-                  ChatPage(
-                      username: username,
-                      groupName: groupName,
-                      groupId: groupId));
-
-          }
-          else {
+            // ignore: use_build_context_synchronously
+            nextPage(
+                context,
+                ChatPage(
+                    username: username,
+                    groupName: groupName,
+                    groupId: groupId));
+          } else {
             setState(() {
-            isUserJoined = !isUserJoined;
+              isUserJoined = !isUserJoined;
               ToastContext toastContext = ToastContext();
               toastContext.init(context);
               Toast.show(
@@ -262,11 +315,10 @@ class _SearchState extends State<Search> {
                 webShowClose: true,
                 backgroundColor: Colors.red,
               );
-
             });
           }
         },
-        child:isUserJoined
+        child: _isJoined
             ? Container(
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
@@ -352,5 +404,4 @@ class _SearchState extends State<Search> {
       });
     }
   }
-
 }

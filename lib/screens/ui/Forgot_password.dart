@@ -55,7 +55,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                         ),
                       ],
                     ),
-                    Container(
+                    SizedBox(
                       width: 335,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -99,6 +99,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
+  // ignore: non_constant_identifier_names
   Future<void> _CreateanaccountBuildMethod(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       setState(() {

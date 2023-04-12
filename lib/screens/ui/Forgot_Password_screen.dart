@@ -28,7 +28,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   int _start = 180;
 
   void startTimer() {
-    const oneSec = const Duration(seconds: 1);
+    const oneSec = Duration(seconds: 1);
     _timer = Timer.periodic(
       oneSec,
       (Timer timer) {
@@ -81,17 +81,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(300),
-                      child: Image.network(
+                      borderRadius: BorderRadius.circular(250),
+                      child: Image.asset("assets/images/reset.jpg",height: 300,)
+                      /*Image.network(
                         imagePath,
                         height: 310,
-                      ),
+                      ),*/
                     ),
                     const SizedBox(
-                      height: 20,
+                      height: 50,
                     ),
                     SizedBox(
-                      width: 310,
+                      width: 320,
                       child: isButton
                           ? Container()
                           : TextFormField(
@@ -112,7 +113,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               },
                               decoration: textInputDecoration.copyWith(
                                 labelText: "Enter Your Email",
-                                prefixIcon: Icon(Icons.email)
+                                prefixIcon: const Icon(Icons.email)
                               ),
                             ),
                     ),

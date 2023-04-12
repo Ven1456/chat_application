@@ -70,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
                           height: 350,
                         ),
                         SizedBox(
-                          width: 310,
+                          width: 320,
                           child: TextFormField(
                             controller: emailTextEditingController,
                             autovalidateMode:
@@ -98,7 +98,7 @@ class _LoginPageState extends State<LoginPage> {
                           height: 15,
                         ),
                         SizedBox(
-                          width: 310,
+                          width: 320,
                           child: TextFormField(
                             controller: passTextEditingController,
                             autovalidateMode:
@@ -165,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
                           height: 5,
                         ),
                         SizedBox(
-                          width: 310,
+                          width: 320,
                           child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                   shape: RoundedRectangleBorder(
@@ -241,8 +241,10 @@ class _LoginPageState extends State<LoginPage> {
               .gettingUserEmail(email);
 
           await SharedPref.saveUserLoginStatus(true);
+
           await SharedPref.saveUserEmail(email);
           await SharedPref.saveUserName(snapshot.docs[0]["fullName"]);
+          // ignore: use_build_context_synchronously
           nextPage(context, const HomeScreen());
         } else {
           ToastContext toastContext = ToastContext();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 const textInputDecoration = InputDecoration(
 labelStyle: TextStyle(color:Colors.black),
   enabledBorder: OutlineInputBorder(
@@ -34,8 +35,41 @@ void showSnackbar(context, color , message ) {
       onPressed: () {},
 
     ),
-    duration: Duration(seconds: 2),
+    duration: const Duration(seconds: 2),
 
   ));
 }
+class NoSpaceFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    // Check if the new value contains any spaces
+    if (newValue.text.contains(' ')) {
+      // If it does, return the old value
+      return oldValue;
+    }
+    // Otherwise, return the new value
+    return newValue;
+  }
+}
+class TrimTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
 
+    return TextEditingValue(
+        text: newValue.text.startsWith(" ") ? newValue.text.replaceAll(" ", "") : newValue.text,
+        selection: newValue.text.startsWith(" ") ? TextSelection.collapsed(offset: newValue.text.replaceAll(" ", "").length) : newValue.selection
+    );
+  }
+}
+
+class NewLineTrimTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+
+    return TextEditingValue(
+        text: newValue.text.startsWith(RegExp('[\n]')) ? newValue.text.trim() : newValue.text,
+        selection: newValue.text.startsWith(RegExp('[\n]')) ? TextSelection.collapsed(offset: newValue.text.trim().length) : newValue.selection
+    );
+  }
+}

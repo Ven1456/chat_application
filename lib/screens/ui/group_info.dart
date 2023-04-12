@@ -4,6 +4,7 @@ import 'package:chat/services/database_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class GroupInfo extends StatefulWidget {
   String groupName;
   String groupId;

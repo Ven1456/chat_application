@@ -9,6 +9,7 @@ import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:lottie/lottie.dart';
 import 'package:toast/toast.dart';
@@ -23,6 +24,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String username = "";
   String email = "";
+  String profilePic = "";
+
   Stream? groups;
   QuerySnapshot? searchSnapshot;
   AuthService authService = AuthService();
@@ -33,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   initState() {
     gettingUserData();
-    // TODO: implement initState
     super.initState();
   }
 
@@ -165,8 +167,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                        const LoginPage()),
-                                        (route) => false);
+                                            const LoginPage()),
+                                    (route) => false);
                               },
                               icon: const Icon(
                                 Icons.done,
@@ -207,11 +209,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemCount: snapshot.data["groups"].length,
                   itemBuilder: (BuildContext context, int index) {
                     // reverse the index value
-                    int reverseIndex = snapshot.data["groups"].length - index -
-                        1;
+                    int reverseIndex =
+                        snapshot.data["groups"].length - index - 1;
                     return GroupTile(
-                        groupName: getName(
-                            snapshot.data["groups"][reverseIndex]),
+                        groupName:
+                            getName(snapshot.data["groups"][reverseIndex]),
                         username: snapshot.data["fullName"],
                         groupId: getId(snapshot.data["groups"][reverseIndex]));
                   },
@@ -236,7 +238,7 @@ class _HomeScreenState extends State<HomeScreen> {
         context: context,
         builder: (context) {
           textEditingController.clear();
-          _isLoading=false;
+          _isLoading = false;
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
               title: const Text(
@@ -253,44 +255,55 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     _isLoading
                         ? Center(
-                      child: SizedBox(
-                          height: 50,
-                          width: 50,
-                          child: Lottie.network(
-                              "https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")),
-                    )
+                            child: SizedBox(
+                                height: 50,
+                                width: 50,
+                                child: Lottie.network(
+                                    "https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")),
+                          )
                         : Form(
-                      key: valFormKey,
-                      child: TextFormField(
-                        controller: textEditingController,
-                        onChanged: (val) {
-                          setState(() {
-                            groupName = val;
-                          });
-                        },
-                        validator: (val) {
-                          if (val!.length < 2) {
-                            return "Please Enter AtLeast 2 Characters";
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          /*     errorText: isGroup ? _groupNameError : null,*/
-                          enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(21),
-                              borderSide:
-                              const BorderSide(color: Colors.blue)),
-                          errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(21),
-                              borderSide:
-                              const BorderSide(color: Colors.red)),
-                          focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(21),
-                              borderSide:
-                              const BorderSide(color: Colors.blue)),
-                        ),
-                      ),
-                    )
+                            key: valFormKey,
+                            child: TextFormField(
+                              /*inputFormatters: [
+                                FilteringTextInputFormatter.deny(
+                                    RegExp(r"^\s+|\s+$")),
+                              ],*/
+                              controller: textEditingController,
+                              onChanged: (val) {
+                                setState(() {
+                                  groupName = val.trim();
+                                });
+                              },
+                              validator: (val) {
+                                if (val!.length < 2) {
+                                  return "Please Enter AtLeast 2 Characters";
+                                } else if (val.trim().isEmpty) {
+                                  return "Please Create A Group Without Spaces";
+                                } else if (val
+                                    .trim()
+                                    .replaceAll(' ', '')
+                                    .isEmpty) {
+                                  return "Please Create A Group That Contains Text";
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                /*     errorText: isGroup ? _groupNameError : null,*/
+                                enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(21),
+                                    borderSide:
+                                        const BorderSide(color: Colors.blue)),
+                                errorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(21),
+                                    borderSide:
+                                        const BorderSide(color: Colors.red)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(21),
+                                    borderSide:
+                                        const BorderSide(color: Colors.blue)),
+                              ),
+                            ),
+                          )
                   ],
                 ),
               ),
@@ -302,12 +315,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: const Text(
                       "Cancel",
                       style:
-                      TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     )),
                 ElevatedButton(
                     onPressed: () async {
                       if (valFormKey.currentState!.validate() &&
-                          groupName != "" && groupName.isNotEmpty &&
+                          groupName != "" &&
+                          groupName.isNotEmpty &&
                           groupName.length >= 2) {
                         setState(() {
                           /*groupName.toString().isEmpty ?_validate=true : _validate=false;*/
@@ -320,6 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             .get();
                         if (querySnapshot.docs.isNotEmpty) {
                           ToastContext toastContext = ToastContext();
+                          // ignore: use_build_context_synchronously
                           toastContext.init(context);
                           Toast.show(
                             "Group with the same name already exists",
@@ -327,8 +342,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             rootNavigator: true,
                             gravity: Toast.bottom,
                             webShowClose: true,
-                            backgroundColor: Colors.red
-                            ,
+                            backgroundColor: Colors.red,
                           );
                           // A group with the same name already exists, so show error message
                           setState(() {
@@ -337,18 +351,19 @@ class _HomeScreenState extends State<HomeScreen> {
                           return;
                         }
 
-                          DatabaseServices(
-                              uid: FirebaseAuth.instance.currentUser!.uid)
-                              .createGroup(
-                              username,
-                              FirebaseAuth.instance.currentUser!.uid,
-                              groupName)
-                              .whenComplete(() {
-                            _isLoading = false;
-                            groupName = "";
-                          });
+                        DatabaseServices(
+                                uid: FirebaseAuth.instance.currentUser!.uid)
+                            .createGroup(
+                                username,
+                                FirebaseAuth.instance.currentUser!.uid,
+                                groupName)
+                            .whenComplete(() {
+                          _isLoading = false;
+                          groupName = "";
+                        });
                         //
                         ToastContext toastContext = ToastContext();
+                        // ignore: use_build_context_synchronously
                         toastContext.init(context);
                         Toast.show(
                           "Group Created Successfully",
@@ -358,8 +373,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           webShowClose: true,
                           backgroundColor: Colors.green,
                         );
+                        // ignore: use_build_context_synchronously
                         Navigator.pop(context);
-                       /*
+                        /*
                         showSnackbar(context, Colors.green,
                             "Group Created Successfully");*/
                       }
@@ -367,7 +383,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: const Text(
                       "Create",
                       style:
-                      TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     )),
               ],
             );

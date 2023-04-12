@@ -63,13 +63,13 @@ class _RegisterPageState extends State<RegisterPage> {
                     height: 15,
                   ),
                   SizedBox(
-                    width: 310,
+                    width: 320,
                     child: TextFormField(
                       autovalidateMode: AutovalidateMode.onUserInteraction,
 
                       decoration: textInputDecoration.copyWith(
                         labelText: "Full Name",
-                        prefixIcon: const Icon(Icons.email),
+                        prefixIcon: const Icon(Icons.account_circle),
                       ),
                       onChanged: (val) {
                         setState(() {
@@ -89,7 +89,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     height: 15,
                   ),
                   SizedBox(
-                    width: 310,
+                    width: 320,
                     child: TextFormField(
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       decoration: textInputDecoration.copyWith(
@@ -103,7 +103,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       },
                       validator: (val) {
                         return RegExp(
-                                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                    r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
                                 .hasMatch(val!)
                             ? null
                             : "Please Enter Correct Email";
@@ -114,7 +114,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     height: 15,
                   ),
                   SizedBox(
-                    width: 310,
+                    width: 320,
                     child: TextFormField(
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       obscureText: !_passwordVisible,
@@ -198,7 +198,8 @@ class _RegisterPageState extends State<RegisterPage> {
             await SharedPref.saveUserLoginStatus(true);
             await SharedPref.saveUserName(fullName);
             await SharedPref.saveUserEmail(email);
-            nextPage(context, HomeScreen());
+            // ignore: use_build_context_synchronously
+            nextPage(context, const HomeScreen());
           }
         else
           {

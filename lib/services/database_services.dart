@@ -29,8 +29,9 @@ class DatabaseServices {
   }
   //setting user profile picture
   Future setUserProfilePicture(String profilePic) async{
-    QuerySnapshot snapshot = await userCollection.where("profilePic",isEqualTo: profilePic).get();
-    return snapshot;
+    DocumentReference documentReference = userCollection.doc(profilePic);
+    DocumentSnapshot documentSnapshot = await documentReference.get();
+    return documentSnapshot["profilePic"];
   }
 
   // get user groups

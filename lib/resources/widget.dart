@@ -1,75 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+// TEXT INPUT DECORATION
 const textInputDecoration = InputDecoration(
-labelStyle: TextStyle(color:Colors.black),
-  enabledBorder: OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.blue)
+  labelStyle: TextStyle(color: Colors.black),
+  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
+  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
+  errorBorder: OutlineInputBorder(
+    borderSide: BorderSide(color: Colors.red),
   ),
-  focusedBorder: OutlineInputBorder(
-borderSide: BorderSide(color: Colors.blue)
+  focusedErrorBorder: OutlineInputBorder(
+    borderSide: BorderSide(color: Colors.red),
   ),
-    errorBorder: OutlineInputBorder(
-borderSide: BorderSide(color: Colors.red),
-),
-  focusedErrorBorder:  OutlineInputBorder(
-borderSide: BorderSide(color: Colors.red),
-),
-
 );
-
- nextPage (context,page){
+// GO TO NEXT PAGE
+nextPage(context, page) {
   Navigator.push(context, MaterialPageRoute(builder: (context) => page));
 }
-void replaceScreen (context,page){
-  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => page));
+
+// REPLACE THE SCREEN
+void replaceScreen(context, page) {
+  Navigator.pushReplacement(
+      context, MaterialPageRoute(builder: (context) => page));
 }
 
-void showSnackbar(context, color , message ) {
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar (
-
-    content : Text(message),
-    backgroundColor : color,
+// SNACK BAR
+void showSnackbar(context, color, message) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    content: Text(message),
+    backgroundColor: color,
     action: SnackBarAction(
       label: "close",
       disabledTextColor: Colors.white,
       onPressed: () {},
-
     ),
     duration: const Duration(seconds: 2),
-
   ));
 }
-class NoSpaceFormatter extends TextInputFormatter {
+
+// TEXT FORMATTERS
+class TrimTextFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {
-    // Check if the new value contains any spaces
-    if (newValue.text.contains(' ')) {
-      // If it does, return the old value
-      return oldValue;
-    }
-    // Otherwise, return the new value
-    return newValue;
-  }
-}
-class TrimTextFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-
     return TextEditingValue(
-        text: newValue.text.startsWith(" ") ? newValue.text.replaceAll(" ", "") : newValue.text,
-        selection: newValue.text.startsWith(" ") ? TextSelection.collapsed(offset: newValue.text.replaceAll(" ", "").length) : newValue.selection
-    );
+        text: newValue.text.startsWith(" ")
+            ? newValue.text.replaceAll(" ", "")
+            : newValue.text,
+        selection: newValue.text.startsWith(" ")
+            ? TextSelection.collapsed(
+                offset: newValue.text.replaceAll(" ", "").length)
+            : newValue.selection);
   }
 }
 
+// TEXT FORMATTERS
 class NewLineTrimTextFormatter extends TextInputFormatter {
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
     return TextEditingValue(
-        text: newValue.text.startsWith(RegExp('[\n]')) ? newValue.text.trim() : newValue.text,
-        selection: newValue.text.startsWith(RegExp('[\n]')) ? TextSelection.collapsed(offset: newValue.text.trim().length) : newValue.selection
-    );
+        text: newValue.text.startsWith(RegExp('[\n]'))
+            ? newValue.text.trim()
+            : newValue.text,
+        selection: newValue.text.startsWith(RegExp('[\n]'))
+            ? TextSelection.collapsed(offset: newValue.text.trim().length)
+            : newValue.selection);
   }
 }

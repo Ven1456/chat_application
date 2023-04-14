@@ -26,7 +26,6 @@ class _SearchState extends State<Search> {
   bool isButtonDisabled = false;
   bool isUserJoined = false;
   bool isTextFieldEmpty = true;
-  bool _isJoined = false;
   bool _isPressed = false;
 
   @override
@@ -59,6 +58,7 @@ class _SearchState extends State<Search> {
     }
     super.dispose();
   }
+
   final searchFromKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -76,13 +76,14 @@ class _SearchState extends State<Search> {
           child: Column(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
                 color: Colors.blue,
                 child: Row(
                   children: [
                     Expanded(
                         child: TextFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       cursorColor: Colors.white,
                       controller: searchController,
                       style: const TextStyle(color: Colors.white),
@@ -91,18 +92,16 @@ class _SearchState extends State<Search> {
                         hintText: "Search Groups Here....",
                         hintStyle: TextStyle(color: Colors.white),
                       ),
-                          validator: (val) {
-                            if (val!.isEmpty) {
-                              return "Please Enter AtLeast 1 Characters";
-                            }
-                            else if (val.trim().isEmpty) {
-                              return "Please Search A Group Without Spaces";
-                            } else if (val.trim().replaceAll(' ', '').isEmpty) {
-                              return "Please Search A Group That Contains Text";
-                            }
-                            return null;
-                          },
-
+                      validator: (val) {
+                        if (val!.isEmpty) {
+                          return "Please Enter AtLeast 1 Characters";
+                        } else if (val.trim().isEmpty) {
+                          return "Please Search A Group Without Spaces";
+                        } else if (val.trim().replaceAll(' ', '').isEmpty) {
+                          return "Please Search A Group That Contains Text";
+                        }
+                        return null;
+                      },
                       onChanged: (value) {
                         setState(() {
                           isTextFieldEmpty = value.isEmpty;
@@ -114,7 +113,7 @@ class _SearchState extends State<Search> {
                     )),
                     GestureDetector(
                       onTap: () {
-                        if (searchFromKey.currentState!.validate()){
+                        if (searchFromKey.currentState!.validate()) {
                           if (!isTextFieldEmpty) {
                             setState(() {
                               hasUserSearched = true;
@@ -124,7 +123,6 @@ class _SearchState extends State<Search> {
                                 : dataNotFound();
                           }
                         }
-
                       },
                       child: Container(
                         width: 40,
@@ -207,7 +205,7 @@ class _SearchState extends State<Search> {
         .isUserJoined(groupName, groupId, username)
         .then((value) {
       setState(() {
-        _isJoined = value;
+        isUserJoined = value;
       });
     });
   }
@@ -237,36 +235,110 @@ class _SearchState extends State<Search> {
         onTap: () async {
           await DatabaseServices(uid: user!.uid)
               .toggleGroupJoin(groupId, username, groupName);
-          /*if (_isPressedFlyer) {
-        setState(() {
-          isUserJoined = !isUserJoined;
-        });
+          setState(() {
+            isUserJoined;
+          });
 
-        ToastContext toastContext = ToastContext();
-        // ignore: use_build_context_synchronously
-        toastContext.init(context);
-        Toast.show(
-          "Successfully Joined Group",
-          duration: Toast.lengthShort,
-          rootNavigator: true,
-          gravity: Toast.bottom,
-          webShowClose: true,
-          backgroundColor: Colors.green,
-        );
-        // ignore: use_build_context_synchronously
-        nextPage(
-            context,
-            ChatPage(
-                username: username,
-                groupName: groupName,
-                groupId: groupId));
-      setState(() {
-        _isPressedFlyer = true;
-        Future.delayed(const Duration(seconds: 3), () {
-          _isPressedFlyer = false;
-        });
-      });
-    }*/
+          if (isUserJoined) {
+            if (_isPressed) {
+              return;
+            }
+            _isPressed = true;
+            Future.delayed(const Duration(seconds: 1), () {
+              _isPressed = false;
+            });
+            ToastContext toastContext = ToastContext();
+            // ignore: use_build_context_synchronously
+            toastContext.init(context);
+            Toast.show(
+              "Successfully Joined Group",
+              duration: Toast.lengthShort,
+              rootNavigator: true,
+              gravity: Toast.bottom,
+              webShowClose: true,
+              backgroundColor: Colors.green,
+            );
+
+            // ignore: use_build_context_synchronously
+            nextPage(
+                context,
+                ChatPage(
+                    username: username,
+                    groupName: groupName,
+                    groupId: groupId));
+          } else {
+              ToastContext toastContext = ToastContext();
+              toastContext.init(context);
+              Toast.show(
+                "Left the  Group $groupName",
+                duration: Toast.lengthShort,
+                rootNavigator: true,
+                gravity: Toast.bottom,
+                webShowClose: true,
+                backgroundColor: Colors.red,
+              );
+          }
+
+        },
+        child: SizedBox(
+          height: 100,
+          width: 80,
+          child: Row(children: [
+            if (isUserJoined) Container(
+                    height: 40,
+                    width: 75,
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.blue,
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.white,
+                            offset: Offset(0.0, 0.0),
+                            blurRadius: 0.0,
+                            spreadRadius: 0.0,
+                          ), //
+                        ],
+                        border: Border.all(color: Colors.white)),
+                    child: const Center(
+                      child: Text(
+                        "left",
+                        style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ) else Container(
+              height: 40,
+              width: 75,
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.blue,
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.white,
+                            offset: Offset(0.0, 0.0),
+                            blurRadius: 0.0,
+                            spreadRadius: 0.0,
+                          ), //
+                        ],
+                        border: Border.all(color: Colors.white)),
+                    child: const Center(
+                      child: Text(
+                        "join",
+                        style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+          ]),
+        ),
+      ),
+/*      trailing: GestureDetector(
+        onTap: () async {
+          await DatabaseServices(uid: user!.uid)
+              .toggleGroupJoin(groupId, username, groupName);
+
           if (_isPressed) {
             return;
           }
@@ -279,10 +351,6 @@ class _SearchState extends State<Search> {
             setState(() {
               isUserJoined = !isUserJoined;
             });
-
-            /*setState(() {
-              isUserJoined = !isUserJoined;
-            });*/
             ToastContext toastContext = ToastContext();
             // ignore: use_build_context_synchronously
             toastContext.init(context);
@@ -318,7 +386,7 @@ class _SearchState extends State<Search> {
             });
           }
         },
-        child: _isJoined
+        child: isUserJoined
             ? Container(
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
@@ -359,7 +427,7 @@ class _SearchState extends State<Search> {
                   style: TextStyle(color: Colors.white),
                 ),
               ),
-      ),
+      ),*/
     );
   }
 

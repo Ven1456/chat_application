@@ -1,3 +1,4 @@
+
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/auth/login_screen.dart';
@@ -10,6 +11,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
 
 import 'package:lottie/lottie.dart';
 import 'package:toast/toast.dart';
@@ -55,7 +57,11 @@ class _HomeScreenState extends State<HomeScreen> {
         groups = snapshot;
       });
     });
-
+    await SharedPref.getProfilePic().then((value) {
+      setState(() {
+        profilePic = value ?? "";
+      });
+    });
     await SharedPref.getName().then((value) {
       setState(() {
         username = value!;
@@ -68,133 +74,169 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+
   final valFormKey = GlobalKey<FormState>();
   bool isGroup = true;
+
+  GlobalKey<SliderDrawerState> _key = GlobalKey<SliderDrawerState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        actions: [
-          IconButton(
-              onPressed: () {
-                nextPage(context, const Search());
-              },
-              icon: const Icon(Icons.search))
+   appBar: _buildAppBar(context),
+     drawer: _buildDrawer(context),
+        
+      body:  groupList(),
+      
+      floatingActionButton: _buildFloatingActionButton(context),
+    );
+  }
+
+  Drawer _buildDrawer(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        children: [
+            (profilePic).isEmpty
+              ? const CircleAvatar(
+            child: Icon(
+              Icons.person,
+              size: 130,
+            ),
+          )
+              : UnconstrainedBox(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(80),
+              child: Image.network(
+                height: 130,
+                width: 130,
+                profilePic,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loading) {
+                  if (loading == null) return child;
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Text(
+            username,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          const Divider(
+            height: 5,
+          ),
+          ListTile(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            leading: const Icon(Icons.group),
+            title: const Text(
+              "Chats",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            ),
+          ),
+          ListTile(
+            onTap: () {
+              nextPage(
+                  context,
+                  Profile(
+                    profilePicTest: profilePic,
+                    username: username,
+                    email: email,
+                  ));
+            },
+            leading: const Icon(Icons.person),
+            title: const Text(
+              "Profile",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            ),
+          ),
+          ListTile(
+            onTap: () {
+              showDialog(
+                  barrierDismissible: false,
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text(
+                        "LogOut",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      content: const Text(
+                        "Are you sure you want Logout",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      actions: [
+                        IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: const Icon(
+                              Icons.cancel,
+                              color: Colors.red,
+                            )),
+                        IconButton(
+                            onPressed: () {
+                              authService.signOut();
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const LoginPage()),
+                                  (route) => false);
+                            },
+                            icon: const Icon(
+                              Icons.done,
+                              color: Colors.green,
+                            )),
+                      ],
+                    );
+                  });
+            },
+            leading: const Icon(Icons.logout),
+            title: const Text(
+              "Log Out",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            ),
+          ),
         ],
-        title: const Text(
-          "Chats",
-          style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
-        ),
       ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            const Icon(
-              Icons.account_circle,
-              size: 100,
-              color: Colors.black,
-            ),
-            Text(
-              username,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            const Divider(
-              height: 5,
-            ),
-            ListTile(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              leading: const Icon(Icons.group),
-              title: const Text(
-                "Chats",
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-              ),
-            ),
-            ListTile(
-              onTap: () {
-                nextPage(
-                    context,
-                    Profile(
-                      username: username,
-                      email: email,
-                    ));
-              },
-              leading: const Icon(Icons.person),
-              title: const Text(
-                "Profile",
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-              ),
-            ),
-            ListTile(
-              onTap: () {
-                showDialog(
-                    barrierDismissible: false,
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text(
-                          "LogOut",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        content: const Text(
-                          "Are you sure you want Logout",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        actions: [
-                          IconButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              icon: const Icon(
-                                Icons.cancel,
-                                color: Colors.red,
-                              )),
-                          IconButton(
-                              onPressed: () {
-                                authService.signOut();
-                                Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const LoginPage()),
-                                    (route) => false);
-                              },
-                              icon: const Icon(
-                                Icons.done,
-                                color: Colors.green,
-                              )),
-                        ],
-                      );
-                    });
-              },
-              leading: const Icon(Icons.logout),
-              title: const Text(
-                "Log Out",
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
+    );
+  }
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      centerTitle: true,
+      actions: [
+        IconButton(
+            onPressed: () {
+              nextPage(context, const Search());
+            },
+            icon: const Icon(Icons.search))
+      ],
+      title: const Text(
+        "Chats",
+        style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
       ),
-      body: groupList(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          popUpDialog(context);
-        },
-        elevation: 0,
-        child: const Icon(Icons.add),
-      ),
+    );
+  }
+
+  FloatingActionButton _buildFloatingActionButton(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () {
+        popUpDialog(context);
+      },
+      elevation: 0,
+      child: const Icon(Icons.add),
     );
   }
 
@@ -212,8 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     int reverseIndex =
                         snapshot.data["groups"].length - index - 1;
                     return GroupTile(
-                        groupName:
-                            getName(snapshot.data["groups"][reverseIndex]),
+                        groupName: getName(snapshot.data["groups"][reverseIndex]),
                         username: snapshot.data["fullName"],
                         groupId: getId(snapshot.data["groups"][reverseIndex]));
                   },

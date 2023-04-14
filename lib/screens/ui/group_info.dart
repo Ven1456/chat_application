@@ -110,34 +110,36 @@ class _GroupInfoState extends State<GroupInfo> {
       ),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(21),
-                color: Colors.blue.withOpacity(0.4),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(21),
+                  color: Colors.blue.withOpacity(0.4),
+                ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      child: Text(widget.groupName.substring(0, 2)),
+                    ),
+                    const SizedBox(
+                      width: 15,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Group : ${widget.groupName}"),
+                        Text("Admin : ${getName(widget.adminName)}"),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    child: Text(widget.groupName.substring(0, 2)),
-                  ),
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Group : ${widget.groupName}"),
-                      Text("Admin : ${getName(widget.adminName)}"),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            memberList()
-          ],
+              memberList()
+            ],
+          ),
         ),
       ),
     );

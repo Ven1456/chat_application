@@ -10,6 +10,7 @@ class GroupTile extends StatefulWidget {
   String username;
   String groupName;
 
+
   GroupTile(
       {Key? key,
       required this.groupName,
@@ -27,7 +28,7 @@ class _GroupTileState extends State<GroupTile> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-         nextPage(context, ChatPage(username: widget.username, groupName: widget.groupName, groupId: widget.groupId));
+         nextPage(context, ChatPage(username: widget.username, groupName: widget.groupName, groupId: widget.groupId,));
       },
       onLongPressStart: ( details) {
         final offset = details.globalPosition;

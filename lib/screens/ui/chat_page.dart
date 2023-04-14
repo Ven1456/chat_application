@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'package:chat/resources/Shared_Preferences.dart';
+import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/ui/group_info.dart';
 import 'package:chat/screens/ui/message_tlle.dart';
+import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -13,9 +16,11 @@ class ChatPage extends StatefulWidget {
   String username;
   String groupName;
   String groupId;
+  String? profilePic;
 
   ChatPage(
       {Key? key,
+      this.profilePic,
       required this.username,
       required this.groupName,
       required this.groupId})
@@ -33,8 +38,8 @@ class _ChatPageState extends State<ChatPage> {
   final TextEditingController messageController = TextEditingController();
   double minHeight = 60;
   double maxHeight = 150;
-  int maxLines =10;
-
+  int maxLines = 10;
+  String profilePic = '';
 
   @override
   void initState() {
@@ -42,16 +47,18 @@ class _ChatPageState extends State<ChatPage> {
 
     // TODO: implement initState
     super.initState();
-      setState(() {
-        isLoadingAnimation = true;
-
-      });
+    setState(() {
+      isLoadingAnimation = true;
+    });
+    getUser();
   }
+
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
   }
+
   void resetHeight() {
     setState(() {
       minHeight = 60;
@@ -71,34 +78,27 @@ class _ChatPageState extends State<ChatPage> {
       });
     });
   }
+
+  getUser() async {
+    await SharedPref.getProfilePic().then((value) {
+      setState(() {
+        profilePic = value ?? "";
+        final user = AuthService().firebaseAuth.currentUser!.uid;
+        DatabaseServices(uid: user);
+      });
+    });
+  }
+
   final chatFromKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(widget.groupName.toString()),
-        elevation: 0,
-        actions: [
-          GestureDetector(
-              onTap: () {
-                nextPage(
-                    context,
-                    GroupInfo(
-                        adminName: adminName,
-                        groupName: widget.groupName,
-                        groupId: widget.groupId));
-              },
-              child: const Icon(Icons.info)),
-          const SizedBox(
-            width: 20,
-          ),
-        ],
-      ),
+      appBar: _buildAppBar(context),
       body: Form(
         key: chatFromKey,
         child: Column(
           children: [
+
             Expanded(
               child: chatMessages(),
             ),
@@ -109,75 +109,70 @@ class _ChatPageState extends State<ChatPage> {
                 children: [
                   Expanded(
                       child: Container(
-                        constraints: BoxConstraints(
-                          minHeight: minHeight,
-                          maxHeight: maxHeight,
-
-                        ),
-
-                        child: TextFormField(
-                          maxLines:null ,
-                    inputFormatters: [
-                      TrimTextFormatter(),
-                      NewLineTrimTextFormatter(),
-                    ],
-                    cursorColor: Colors.white  ,
-                    keyboardType: TextInputType.multiline,
-                    controller: messageController,
-
-                    style: const TextStyle(color: Colors.white),
-                     /*     validator: (val) {
-                            if (val!.trim().isEmpty) {
-                              return "Please Enter A Message Without Spaces";
-
-                            } else if (val.trim().replaceAll(' ', '').isEmpty) {
-                              return "Please Enter A Message That Contains Text";
-
-                            }
-                            return null;
-
-                          },*/
-
-                          onChanged: (value) {
-
-                            final lines = value.split('\n').length;
-                            if (lines < 2) {
-                              setState(() {
-                                minHeight = 60;
-                                maxHeight = 150;
-                              });
-                            } else if (lines < 6) {
-                              setState(() {
-                                minHeight = 66;
-                                maxHeight = 150;
-                              });
-                            } else if (lines <= 10) {
-                              setState(() {
-                                minHeight = 60 + (5 - 1) * 20;
-                                maxHeight = 150 + (lines - 5) * 20;
-                                maxLines = lines;
-                              });
-                            } else {
-                              setState(() {
-                                maxLines = maxLines;
-                              });
-                            }
-                          },
-                    decoration: const InputDecoration(
+                    constraints: BoxConstraints(
+                      minHeight: minHeight,
+                      maxHeight: maxHeight,
+                    ),
+                    child: TextFormField(
+                      maxLines: null,
+                      inputFormatters: [
+                        TrimTextFormatter(),
+                        NewLineTrimTextFormatter(),
+                      ],
+                      cursorColor: Colors.white,
+                      keyboardType: TextInputType.multiline,
+                      controller: messageController,
+                      style: const TextStyle(color: Colors.white),
+                      onChanged: (value) {
+                        final lines = value.split('\n').length;
+                        if (lines < 2) {
+                          setState(() {
+                            minHeight = 60;
+                            maxHeight = 150;
+                          });
+                        } else if (lines < 6) {
+                          setState(() {
+                            minHeight = 66;
+                            maxHeight = 150;
+                          });
+                        } else if (lines <= 10) {
+                          setState(() {
+                            minHeight = 60 + (5 - 1) * 20;
+                            maxHeight = 150 + (lines - 5) * 20;
+                            maxLines = lines;
+                          });
+                        } else {
+                          setState(() {
+                            maxLines = maxLines;
+                          });
+                        }
+                      },
+                      decoration: const InputDecoration(
                         hintText: "Send a Message",
                         hintStyle: TextStyle(color: Colors.white),
                         border: InputBorder.none,
-                      errorStyle: TextStyle(color: Colors.white,fontSize: 15),
+                        errorStyle:
+                            TextStyle(color: Colors.white, fontSize: 15),
+                      ),
                     ),
-                  ),
+                  )),
+                  GestureDetector(
+                      onTap: () {
+                        ProfileController().pickImage(context);
+                      },
+                      child: const Icon(
+                        Icons.image,
+                        size: 40,
                       )),
+                  const SizedBox(
+                    width: 15,
+                  ),
                   GestureDetector(
                     onTap: () {
                       if (chatFromKey.currentState!.validate()) {
                         sendMessages();
                         resetHeight();
                       }
-
                     },
                     child: Container(
                       height: 50,
@@ -201,19 +196,63 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      centerTitle: true,
+      title: Text(
+        widget.groupName.toString(),
+        style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+      ),
+      elevation: 0,
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 3.0),
+          child: ClipRRect(
+              borderRadius: BorderRadius.circular(100),
+              child: profilePic.isEmpty
+                  ? const Center(
+                      child: Icon(
+                      Icons.person,
+                      size: 30,
+                    ))
+                  : Image.network(profilePic,
+                      height: 50, width: 55, fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loading) {
+                      if (loading == null) return child;
+                      return const Center(child: CircularProgressIndicator());
+                    })),
+        ),
+        const SizedBox(
+          width: 15,
+        ),
+        GestureDetector(
+            onTap: () {
+              nextPage(
+                  context,
+                  GroupInfo(
+                      adminName: adminName,
+                      groupName: widget.groupName,
+                      groupId: widget.groupId));
+            },
+            child: const Icon(Icons.info)),
+        const SizedBox(
+          width: 20,
+        ),
+      ],
+    );
+  }
 
   // function to convert time stamp to date
   static DateTime returnDateAndTimeFormat(String time) {
     var dt = DateTime.fromMicrosecondsSinceEpoch(int.parse(time));
-   /* var originalDate = DateFormat('MM/dd/yyyy').format(dt);*/
+    /* var originalDate = DateFormat('MM/dd/yyyy').format(dt);*/
     return DateTime(dt.year, dt.month, dt.day);
   }
-
 
   // function to return date if date changes based on your local date and time
   static String groupMessageDateAndTime(String time) {
     var dt = DateTime.fromMicrosecondsSinceEpoch(int.parse(time.toString()));
-  /*  var originalDate = DateFormat('MM/dd/yyyy').format(dt);*/
+    /*  var originalDate = DateFormat('MM/dd/yyyy').format(dt);*/
 
     final todayDate = DateTime.now();
 
@@ -238,15 +277,17 @@ class _ChatPageState extends State<ChatPage> {
     return StreamBuilder(
       stream: chats,
       builder: (context, AsyncSnapshot snapshot) {
-        isLoadingAnimation ? WidgetsBinding.instance.addPostFrameCallback((_) async {
-          // Scroll to the last item in the list
-          if (_scrollController.hasClients) {
-            Timer(
-                const Duration(milliseconds: 2),
-                () => _scrollController
-                    .jumpTo(_scrollController.position.maxScrollExtent));
-          }
-        }) : "";
+        isLoadingAnimation
+            ? WidgetsBinding.instance.addPostFrameCallback((_) async {
+                // Scroll to the last item in the list
+                if (_scrollController.hasClients) {
+                  Timer(
+                      const Duration(milliseconds: 2),
+                      () => _scrollController
+                          .jumpTo(_scrollController.position.maxScrollExtent));
+                }
+              })
+            : "";
         return snapshot.hasData
             ? Column(
                 children: [
@@ -258,9 +299,6 @@ class _ChatPageState extends State<ChatPage> {
                         itemBuilder: (context, index) {
                           bool isSameDate = false;
                           String? newDate = '';
-
-                          /*final DateTime date = returnDateAndTimeFormat(
-                              snapshot.data.docs[index]["time"].toString());*/
 
                           if (index == 0) {
                             newDate = groupMessageDateAndTime(snapshot
@@ -318,64 +356,6 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-/*  chatMessages() {
-    return StreamBuilder(
-        stream: chats,
-        builder: (context, AsyncSnapshot snapshot) {
-          return snapshot.hasData
-              ? Padding(
-                padding: const EdgeInsets.only(bottom: 40.0),
-                child: ListView.builder(
-                    itemCount: snapshot.data.docs.length,
-                    itemBuilder: (context, index) {
-                      print(":${snapshot.data.docs.length}");
-                      bool isSameDate = false;
-                      String? newDate = '';
-
-                      final DateTime date = returnDateAndTimeFormat(snapshot.data.docs[index]["time"].toString());
-
-
-                      if(index == 0  && snapshot.data.docs.length ==  1){
-                        newDate =  groupMessageDateAndTime(snapshot.data.docs[index]["time"].toString()).toString();
-                      }else if(index == snapshot.data.docs.length - 1){
-                        newDate =  groupMessageDateAndTime(snapshot.data.docs[index]["time"].toString()).toString();
-                      }else {
-
-                        final DateTime date = returnDateAndTimeFormat(snapshot.data.docs[index]["time"].toString());
-                        final DateTime prevDate = returnDateAndTimeFormat(snapshot.data.docs[index + 1]["time"].toString());
-                        isSameDate = date.isAtSameMomentAs(prevDate);
-
-                        newDate =  isSameDate ?  "": groupMessageDateAndTime(snapshot.data.docs[index-1]["time"].toString()).toString() ;
-                      }
-
-                      return Column(
-                        children: [
-                          if(newDate.isNotEmpty)
-                            Center(child:
-                            Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.lightGreen,
-                                    borderRadius: BorderRadius.circular(20)
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(newDate),
-                                ))),
-                          MessageTile(
-                              message: snapshot.data.docs[index]["message"],
-                              sendByMe: widget.username ==
-                              snapshot.data.docs[index]["sender"],
-                              sender: snapshot.data.docs[index]["sender"],
-                              time:  snapshot.data.docs[index]["time"].toString(),
-                          ),
-                        ],
-                      );
-                    }),
-              )
-              : Container();
-        });
-  }*/
-
   sendMessages() {
     if (messageController.text.isNotEmpty) {
       _scrollController.animateTo(
@@ -386,7 +366,7 @@ class _ChatPageState extends State<ChatPage> {
       Map<String, dynamic> chatMessageMap = {
         "message": messageController.text.trim(),
         "sender": widget.username,
-        "time": DateTime.now().microsecondsSinceEpoch
+        "time": DateTime.now().microsecondsSinceEpoch,
       };
       DatabaseServices().sendMessage(widget.groupId, chatMessageMap);
       setState(() {

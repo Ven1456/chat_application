@@ -1,34 +1,57 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SharedPref{
-  static String userLogin="LoginKey";
-  static String userName="NameKey";
-  static String userEmail="EmailKey";
+class SharedPref {
+  static String userLogin = "LoginKey";
+  static String userName = "NameKey";
+  static String userEmail = "EmailKey";
+  static String profilePic = "profilePic";
 
-    static Future<bool?> saveUserLoginStatus(bool isUserLogged) async{
-       SharedPreferences sharedPreferences =await SharedPreferences.getInstance();
-      sharedPreferences.setBool(userLogin,isUserLogged );
-    }
-
-  static Future<bool?> saveUserName(String isUsername) async{
-    SharedPreferences sharedPreferences =await SharedPreferences.getInstance();
-    sharedPreferences.setString(userName,isUsername);
-  }
-  static Future<bool?> saveUserEmail(String isUserEmail) async{
-    SharedPreferences sharedPreferences =await SharedPreferences.getInstance();
-   return await sharedPreferences.setString(userEmail,isUserEmail);
+  // SAVE THE USER LOGIN STATUS SHARED PREFERENCE
+  static Future<bool?> saveUserLoginStatus(bool isUserLogged) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setBool(userLogin, isUserLogged);
+    return null;
   }
 
-  static Future <bool?> isUserLogin() async {
+  // SAVE THE USER NAME STATUS SHARED PREFERENCE
+  static Future<bool?> saveUserName(String isUsername) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString(userName, isUsername);
+    return null;
+  } // SAVE THE USER EMAIL STATUS SHARED PREFERENCE
+
+  static Future<bool?> saveUserEmail(String isUserEmail) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return await sharedPreferences.setString(userEmail, isUserEmail);
+  }
+
+// SAVE THE USER PROFILE PIC STATUS SHARED PREFERENCE
+  static Future<bool?> saveProfilePic(String profile) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return await sharedPreferences.setString(profilePic, profile);
+  }
+
+// SAVE THE IS USER LOGIN NAME STATUS SHARED PREFERENCE
+  static Future<bool?> isUserLogin() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return sharedPreferences.getBool(userLogin);
   }
-  static Future<String?> getName()async{
+
+  // GET THE NAME STATUS SHARED PREFERENCE
+  static Future<String?> getName() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return sharedPreferences.getString(userName);
   }
-  static Future<String?> getEmail()async{
+
+  // GET THE EMAIL STATUS SHARED PREFERENCE
+  static Future<String?> getEmail() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return sharedPreferences.getString(userEmail);
+  }
+
+  // GET THE PROFILE PIC STATUS SHARED PREFERENCE
+  static Future<String?> getProfilePic() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return sharedPreferences.getString(profilePic);
   }
 }

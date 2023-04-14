@@ -2,8 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseServices {
   final String? uid;
+  final String? groupId;
 
-  DatabaseServices({this.uid});
+  DatabaseServices({this.uid,this.groupId});
 
   // reference from our collections
   final CollectionReference userCollection =
@@ -54,10 +55,12 @@ class DatabaseServices {
       "groupIcon": "",
       "admin": "${id}_$username",
       "members": [],
-      "groupId": "",
+      "groupId": groupId,
       "recentMessage": "",
       "recentMessageSender": "",
     });
+
+
     // update the members
     await groupDocumentReference.update({
       "members": FieldValue.arrayUnion(["${id}_$username"]),
@@ -117,6 +120,13 @@ class DatabaseServices {
         .get();
   }
 
+// delete the group name
+  Future deleteGroupName(String uid) async {
+     await groupCollection.doc(uid).update({
+      "groupId": FieldValue.delete(),
+      "groupName": FieldValue.delete(),
+    });
+  }
 
   Future<bool> isUserJoined(
       String groupName, String groupId, String userName) async {
@@ -162,6 +172,7 @@ class DatabaseServices {
       "recentMessage": chatMessageData["message"],
       "recentMessageSender": chatMessageData["sender"],
       "recentMessageTime": chatMessageData["time"].toString(),
+      "groupIcon": chatMessageData["groupPic"].toString(),
     });
   }
 }

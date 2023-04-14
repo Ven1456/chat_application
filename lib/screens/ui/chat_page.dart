@@ -4,6 +4,7 @@ import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/ui/group_info.dart';
 import 'package:chat/screens/ui/message_tlle.dart';
+import 'package:chat/screens/ui/profile.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -159,6 +160,8 @@ class _ChatPageState extends State<ChatPage> {
                   GestureDetector(
                       onTap: () {
                         ProfileController().pickImage(context);
+                        ProfileController().url;
+                        print(ProfileController().url);
                       },
                       child: const Icon(
                         Icons.image,
@@ -367,6 +370,7 @@ class _ChatPageState extends State<ChatPage> {
         "message": messageController.text.trim(),
         "sender": widget.username,
         "time": DateTime.now().microsecondsSinceEpoch,
+        "groupPic":""
       };
       DatabaseServices().sendMessage(widget.groupId, chatMessageMap);
       setState(() {

@@ -1,16 +1,20 @@
+import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/ui/homeScreen.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
 class GroupInfo extends StatefulWidget {
   String groupName;
   String groupId;
   String adminName;
+  String? groupPic;
 
   GroupInfo({Key? key,
+    this.groupPic,
     required this.adminName,
     required this.groupName,
     required this.groupId})
@@ -22,6 +26,7 @@ class GroupInfo extends StatefulWidget {
 
 class _GroupInfoState extends State<GroupInfo> {
   Stream? members;
+
 
   @override
   void initState() {
@@ -91,7 +96,6 @@ class _GroupInfoState extends State<GroupInfo> {
                                     widget.groupId, getName(widget.adminName),
                                     widget.groupName).whenComplete(() {
                                       nextPage(context, const HomeScreen());
-
                                 });
                               },
                               icon: const Icon(
@@ -108,11 +112,58 @@ class _GroupInfoState extends State<GroupInfo> {
           ),
         ],
       ),
-      body: Container(
+      body: ChangeNotifierProvider(
+        create: (_) => ProfileController(),
+    child: Consumer<ProfileController>(
+    builder: (context, provider, child) {
+
+      return Container(
         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
         child: SingleChildScrollView(
           child: Column(
             children: [
+              Stack(
+                alignment: Alignment.bottomRight,
+                children:[
+                  SizedBox(
+                    height: 100,
+                    width: 100,
+                    child: CircleAvatar(
+                      child:Center(
+                        child: Text(widget.groupName.substring(0, 2) ,style: const TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold
+                        ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: (){
+                      ProfileController().pickImage(context);
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: provider.image == null
+                          ? (widget.groupPic ?? "").isEmpty
+                          ?  Padding(
+                        padding: const EdgeInsets.only(left: 8.0,right: 8,top: 4),
+                        child: Container(
+                            decoration: const BoxDecoration(
+                                color: Colors.deepOrange,
+                                shape: BoxShape.circle
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.all(2.0),
+                              child: Icon(Icons.edit),
+                            )),
+                      ) : Image.network(widget.groupPic.toString()) : Container()
+                    )
+
+                  )
+                ]
+              ),
+              const SizedBox(height: 20,),
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -141,7 +192,12 @@ class _GroupInfoState extends State<GroupInfo> {
             ],
           ),
         ),
-      ),
+      );
+
+
+    }
+    )
+      )
     );
   }
 

@@ -11,7 +11,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
 
 import 'package:lottie/lottie.dart';
 import 'package:toast/toast.dart';
@@ -78,7 +77,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final valFormKey = GlobalKey<FormState>();
   bool isGroup = true;
 
-  GlobalKey<SliderDrawerState> _key = GlobalKey<SliderDrawerState>();
 
   @override
   Widget build(BuildContext context) {
@@ -97,12 +95,20 @@ class _HomeScreenState extends State<HomeScreen> {
       child: ListView(
         children: [
             (profilePic).isEmpty
-              ? const CircleAvatar(
+              ? const UnconstrainedBox(
+                child: SizedBox(
+                height: 150,
+                  width: 150,
+                  child: CircleAvatar(
+
             child: Icon(
-              Icons.person,
-              size: 130,
+                  Icons.person,
+                  color: Colors.black,
+                  size: 130,
             ),
-          )
+          ),
+                ),
+              )
               : UnconstrainedBox(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(80),

@@ -1,36 +1,41 @@
 import 'dart:io';
 
+import 'package:chat/screens/ui/group_Tile.dart';
+import 'package:chat/screens/ui/group_info.dart';
 import 'package:chat/services/auth_service.dart';
+import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:toast/toast.dart';
 
 import 'Shared_Preferences.dart';
 
 class ProfileController extends ChangeNotifier {
+
   final picker = ImagePicker();
   AuthService authService = AuthService();
   XFile? _image;
   XFile? get image => _image;
+  String getId = "";
   String url = "";
-  firebase_storage.FirebaseStorage storage =
-      firebase_storage.FirebaseStorage.instanceFor(
-          bucket: 'gs://chatapp-4f907.appspot.com');
+  firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instanceFor(bucket: 'gs://chatapp-4f907.appspot.com');
   // IMAGE PICK FROM GALLERY
   Future pickGalleryImage(BuildContext context) async {
-    final pickedFile =
-        await picker.pickImage(source: ImageSource.gallery, imageQuality: 100);
+    final pickedFile =  await picker.pickImage(source: ImageSource.gallery, imageQuality: 100);
     if (pickedFile != null) {
       _image = XFile(pickedFile.path);
       _image = await _CropImage(imageFile: _image);
       // ignore: use_build_context_synchronously
       uploadImage(context);
       notifyListeners();
+      // ignore: use_build_context_synchronously
+      uploadGroupImage(context);
     }
   }
+
+
 
   // CROP THE IMAGE
   Future<XFile?> _CropImage({XFile? imageFile}) async {
@@ -49,9 +54,12 @@ class ProfileController extends ChangeNotifier {
       _image = XFile(pickedFile.path);
       // ignore: use_build_context_synchronously
       uploadImage(context);
+      // ignore: use_build_context_synchronously
+      uploadGroupImage(context);
       notifyListeners();
     }
   }
+
 
   // UPLOADING THE IMAGE FROM YUR DEVICE
   void uploadImage(BuildContext context) async {
@@ -105,6 +113,7 @@ class ProfileController extends ChangeNotifier {
     // });
   }
 
+
   // PICK IMAGE FROM YOUR DEVICE
   void pickImage(context) {
     showDialog(
@@ -137,5 +146,29 @@ class ProfileController extends ChangeNotifier {
             ),
           );
         });
+  }
+
+  void uploadGroupImage(BuildContext context) async {
+    if (image == null) {
+      return;
+    }
+    firebase_storage.Reference reference = firebase_storage
+        .FirebaseStorage.instance
+        .ref()
+        .child("/groupIcon")
+        .child(DatabaseServices().groupId.toString());
+    firebase_storage.UploadTask uploadTask =
+    reference.putFile(File(image!.path).absolute);
+    await Future.value(uploadTask);
+    String downloadUrl = await reference.getDownloadURL();
+    String userId = DatabaseServices().groupId.toString();
+    DocumentSnapshot snapshot =
+    await FirebaseFirestore.instance.collection('groups').doc(userId).get();
+    if (snapshot.exists) {
+      await FirebaseFirestore.instance.collection('users').doc(userId).update({
+        'groupIcon': downloadUrl,
+      });
+      url = downloadUrl;
+    }
   }
 }

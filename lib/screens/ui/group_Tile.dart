@@ -2,6 +2,9 @@
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/ui/chat_page.dart';
 import 'package:chat/services/auth_service.dart';
+import 'package:chat/services/database_services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
@@ -23,6 +26,11 @@ class GroupTile extends StatefulWidget {
 }
 
 class _GroupTileState extends State<GroupTile> {
+
+  String getId(String res) {
+    return res.substring(0, res.indexOf("_"));
+  }
+  CollectionReference collectionReference =   FirebaseFirestore.instance.collection("groups");
   AuthService authService = AuthService();
   @override
   Widget build(BuildContext context) {
@@ -40,10 +48,9 @@ class _GroupTileState extends State<GroupTile> {
         ), items: [
           PopupMenuItem(
             onTap: (){
-            /*  DatabaseServices().deleteUserData(FirebaseAuth.instance.currentUser!.uid).then((value)
-
-              {
-              });*/
+           setState(() {
+             FirebaseFirestore.instance.collection('groups').doc(widget.groupId).delete();
+           });
             },
             child: const Text("Delete"),
           ),
@@ -53,7 +60,8 @@ class _GroupTileState extends State<GroupTile> {
           ),
 
 
-        ]);
+        ]
+        );
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),

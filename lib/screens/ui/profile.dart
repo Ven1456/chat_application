@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/services/auth_service.dart';
+import 'package:chat/services/database_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,8 +17,11 @@ class Profile extends StatefulWidget {
   State<Profile> createState() => _ProfileState();
 }
 class _ProfileState extends State<Profile> {
+  final TextEditingController _textEditingController = TextEditingController();
+
   AuthService authService = AuthService();
   String? image = "";
+  String user ="";
   File? imageFile;
   @override
   void initState() {
@@ -33,6 +37,7 @@ class _ProfileState extends State<Profile> {
       });
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,7 +86,6 @@ class _ProfileState extends State<Profile> {
                             : Stack(children: [
                           Image.file(File(provider.image!.path).absolute,
                             fit: BoxFit.cover,
-
                           ),
 
                         ]),
@@ -160,7 +164,7 @@ class _ProfileState extends State<Profile> {
       color: Colors.grey.withOpacity(0.5),
       spreadRadius: 2,
       blurRadius: 5,
-      offset: Offset(0, 4), // changes position of shadow
+      offset: const Offset(0, 4), // changes position of shadow
     ),],
 
       ),
@@ -189,7 +193,7 @@ class _ProfileState extends State<Profile> {
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 2,
             blurRadius: 5,
-            offset: Offset(0, 4), // changes position of shadow
+            offset: const Offset(0, 4), // changes position of shadow
           ),],
       ),
       child: Center(

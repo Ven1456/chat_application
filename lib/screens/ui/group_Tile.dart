@@ -1,10 +1,10 @@
 
+import 'package:chat/resources/Shared_Preferences.dart';
+import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/ui/chat_page.dart';
 import 'package:chat/services/auth_service.dart';
-import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
@@ -12,10 +12,12 @@ class GroupTile extends StatefulWidget {
   String groupId;
   String username;
   String groupName;
+  String? groupPic;
 
 
   GroupTile(
       {Key? key,
+        this.groupPic,
       required this.groupName,
       required this.username,
       required this.groupId})
@@ -36,7 +38,7 @@ class _GroupTileState extends State<GroupTile> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-         nextPage(context, ChatPage(username: widget.username, groupName: widget.groupName, groupId: widget.groupId,));
+         nextPage(context, ChatPage(groupPic : widget.groupPic,username: widget.username, groupName: widget.groupName, groupId: widget.groupId,));
       },
       onLongPressStart: ( details) {
         final offset = details.globalPosition;
@@ -47,9 +49,11 @@ class _GroupTileState extends State<GroupTile> {
           offset.dy + 1,
         ), items: [
           PopupMenuItem(
-            onTap: (){
-           setState(() {
-             FirebaseFirestore.instance.collection('groups').doc(widget.groupId).delete();
+            onTap: ()async {
+              String?  getId = await( SharedPref.getGroupId());
+           setState(()  {
+
+             FirebaseFirestore.instance.collection('groups').doc(getId).delete();
            });
             },
             child: const Text("Delete"),

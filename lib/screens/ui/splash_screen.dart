@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
             context,
             MaterialPageRoute(
                 builder: (context) =>
-                isLogin ? const HomeScreen() : const LoginPage())));
+                isLogin ?  HomeScreen() : const LoginPage())));
   }
   isUserLogin() async {
     await SharedPref.isUserLogin().then((value) {

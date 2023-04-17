@@ -1,5 +1,6 @@
 
 import 'package:chat/resources/Shared_Preferences.dart';
+import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/auth/login_screen.dart';
 import 'package:chat/screens/ui/group_Tile.dart';
@@ -16,7 +17,8 @@ import 'package:lottie/lottie.dart';
 import 'package:toast/toast.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+
+   HomeScreen({Key? key}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -26,7 +28,6 @@ class _HomeScreenState extends State<HomeScreen> {
   String username = "";
   String email = "";
   String profilePic = "";
-
   Stream? groups;
   QuerySnapshot? searchSnapshot;
   AuthService authService = AuthService();
@@ -38,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
   initState() {
     gettingUserData();
     super.initState();
+
   }
 
   String getId(String res) {
@@ -80,12 +82,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
    appBar: _buildAppBar(context),
      drawer: _buildDrawer(context),
-        
+
       body:  groupList(),
-      
+
       floatingActionButton: _buildFloatingActionButton(context),
     );
   }
@@ -187,6 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         IconButton(
                             onPressed: () {
                               Navigator.pop(context);
+
                             },
                             icon: const Icon(
                               Icons.cancel,
@@ -257,8 +261,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemCount: snapshot.data["groups"].length,
                   itemBuilder: (BuildContext context, int index) {
                     // reverse the index value
-                    int reverseIndex =
-                        snapshot.data["groups"].length - index - 1;
+                    int reverseIndex = snapshot.data["groups"].length - index - 1;
+                    SharedPref.saveGroupId(getId(snapshot.data["groups"][reverseIndex]));
                     return GroupTile(
                         groupName: getName(snapshot.data["groups"][reverseIndex]),
                         username: snapshot.data["fullName"],

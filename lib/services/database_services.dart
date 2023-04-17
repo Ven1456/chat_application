@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseServices {
   final String? uid;
-  final String? groupId;
+  String? groupId;
 
   DatabaseServices({this.uid,this.groupId});
 
@@ -21,6 +21,13 @@ class DatabaseServices {
       "profilePic": "",
       "uid": uid,
     });
+  }
+  Future updateUserName(String userName)async{
+    return userCollection.doc(uid).update(
+      {
+        "fullName" : userName,
+      }
+    );
   }
   // getting user email data
   Future gettingUserEmail(String email) async {
@@ -55,7 +62,7 @@ class DatabaseServices {
       "groupIcon": "",
       "admin": "${id}_$username",
       "members": [],
-      "groupId": groupId,
+      "groupId": "",
       "recentMessage": "",
       "recentMessageSender": "",
     });
@@ -106,7 +113,6 @@ class DatabaseServices {
   Future getSearchByName(String groupName) async {
     return groupCollection.where("groupName", isEqualTo: groupName).get();
   }
-
   // search group not found
   Future searchByNameNotFound(String groupName) async {
     return groupCollection.where("groupName", isNotEqualTo: groupName).get();

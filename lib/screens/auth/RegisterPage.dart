@@ -230,7 +230,7 @@ class _RegisterPageState extends State<RegisterPage> {
           await SharedPref.saveUserName(fullName);
           await SharedPref.saveUserEmail(email);
           // ignore: use_build_context_synchronously
-          nextPage(context, const HomeScreen());
+          nextPage(context,  HomeScreen());
         } else {
           setState(() {
             ToastContext toastContext = ToastContext();

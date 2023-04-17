@@ -17,11 +17,11 @@ class ChatPage extends StatefulWidget {
   String username;
   String groupName;
   String groupId;
-  String? profilePic;
+  String? groupPic;
 
   ChatPage(
       {Key? key,
-      this.profilePic,
+      this.groupPic,
       required this.username,
       required this.groupName,
       required this.groupId})
@@ -51,7 +51,7 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {
       isLoadingAnimation = true;
     });
-    getUser();
+    getImage();
   }
 
   @override
@@ -80,14 +80,14 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  getUser() async {
-    await SharedPref.getProfilePic().then((value) {
+  getImage() async {
+
+    await SharedPref.getGroupPic().then((value) {
       setState(() {
         profilePic = value ?? "";
-        final user = AuthService().firebaseAuth.currentUser!.uid;
-        DatabaseServices(uid: user);
       });
     });
+
   }
 
   final chatFromKey = GlobalKey<FormState>();
@@ -160,8 +160,6 @@ class _ChatPageState extends State<ChatPage> {
                   GestureDetector(
                       onTap: () {
                         ProfileController().pickImage(context);
-                        ProfileController().url;
-                        print(ProfileController().url);
                       },
                       child: const Icon(
                         Icons.image,
@@ -233,6 +231,7 @@ class _ChatPageState extends State<ChatPage> {
               nextPage(
                   context,
                   GroupInfo(
+                    groupPic: widget.groupPic.toString(),
                       adminName: adminName,
                       groupName: widget.groupName,
                       groupId: widget.groupId));

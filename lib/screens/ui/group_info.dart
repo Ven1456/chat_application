@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/ui/homeScreen.dart';
@@ -13,11 +16,12 @@ class GroupInfo extends StatefulWidget {
   String adminName;
   String? groupPic;
 
-  GroupInfo({Key? key,
-    this.groupPic,
-    required this.adminName,
-    required this.groupName,
-    required this.groupId})
+  GroupInfo(
+      {Key? key,
+         this.groupPic,
+      required this.adminName,
+      required this.groupName,
+      required this.groupId})
       : super(key: key);
 
   @override
@@ -27,12 +31,22 @@ class GroupInfo extends StatefulWidget {
 class _GroupInfoState extends State<GroupInfo> {
   Stream? members;
 
-
   @override
   void initState() {
     getMembers();
+    getImage();
     // TODO: implement initState
     super.initState();
+  }
+
+  getImage() async {
+
+    await SharedPref.getGroupPic().then((value) {
+      setState(() {
+        widget.groupPic = value ?? "";
+      });
+    });
+
   }
 
   getMembers() {
@@ -50,13 +64,186 @@ class _GroupInfoState extends State<GroupInfo> {
   }
 
   String getId(String res) {
-    return res.substring(1, res.indexOf("_")-1 );
+    return res.substring(1, res.indexOf("_") - 1);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+        appBar: _buildAppBar(context),
+        body: ChangeNotifierProvider(
+            create: (_) => ProfileController(),
+            child: Consumer<ProfileController>(
+                builder: (context, provider, child) {
+              return Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Stack(
+                        alignment: Alignment.bottomRight,
+                        children: [
+                          Container(
+                            height: 200,
+                            width: 200,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.black),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(100),
+                              child: provider.groupImage == null
+                                  ? (widget.groupPic ?? "").isEmpty
+                                  ? Container(
+                                color: Colors.orange,
+                                child: Center(
+                                  child: Text(
+                                    widget.groupName.substring(0, 2),
+                                    style: const TextStyle(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              )
+                                  : Image.network(
+                                height: 150,
+                                width: 150,
+                                widget.groupPic ?? "",
+                                fit: BoxFit.cover,
+                                loadingBuilder: (context, child, loading) {
+                                  if (loading == null) return child;
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                },
+                              )
+                                  : Stack(children: [
+                                Image.file(File(provider.groupImage!.path).absolute,
+                                  fit: BoxFit.cover,
+                                ),
+
+                              ]),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              provider.pickGroupImage(context);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 35.0,vertical: 0),
+                              child: Container(
+                                  height: 40,
+                                  width: 40,
+                                  decoration: const BoxDecoration(
+                                      color: Colors.blue,
+                                      shape: BoxShape.circle
+                                  ),
+                                  child: const Icon(Icons.edit)),
+                            ),
+                          )
+                        ],
+                      ),
+                    /*  Stack(
+                        alignment: Alignment.bottomRight,
+                        children: [
+                          Container(
+                            height: 150,
+                            width: 150,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.black),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(100),
+                              child: provider.groupImage == null
+                                  ? (widget.groupPic).isEmpty
+                                      ? Container(
+                                color: Colors.orange,
+                                        child: Center(
+                                            child: Text(
+                                              widget.groupName.substring(0, 2),
+                                              style: const TextStyle(
+                                                  fontSize: 30,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                      )
+                                      : Image.network(
+                                          height: 120,
+                                          width: 120,
+                                          widget.groupPic,
+                                          fit: BoxFit.cover,
+                                          loadingBuilder:
+                                              (context, child, loading) {
+                                            if (loading == null) return child;
+                                            return const Center(
+                                                child:
+                                                    CircularProgressIndicator());
+                                          },
+                                        )
+                                  : Stack(children: [
+                                      Image.file(
+                                        File(provider.groupImage!.path)
+                                            .absolute,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ]) ,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              provider.pickGroupImage(context);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 12.0,right: 24,top: 4),
+                              child: Container(
+                                  height: 40,
+                                  width: 40,
+                                  decoration: const BoxDecoration(
+                                      color: Colors.blue,
+                                      shape: BoxShape.circle),
+                                  child: const Icon(Icons.edit)),
+                            ),
+                          )
+                        ],
+                      ),*/
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(21),
+                          color: Colors.blue.withOpacity(0.4),
+                        ),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              child: Text(widget.groupName.substring(0, 2)),
+                            ),
+                            const SizedBox(
+                              width: 15,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Group : ${widget.groupName}"),
+                                Text("Admin : ${getName(widget.adminName)}"),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      memberList()
+                    ],
+                  ),
+                ),
+              );
+            })));
+  }
+
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
         title: const Text("Group Info"),
         centerTitle: true,
         actions: [
@@ -91,11 +278,14 @@ class _GroupInfoState extends State<GroupInfo> {
                           IconButton(
                               onPressed: () async {
                                 DatabaseServices(
-                                    uid: FirebaseAuth.instance.currentUser!.uid)
+                                        uid: FirebaseAuth
+                                            .instance.currentUser!.uid)
                                     .toggleGroupJoin(
-                                    widget.groupId, getName(widget.adminName),
-                                    widget.groupName).whenComplete(() {
-                                      nextPage(context, const HomeScreen());
+                                        widget.groupId,
+                                        getName(widget.adminName),
+                                        widget.groupName)
+                                    .whenComplete(() {
+                                  nextPage(context, HomeScreen());
                                 });
                               },
                               icon: const Icon(
@@ -111,94 +301,7 @@ class _GroupInfoState extends State<GroupInfo> {
             width: 20,
           ),
         ],
-      ),
-      body: ChangeNotifierProvider(
-        create: (_) => ProfileController(),
-    child: Consumer<ProfileController>(
-    builder: (context, provider, child) {
-
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Stack(
-                alignment: Alignment.bottomRight,
-                children:[
-                  SizedBox(
-                    height: 100,
-                    width: 100,
-                    child: CircleAvatar(
-                      child:Center(
-                        child: Text(widget.groupName.substring(0, 2) ,style: const TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold
-                        ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: (){
-                      ProfileController().pickImage(context);
-                    },
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(100),
-                      child: provider.image == null
-                          ? (widget.groupPic ?? "").isEmpty
-                          ?  Padding(
-                        padding: const EdgeInsets.only(left: 8.0,right: 8,top: 4),
-                        child: Container(
-                            decoration: const BoxDecoration(
-                                color: Colors.deepOrange,
-                                shape: BoxShape.circle
-                            ),
-                            child: const Padding(
-                              padding: EdgeInsets.all(2.0),
-                              child: Icon(Icons.edit),
-                            )),
-                      ) : Image.network(widget.groupPic.toString()) : Container()
-                    )
-
-                  )
-                ]
-              ),
-              const SizedBox(height: 20,),
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(21),
-                  color: Colors.blue.withOpacity(0.4),
-                ),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      child: Text(widget.groupName.substring(0, 2)),
-                    ),
-                    const SizedBox(
-                      width: 15,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Group : ${widget.groupName}"),
-                        Text("Admin : ${getName(widget.adminName)}"),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              memberList()
-            ],
-          ),
-        ),
       );
-
-
-    }
-    )
-      )
-    );
   }
 
   memberList() {
@@ -231,8 +334,8 @@ class _GroupInfoState extends State<GroupInfo> {
                                 style: const TextStyle(
                                     fontSize: 15, fontWeight: FontWeight.bold)),
                             subtitle: Text(
-                               "Your Are In ${widget.groupName} Group" ,
-                           /*   getId(snapshot.data["members"][index]),*/
+                              "Your Are In ${widget.groupName} Group",
+                              /*   getId(snapshot.data["members"][index]),*/
                               style: const TextStyle(
                                   fontSize: 12, fontWeight: FontWeight.bold),
                             )),

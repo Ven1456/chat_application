@@ -251,7 +251,7 @@ class _LoginPageState extends State<LoginPage> {
           await SharedPref.saveUserName(snapshot.docs[0]["fullName"]);
           await SharedPref.saveProfilePic(snapshot.docs[0]["profilePic"]);
           // ignore: use_build_context_synchronously
-          nextPage(context, const HomeScreen());
+          nextPage(context,  HomeScreen());
         } else {
           ToastContext toastContext = ToastContext();
           toastContext.init(context);

@@ -5,7 +5,6 @@ import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/ui/homeScreen.dart';
 import 'package:chat/services/database_services.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +18,7 @@ class GroupInfo extends StatefulWidget {
 
   GroupInfo(
       {Key? key,
-         this.groupPic,
+      this.groupPic,
       required this.adminName,
       required this.groupName,
       required this.groupId})
@@ -35,41 +34,26 @@ class _GroupInfoState extends State<GroupInfo> {
 
   @override
   void initState() {
-
-/*    getImage();*/
+    SharedPref.saveGroupId(widget.groupId);
     // TODO: implement initState
     super.initState();
     getMembers();
-    setState(() {
-
-    });
+    setState(() {});
   }
 
-/*  getImage(String id)async{
-    QuerySnapshot snapshot = await DatabaseServices(uid:FirebaseAuth.instance.currentUser!.uid).
-    getGroupMembers(id);
-    setState(() {
-      groupProfile =  snapshot.docs[0]["groupIcon"];
-    });
-  }*/
-/*
   getImage() async {
-    await SharedPref.getGroupPic().then((value) {
+    DatabaseServices().getGroupIcon(widget.groupId).then((value) {
       setState(() {
-        widget.groupPic = value ?? "";
+        widget.groupPic = value;
       });
     });
-
   }
-*/
 
   getMembers() {
-    DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
-        .getGroupMembers(widget.groupId)
-        .then((value) {
+    DatabaseServices().getGroupMembers(widget.groupId).then((value) {
       setState(() {
         members = value;
-      /*  getImage(widget.groupId);*/
+        getImage();
       });
     });
   }
@@ -84,7 +68,6 @@ class _GroupInfoState extends State<GroupInfo> {
 
   @override
   Widget build(BuildContext context) {
-  /*  print(" groupPic:${getImage("")}");*/
     return Scaffold(
         appBar: _buildAppBar(context),
         body: ChangeNotifierProvider(
@@ -107,117 +90,27 @@ class _GroupInfoState extends State<GroupInfo> {
                               shape: BoxShape.circle,
                               border: Border.all(color: Colors.black),
                             ),
-                     child:  ClipRRect(
-                       borderRadius: BorderRadius.circular(100),
-                       child:provider.groupImage == null ? (widget.groupPic ?? "").isEmpty ?
-                       Container(
-                         color: Colors.orange,
-                         child: Center(
-                           child: Text(
-                             widget.groupName.substring(0, 2),
-                             style: const TextStyle(
-                                 fontSize: 30,
-                                 fontWeight: FontWeight.bold),
-                           ),
-                         ),
-                       ) : Image.network(
-                         height: 150,
-                         width: 150,
-                         widget.groupPic ?? "",
-                         fit: BoxFit.cover,
-                         loadingBuilder: (context, child, loading) {
-                           if (loading == null) return child;
-                           return const Center(
-                               child: CircularProgressIndicator());
-                         },
-                       ) :  Stack(children: [
-                         Image.file(File(provider.groupImage!.path).absolute,
-                           fit: BoxFit.cover,
-                         ),
-
-                       ]),
-                     ),
-                     /*       child: ClipRRect(
-                              borderRadius: BorderRadius.circular(100),
-                              child: provider.groupImage == null
-                                  ? (widget.groupPic ?? "").isEmpty
-                                  ? Container(
-                                color: Colors.orange,
-                                child: Center(
-                                  child: Text(
-                                    widget.groupName.substring(0, 2),
-                                    style: const TextStyle(
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              )
-                                  : Image.network(
-                                height: 150,
-                                width: 150,
-                                widget.groupPic ?? "",
-                                fit: BoxFit.cover,
-                                loadingBuilder: (context, child, loading) {
-                                  if (loading == null) return child;
-                                  return const Center(
-                                      child: CircularProgressIndicator());
-                                },
-                              )
-                                  : Stack(children: [
-                                Image.file(File(provider.groupImage!.path).absolute,
-                                  fit: BoxFit.cover,
-                                ),
-
-                              ]),
-                            ),*/
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              provider.pickGroupImage(context);
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 35.0,vertical: 0),
-                              child: Container(
-                                  height: 40,
-                                  width: 40,
-                                  decoration: const BoxDecoration(
-                                      color: Colors.blue,
-                                      shape: BoxShape.circle
-                                  ),
-                                  child: const Icon(Icons.edit)),
-                            ),
-                          )
-                        ],
-                      ),
-                    /*  Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
-                          Container(
-                            height: 150,
-                            width: 150,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.black),
-                            ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(100),
                               child: provider.groupImage == null
-                                  ? (widget.groupPic).isEmpty
+                                  ? (widget.groupPic ?? "").isEmpty
                                       ? Container(
-                                color: Colors.orange,
-                                        child: Center(
+                                          color: Colors.orange,
+                                          child: Center(
                                             child: Text(
-                                              widget.groupName.substring(0, 2),
+                                              widget.groupName
+                                                  .substring(0, 2)
+                                                  .toUpperCase(),
                                               style: const TextStyle(
                                                   fontSize: 30,
                                                   fontWeight: FontWeight.bold),
                                             ),
                                           ),
-                                      )
+                                        )
                                       : Image.network(
-                                          height: 120,
-                                          width: 120,
-                                          widget.groupPic,
+                                          height: 150,
+                                          width: 150,
+                                          widget.groupPic ?? "",
                                           fit: BoxFit.cover,
                                           loadingBuilder:
                                               (context, child, loading) {
@@ -233,7 +126,7 @@ class _GroupInfoState extends State<GroupInfo> {
                                             .absolute,
                                         fit: BoxFit.cover,
                                       ),
-                                    ]) ,
+                                    ]),
                             ),
                           ),
                           GestureDetector(
@@ -241,7 +134,8 @@ class _GroupInfoState extends State<GroupInfo> {
                               provider.pickGroupImage(context);
                             },
                             child: Padding(
-                              padding: const EdgeInsets.only(left: 12.0,right: 24,top: 4),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 35.0, vertical: 0),
                               child: Container(
                                   height: 40,
                                   width: 40,
@@ -252,7 +146,7 @@ class _GroupInfoState extends State<GroupInfo> {
                             ),
                           )
                         ],
-                      ),*/
+                      ),
                       const SizedBox(
                         height: 20,
                       ),
@@ -290,64 +184,64 @@ class _GroupInfoState extends State<GroupInfo> {
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
-        title: const Text("Group Info"),
-        centerTitle: true,
-        actions: [
-          GestureDetector(
-              onTap: () {
-                showDialog(
-                    barrierDismissible: false,
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text(
-                          "LogOut",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
+      title: const Text("Group Info"),
+      centerTitle: true,
+      actions: [
+        GestureDetector(
+            onTap: () {
+              showDialog(
+                  barrierDismissible: false,
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text(
+                        "LogOut",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
                         ),
-                        content: const Text(
-                          "Are you sure you want Exit this Group",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
+                      ),
+                      content: const Text(
+                        "Are you sure you want Exit this Group",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
                         ),
-                        actions: [
-                          IconButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              icon: const Icon(
-                                Icons.cancel,
-                                color: Colors.red,
-                              )),
-                          IconButton(
-                              onPressed: () async {
-                                DatabaseServices(
-                                        uid: FirebaseAuth
-                                            .instance.currentUser!.uid)
-                                    .toggleGroupJoin(
-                                        widget.groupId,
-                                        getName(widget.adminName),
-                                        widget.groupName)
-                                    .whenComplete(() {
-                                  nextPage(context, HomeScreen());
-                                });
-                              },
-                              icon: const Icon(
-                                Icons.done,
-                                color: Colors.green,
-                              )),
-                        ],
-                      );
-                    });
-              },
-              child: const Icon(Icons.exit_to_app)),
-          const SizedBox(
-            width: 20,
-          ),
-        ],
-      );
+                      ),
+                      actions: [
+                        IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: const Icon(
+                              Icons.cancel,
+                              color: Colors.red,
+                            )),
+                        IconButton(
+                            onPressed: () async {
+                              DatabaseServices(
+                                      uid: FirebaseAuth
+                                          .instance.currentUser!.uid)
+                                  .toggleGroupJoin(
+                                      widget.groupId,
+                                      getName(widget.adminName),
+                                      widget.groupName)
+                                  .whenComplete(() {
+                                nextPage(context, HomeScreen());
+                              });
+                            },
+                            icon: const Icon(
+                              Icons.done,
+                              color: Colors.green,
+                            )),
+                      ],
+                    );
+                  });
+            },
+            child: const Icon(Icons.exit_to_app)),
+        const SizedBox(
+          width: 20,
+        ),
+      ],
+    );
   }
 
   memberList() {

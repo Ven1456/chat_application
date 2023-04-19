@@ -1,7 +1,6 @@
 
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/profile_Controller.dart';
-import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -48,7 +47,7 @@ class _MessageTileState extends State<MessageTile> {
   void initState() {
     // TODO: implement initState
     super.initState();
-  /*  getImage();*/
+
     getProfilePic();
     setState(() {
     });
@@ -56,18 +55,27 @@ class _MessageTileState extends State<MessageTile> {
 /*    getUser();*/
   /*  getUser();*/
   }
-/*  getImage() async {
+ /* getImage() async {
+    QuerySnapshot snapshot = await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
+        .gettingUserPic();
+    setState(() {
+      senderProfile = snapshot.docs[0]["profilePic"];
+      profilePic = snapshot.docs[0]["profilePic"];
+    });
+  }
+  getSendByImage() async {
     QuerySnapshot snapshot = await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
         .gettingUserEmail(email);
     setState(() {
       profilePic = snapshot.docs[0]["profilePic"];
-      print(email);
     });
   }*/
   getProfilePic() async {
     await SharedPref.getProfilePic().then((value) {
       setState(() {
-        profilePic = value!;
+       profilePic = value!;
+     /*   getImage();
+       getSendByImage();*/
       });
     });
   }
@@ -191,7 +199,7 @@ class _MessageTileState extends State<MessageTile> {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: Colors.black,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 4.0),
@@ -199,7 +207,7 @@ class _MessageTileState extends State<MessageTile> {
                   getDateForChat(widget.time),
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Colors.black,
+                    color: Colors.white,
                   ),
                 ),
               ],

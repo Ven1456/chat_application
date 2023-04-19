@@ -24,7 +24,7 @@ class DatabaseServices {
   }
   Future gettingUserPic() async {
     QuerySnapshot snapshot =
-    await userCollection.get();
+    await groupCollection.get();
     return snapshot;
   }
   // getting user email data
@@ -64,8 +64,6 @@ class DatabaseServices {
       "recentMessageSender": "",
       "userProfile":""
     });
-
-
     // update the members
     await groupDocumentReference.update({
       "members": FieldValue.arrayUnion(["${id}_$username"]),
@@ -100,6 +98,11 @@ class DatabaseServices {
     DocumentReference documentReference = groupCollection.doc(groupId);
     DocumentSnapshot documentSnapshot = await documentReference.get();
     return documentSnapshot["admin"];
+  }
+  Future getGroupIcon(String? groupId) async {
+    DocumentReference documentReference = groupCollection.doc(groupId);
+    DocumentSnapshot documentSnapshot = await documentReference.get();
+    return documentSnapshot["groupIcon"];
   }
 
 //get group members

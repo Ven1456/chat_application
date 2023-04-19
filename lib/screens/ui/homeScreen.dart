@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
@@ -10,13 +12,13 @@ import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'package:lottie/lottie.dart';
+import 'package:provider/provider.dart';
 import 'package:toast/toast.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -36,9 +38,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   initState() {
-    gettingUserData();
+
     super.initState();
-    setState(() {});
+    setState(() {
+      gettingUserData();
+    });
+
   }
 
   String getId(String res) {
@@ -65,12 +70,6 @@ class _HomeScreenState extends State<HomeScreen> {
         groups = snapshot;
       });
     });
-
-    /*   await SharedPref.getProfilePic().then((value) {
-      setState(() {
-        profilePic = value ?? "";
-      });
-    });*/
     await SharedPref.getName().then((value) {
       setState(() {
         username = value!;
@@ -91,45 +90,55 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(context),
-      drawer: _buildDrawer(context),
+      drawer:  _buildChangeNotifierProvider(),
       body: groupList(),
       floatingActionButton: _buildFloatingActionButton(context),
     );
   }
 
-  Drawer _buildDrawer(BuildContext context) {
-    return Drawer(
+  ChangeNotifierProvider<ProfileController> _buildChangeNotifierProvider() {
+    return ChangeNotifierProvider(
+        create: (_) => ProfileController(),
+        child: Consumer<ProfileController>(
+            builder: (context, provider, child) {
+           return    Drawer(
       child: ListView(
         children: [
+          provider.image == null ?
           (profilePic).isEmpty
               ? const UnconstrainedBox(
-                  child: SizedBox(
-                    height: 150,
-                    width: 150,
-                    child: CircleAvatar(
-                      child: Icon(
-                        Icons.person,
-                        color: Colors.black,
-                        size: 130,
-                      ),
-                    ),
-                  ),
-                )
-              : UnconstrainedBox(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(80),
-                    child: Image.network(
-                      height: 130,
-                      width: 130,
-                      profilePic,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loading) {
-                        if (loading == null) return child;
-                        return const Center(child: CircularProgressIndicator());
-                      },
-                    ),
-                  ),
+            child: SizedBox(
+              height: 150,
+              width: 150,
+              child: CircleAvatar(
+                child: Icon(
+                  Icons.person,
+                  color: Colors.black,
+                  size: 130,
                 ),
+              ),
+            ),
+          )
+              : UnconstrainedBox(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(80),
+              child: Image.network(
+                height: 130,
+                width: 130,
+                profilePic,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loading) {
+                  if (loading == null) return child;
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
+            ),
+          ) : Stack(children: [
+           Image.file(
+           File(provider.image!.path).absolute,
+              fit: BoxFit.cover,
+              ),
+              ]),
           const SizedBox(
             height: 10,
           ),
@@ -205,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => const LoginPage()),
-                                  (route) => false);
+                                      (route) => false);
                             },
                             icon: const Icon(
                               Icons.done,
@@ -224,7 +233,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
+
+  },
+    )
+    );
   }
+
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
@@ -257,17 +271,18 @@ class _HomeScreenState extends State<HomeScreen> {
     return StreamBuilder(
         stream: groups,
         builder: (context, AsyncSnapshot snapshot) {
+
           if (snapshot.hasData) {
             if (snapshot.data["groups"] != null) {
               if (snapshot.data["groups"].length != 0) {
                 return ListView.builder(
                   itemCount: snapshot.data["groups"].length,
                   itemBuilder: (BuildContext context, int index) {
+
                     // reverse the index value
                     int reverseIndex =
                         snapshot.data["groups"].length - index - 1;
-                    SharedPref.saveGroupId(
-                        getId(snapshot.data["groups"][reverseIndex]));
+
                     return GroupTile(
                         groupName: getName(snapshot.data["groups"][reverseIndex]),
                         userProfile: snapshot.data["profilePic"],

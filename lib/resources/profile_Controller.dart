@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:chat/screens/ui/chat_page.dart';
 import 'package:chat/screens/ui/group_info.dart';
 import 'package:chat/services/auth_service.dart';
+import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
@@ -205,8 +206,7 @@ class ProfileController extends ChangeNotifier {
       return;
     }
 
-    getId = (await SharedPref.getGroupId())!;
-    print("dhsgdfghfsgg:$getId");
+    getId =(await SharedPref.getGroupId())!;
     firebase_storage.Reference reference = firebase_storage
         .FirebaseStorage.instance
         .ref()
@@ -221,8 +221,8 @@ class ProfileController extends ChangeNotifier {
     await FirebaseFirestore.instance.collection('groups').doc(userId).get();
     if (snapshot.exists) {
       await FirebaseFirestore.instance.collection('groups').doc(userId).update({
-        'groupIcon': downloadUrl,
-      });
+      'groupIcon': downloadUrl,
+    });
       url = downloadUrl;
      /* await SharedPref.saveGroupPic(downloadUrl);*/
     }

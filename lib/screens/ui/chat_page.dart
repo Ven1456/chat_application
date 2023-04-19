@@ -6,7 +6,6 @@ import 'package:chat/screens/ui/group_info.dart';
 import 'package:chat/screens/ui/message_tlle.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -22,7 +21,7 @@ class ChatPage extends StatefulWidget {
   ChatPage(
       {Key? key,
       this.groupPic,
-        this.userProfile,
+      this.userProfile,
       required this.username,
       required this.groupName,
       required this.groupId})
@@ -48,15 +47,13 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     getChatAndAdminName();
-
     // TODO: implement initState
     super.initState();
     setState(() {
       isLoadingAnimation = true;
     });
     getImage();
-    setState(() {
-    });
+    setState(() {});
   }
 
   @override
@@ -72,6 +69,14 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
+  getGroupImage() async {
+    DatabaseServices().getGroupIcon(widget.groupId).then((value) {
+      setState(() {
+        widget.groupPic = value;
+      });
+    });
+  }
+
   void getChatAndAdminName() {
     DatabaseServices().getCharts(widget.groupId).then((value) {
       setState(() {
@@ -84,23 +89,16 @@ class _ChatPageState extends State<ChatPage> {
       });
     });
   }
-  getGroupPic() async {
-    QuerySnapshot snapshot =
-       await  DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid).gettingGroupPic(widget.groupId);
-    setState(() {
-      groupPicture = snapshot.docs[0]["groupIcon"];
-    });
-  }
 
   getImage() async {
     await SharedPref.getGroupPic().then((value) {
       setState(() {
         profilePic = value ?? "";
-        getGroupPic();
+        getGroupImage();
+        /*  getGroupPic();*/
       });
     });
   }
-
 
   final chatFromKey = GlobalKey<FormState>();
   @override
@@ -111,7 +109,6 @@ class _ChatPageState extends State<ChatPage> {
         key: chatFromKey,
         child: Column(
           children: [
-
             Expanded(
               child: chatMessages(),
             ),
@@ -222,13 +219,13 @@ class _ChatPageState extends State<ChatPage> {
           padding: const EdgeInsets.only(bottom: 3.0),
           child: ClipRRect(
               borderRadius: BorderRadius.circular(100),
-              child: groupPicture.isEmpty
+              child: (widget.groupPic ?? "").isEmpty
                   ? const Center(
                       child: Icon(
                       Icons.person,
                       size: 30,
                     ))
-                  : Image.network(groupPicture,
+                  : Image.network(widget.groupPic.toString(),
                       height: 50, width: 55, fit: BoxFit.cover,
                       loadingBuilder: (context, child, loading) {
                       if (loading == null) return child;
@@ -243,7 +240,7 @@ class _ChatPageState extends State<ChatPage> {
               nextPage(
                   context,
                   GroupInfo(
-                    groupPic: groupPicture,
+                      groupPic: groupPicture,
                       adminName: adminName,
                       groupName: widget.groupName,
                       groupId: widget.groupId));
@@ -354,11 +351,15 @@ class _ChatPageState extends State<ChatPage> {
                                 ),
                               MessageTile(
                                 message: snapshot.data.docs[index]["message"],
-                                sendByMe: widget.username == snapshot.data.docs[index]["sender"],
+                                sendByMe: widget.username ==
+                                    snapshot.data.docs[index]["sender"],
                                 sender: snapshot.data.docs[index]["sender"],
-                                time: snapshot.data.docs[index]["time"].toString(),
-                                userProfile: userProfile = snapshot.data.docs[index]["userProfile"].toString(),
-                              /*  groupPic: groupPicture = snapshot.data.docs[index]["groupPic"].toString(),*/
+                                time: snapshot.data.docs[index]["time"]
+                                    .toString(),
+                                userProfile: userProfile = snapshot
+                                    .data.docs[index]["userProfile"]
+                                    .toString(),
+                                /*  groupPic: groupPicture = snapshot.data.docs[index]["groupPic"].toString(),*/
                               ),
                             ],
                           );
@@ -382,8 +383,8 @@ class _ChatPageState extends State<ChatPage> {
         "message": messageController.text.trim(),
         "sender": widget.username,
         "time": DateTime.now().microsecondsSinceEpoch,
-       /* "groupPic":groupPicture,*/
-        "userProfile":userProfile
+        /* "groupPic":groupPicture,*/
+        "userProfile": userProfile
       };
       DatabaseServices().sendMessage(widget.groupId, chatMessageMap);
       setState(() {

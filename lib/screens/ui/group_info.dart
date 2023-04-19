@@ -5,6 +5,7 @@ import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/ui/homeScreen.dart';
 import 'package:chat/services/database_services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -30,17 +31,29 @@ class GroupInfo extends StatefulWidget {
 
 class _GroupInfoState extends State<GroupInfo> {
   Stream? members;
+  String? groupProfile = " ";
 
   @override
   void initState() {
-    getMembers();
-    getImage();
+
+/*    getImage();*/
     // TODO: implement initState
     super.initState();
+    getMembers();
+    setState(() {
+
+    });
   }
 
+/*  getImage(String id)async{
+    QuerySnapshot snapshot = await DatabaseServices(uid:FirebaseAuth.instance.currentUser!.uid).
+    getGroupMembers(id);
+    setState(() {
+      groupProfile =  snapshot.docs[0]["groupIcon"];
+    });
+  }*/
+/*
   getImage() async {
-
     await SharedPref.getGroupPic().then((value) {
       setState(() {
         widget.groupPic = value ?? "";
@@ -48,6 +61,7 @@ class _GroupInfoState extends State<GroupInfo> {
     });
 
   }
+*/
 
   getMembers() {
     DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
@@ -55,6 +69,7 @@ class _GroupInfoState extends State<GroupInfo> {
         .then((value) {
       setState(() {
         members = value;
+      /*  getImage(widget.groupId);*/
       });
     });
   }
@@ -69,6 +84,7 @@ class _GroupInfoState extends State<GroupInfo> {
 
   @override
   Widget build(BuildContext context) {
+  /*  print(" groupPic:${getImage("")}");*/
     return Scaffold(
         appBar: _buildAppBar(context),
         body: ChangeNotifierProvider(
@@ -91,7 +107,37 @@ class _GroupInfoState extends State<GroupInfo> {
                               shape: BoxShape.circle,
                               border: Border.all(color: Colors.black),
                             ),
-                            child: ClipRRect(
+                     child:  ClipRRect(
+                       borderRadius: BorderRadius.circular(100),
+                       child:provider.groupImage == null ? (widget.groupPic ?? "").isEmpty ?
+                       Container(
+                         color: Colors.orange,
+                         child: Center(
+                           child: Text(
+                             widget.groupName.substring(0, 2),
+                             style: const TextStyle(
+                                 fontSize: 30,
+                                 fontWeight: FontWeight.bold),
+                           ),
+                         ),
+                       ) : Image.network(
+                         height: 150,
+                         width: 150,
+                         widget.groupPic ?? "",
+                         fit: BoxFit.cover,
+                         loadingBuilder: (context, child, loading) {
+                           if (loading == null) return child;
+                           return const Center(
+                               child: CircularProgressIndicator());
+                         },
+                       ) :  Stack(children: [
+                         Image.file(File(provider.groupImage!.path).absolute,
+                           fit: BoxFit.cover,
+                         ),
+
+                       ]),
+                     ),
+                     /*       child: ClipRRect(
                               borderRadius: BorderRadius.circular(100),
                               child: provider.groupImage == null
                                   ? (widget.groupPic ?? "").isEmpty
@@ -123,7 +169,7 @@ class _GroupInfoState extends State<GroupInfo> {
                                 ),
 
                               ]),
-                            ),
+                            ),*/
                           ),
                           GestureDetector(
                             onTap: () {

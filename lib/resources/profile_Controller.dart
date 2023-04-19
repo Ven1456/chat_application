@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:chat/screens/ui/chat_page.dart';
+import 'package:chat/screens/ui/group_info.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -222,8 +224,7 @@ class ProfileController extends ChangeNotifier {
         'groupIcon': downloadUrl,
       });
       url = downloadUrl;
-      await SharedPref.saveGroupPic(downloadUrl);
-      print(url);
+     /* await SharedPref.saveGroupPic(downloadUrl);*/
     }
   }
 }

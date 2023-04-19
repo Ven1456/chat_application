@@ -249,7 +249,7 @@ class _LoginPageState extends State<LoginPage> {
 
           await SharedPref.saveUserEmail(email);
           await SharedPref.saveUserName(snapshot.docs[0]["fullName"]);
-          await SharedPref.saveProfilePic(snapshot.docs[0]["profilePic"]);
+       /*   await SharedPref.saveProfilePic(snapshot.docs[0]["profilePic"]);*/
           // ignore: use_build_context_synchronously
           nextPage(context,  HomeScreen());
         } else {

@@ -3,6 +3,8 @@ import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/database_services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import "package:flutter/foundation.dart";
@@ -14,11 +16,16 @@ class MessageTile extends StatefulWidget {
   String sender;
   String time;
   bool sendByMe;
+  String? groupPic;
+  String userProfile;
+
 
 
 
   MessageTile(
       {Key? key,
+        this.groupPic,
+        required  this.userProfile,
       required this.time,
       required this.message,
       required this.sendByMe,
@@ -34,16 +41,37 @@ class _MessageTileState extends State<MessageTile> {
   String datetime = DateFormat("hh:mm a").format(DateTime.now());
   String email = '';
   String profilePic = '';
+  String senderProfile = "";
+
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getUser();
-    print("jfdguhfgdjhfgjkd:$profilePic");
+  /*  getImage();*/
+    getProfilePic();
+    setState(() {
+    });
 
+/*    getUser();*/
   /*  getUser();*/
   }
-  getUser() async {
+/*  getImage() async {
+    QuerySnapshot snapshot = await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
+        .gettingUserEmail(email);
+    setState(() {
+      profilePic = snapshot.docs[0]["profilePic"];
+      print(email);
+    });
+  }*/
+  getProfilePic() async {
+    await SharedPref.getProfilePic().then((value) {
+      setState(() {
+        profilePic = value!;
+      });
+    });
+  }
+ /* getUser() async {
     await SharedPref.getProfilePic().then((value) {
       setState(() {
         profilePic = value ?? "";
@@ -51,7 +79,7 @@ class _MessageTileState extends State<MessageTile> {
         DatabaseServices(uid: user);
       });
     });
-  }
+  }*/
 /*getProfilePic()async{
   QuerySnapshot snapshot = await DatabaseServices(
       uid: FirebaseAuth.instance.currentUser!.uid).gettingUserEmail(email);
@@ -61,7 +89,6 @@ class _MessageTileState extends State<MessageTile> {
       profilePic = value;
     });
   }*/
-
 
   /*DatabaseServices().setUserProfilePicture(profilePic).then((value) {
       setState(() {
@@ -106,15 +133,27 @@ class _MessageTileState extends State<MessageTile> {
               color: Colors.green[300],
               shape: BoxShape.circle,
           ),
-          child: Center(
-              child: Text(
-                widget.sender.substring(0, 2).toUpperCase(),
-                style:  TextStyle(
-                  fontSize: isSmallScreen ? 12 : 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+          child:ClipRRect(
+            borderRadius: BorderRadius.circular(100),
+            child: senderProfile.isEmpty ?  Center(
+                child: Text(
+                  widget.sender.substring(0, 2).toUpperCase(),
+                  style:  TextStyle(
+                    fontSize: isSmallScreen ? 12 : 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
                 ),
-              ),
+            ) :  Image.network(
+                height: 50,
+                width: 50,
+              senderProfile.toString(),
+              fit: BoxFit.cover,
+              loadingBuilder: (context, child, loading) {
+                if (loading == null) return child;
+                return Center(child: CircularProgressIndicator());
+              },
+            ),
           ),
         ),
             ),

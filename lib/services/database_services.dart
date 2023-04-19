@@ -22,12 +22,10 @@ class DatabaseServices {
       "uid": uid,
     });
   }
-  Future updateUserName(String userName)async{
-    return userCollection.doc(uid).update(
-      {
-        "fullName" : userName,
-      }
-    );
+  Future gettingUserPic() async {
+    QuerySnapshot snapshot =
+    await userCollection.get();
+    return snapshot;
   }
   // getting user email data
   Future gettingUserEmail(String email) async {
@@ -35,11 +33,10 @@ class DatabaseServices {
         await userCollection.where("email", isEqualTo: email).get();
     return snapshot;
   }
-  //setting user profile picture
-  Future setUserProfilePicture(String profilePic) async{
-    DocumentReference documentReference = userCollection.doc(profilePic);
-    DocumentSnapshot documentSnapshot = await documentReference.get();
-    return documentSnapshot["profilePic"];
+  //
+  Future gettingGroupPic(String groupName)async{
+    QuerySnapshot snapshot =  await groupCollection.where("groupName",isEqualTo: groupName).get();
+    return snapshot;
   }
 
   // get user groups
@@ -65,6 +62,7 @@ class DatabaseServices {
       "groupId": "",
       "recentMessage": "",
       "recentMessageSender": "",
+      "userProfile":""
     });
 
 
@@ -178,7 +176,8 @@ class DatabaseServices {
       "recentMessage": chatMessageData["message"],
       "recentMessageSender": chatMessageData["sender"],
       "recentMessageTime": chatMessageData["time"].toString(),
-      "groupIcon": chatMessageData["groupPic"].toString(),
+      /*"groupIcon": chatMessageData["groupPic"].toString(),*/
+      "messageUserIcon": chatMessageData["userProfile"].toString()
     });
   }
 }

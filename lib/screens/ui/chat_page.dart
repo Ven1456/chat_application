@@ -4,10 +4,9 @@ import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/ui/group_info.dart';
 import 'package:chat/screens/ui/message_tlle.dart';
-import 'package:chat/screens/ui/profile.dart';
-import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -18,10 +17,12 @@ class ChatPage extends StatefulWidget {
   String groupName;
   String groupId;
   String? groupPic;
+  String? userProfile;
 
   ChatPage(
       {Key? key,
       this.groupPic,
+        this.userProfile,
       required this.username,
       required this.groupName,
       required this.groupId})
@@ -41,6 +42,8 @@ class _ChatPageState extends State<ChatPage> {
   double maxHeight = 150;
   int maxLines = 10;
   String profilePic = '';
+  String groupPicture = "";
+  String userProfile = "";
 
   @override
   void initState() {
@@ -52,6 +55,8 @@ class _ChatPageState extends State<ChatPage> {
       isLoadingAnimation = true;
     });
     getImage();
+    setState(() {
+    });
   }
 
   @override
@@ -79,16 +84,23 @@ class _ChatPageState extends State<ChatPage> {
       });
     });
   }
+  getGroupPic() async {
+    QuerySnapshot snapshot =
+       await  DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid).gettingGroupPic(widget.groupId);
+    setState(() {
+      groupPicture = snapshot.docs[0]["groupIcon"];
+    });
+  }
 
   getImage() async {
-
     await SharedPref.getGroupPic().then((value) {
       setState(() {
         profilePic = value ?? "";
+        getGroupPic();
       });
     });
-
   }
+
 
   final chatFromKey = GlobalKey<FormState>();
   @override
@@ -210,13 +222,13 @@ class _ChatPageState extends State<ChatPage> {
           padding: const EdgeInsets.only(bottom: 3.0),
           child: ClipRRect(
               borderRadius: BorderRadius.circular(100),
-              child: profilePic.isEmpty
+              child: groupPicture.isEmpty
                   ? const Center(
                       child: Icon(
                       Icons.person,
                       size: 30,
                     ))
-                  : Image.network(profilePic,
+                  : Image.network(groupPicture,
                       height: 50, width: 55, fit: BoxFit.cover,
                       loadingBuilder: (context, child, loading) {
                       if (loading == null) return child;
@@ -231,7 +243,7 @@ class _ChatPageState extends State<ChatPage> {
               nextPage(
                   context,
                   GroupInfo(
-                    groupPic: widget.groupPic.toString(),
+                    groupPic: groupPicture,
                       adminName: adminName,
                       groupName: widget.groupName,
                       groupId: widget.groupId));
@@ -299,6 +311,7 @@ class _ChatPageState extends State<ChatPage> {
                         controller: _scrollController,
                         itemCount: snapshot.data.docs.length,
                         itemBuilder: (context, index) {
+                          /*print(snapshot.data.docs[index]["userProfile"].toString());*/
                           bool isSameDate = false;
                           String? newDate = '';
 
@@ -341,11 +354,11 @@ class _ChatPageState extends State<ChatPage> {
                                 ),
                               MessageTile(
                                 message: snapshot.data.docs[index]["message"],
-                                sendByMe: widget.username ==
-                                    snapshot.data.docs[index]["sender"],
+                                sendByMe: widget.username == snapshot.data.docs[index]["sender"],
                                 sender: snapshot.data.docs[index]["sender"],
-                                time: snapshot.data.docs[index]["time"]
-                                    .toString(),
+                                time: snapshot.data.docs[index]["time"].toString(),
+                                userProfile: userProfile = snapshot.data.docs[index]["userProfile"].toString(),
+                              /*  groupPic: groupPicture = snapshot.data.docs[index]["groupPic"].toString(),*/
                               ),
                             ],
                           );
@@ -369,7 +382,8 @@ class _ChatPageState extends State<ChatPage> {
         "message": messageController.text.trim(),
         "sender": widget.username,
         "time": DateTime.now().microsecondsSinceEpoch,
-        "groupPic":""
+       /* "groupPic":groupPicture,*/
+        "userProfile":userProfile
       };
       DatabaseServices().sendMessage(widget.groupId, chatMessageMap);
       setState(() {

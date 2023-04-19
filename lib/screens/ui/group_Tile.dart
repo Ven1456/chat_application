@@ -1,6 +1,4 @@
-
 import 'package:chat/resources/Shared_Preferences.dart';
-import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/ui/chat_page.dart';
 import 'package:chat/services/auth_service.dart';
@@ -13,11 +11,13 @@ class GroupTile extends StatefulWidget {
   String username;
   String groupName;
   String? groupPic;
+  String userProfile;
 
 
   GroupTile(
       {Key? key,
         this.groupPic,
+        required this.userProfile,
       required this.groupName,
       required this.username,
       required this.groupId})
@@ -32,13 +32,13 @@ class _GroupTileState extends State<GroupTile> {
   String getId(String res) {
     return res.substring(0, res.indexOf("_"));
   }
-  CollectionReference collectionReference =   FirebaseFirestore.instance.collection("groups");
+
   AuthService authService = AuthService();
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-         nextPage(context, ChatPage(groupPic : widget.groupPic,username: widget.username, groupName: widget.groupName, groupId: widget.groupId,));
+         nextPage(context, ChatPage(groupPic : widget.groupPic,username: widget.username, groupName: widget.groupName, groupId: widget.groupId,userProfile: widget.userProfile,));
       },
       onLongPressStart: ( details) {
         final offset = details.globalPosition;

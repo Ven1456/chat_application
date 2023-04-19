@@ -1,4 +1,3 @@
-
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
@@ -17,8 +16,7 @@ import 'package:lottie/lottie.dart';
 import 'package:toast/toast.dart';
 
 class HomeScreen extends StatefulWidget {
-
-   HomeScreen({Key? key}) : super(key: key);
+  HomeScreen({Key? key}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -33,13 +31,14 @@ class _HomeScreenState extends State<HomeScreen> {
   AuthService authService = AuthService();
   bool _isLoading = false;
   String groupName = "";
+  String userProfile = "";
   final TextEditingController textEditingController = TextEditingController();
 
   @override
   initState() {
     gettingUserData();
     super.initState();
-
+    setState(() {});
   }
 
   String getId(String res) {
@@ -50,6 +49,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return res.substring(res.indexOf("_") + 1);
   }
 
+  getImage() async {
+    QuerySnapshot snapshot = await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
+            .gettingUserEmail(email);
+    setState(() {
+      profilePic = snapshot.docs[0]["profilePic"];
+    });
+  }
+
   gettingUserData() async {
     await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
         .getUserGroups()
@@ -58,11 +65,12 @@ class _HomeScreenState extends State<HomeScreen> {
         groups = snapshot;
       });
     });
-    await SharedPref.getProfilePic().then((value) {
+
+    /*   await SharedPref.getProfilePic().then((value) {
       setState(() {
         profilePic = value ?? "";
       });
-    });
+    });*/
     await SharedPref.getName().then((value) {
       setState(() {
         username = value!;
@@ -71,24 +79,20 @@ class _HomeScreenState extends State<HomeScreen> {
     await SharedPref.getEmail().then((value) {
       setState(() {
         email = value!;
+        getImage();
       });
     });
   }
 
-
   final valFormKey = GlobalKey<FormState>();
   bool isGroup = true;
 
-
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-   appBar: _buildAppBar(context),
-     drawer: _buildDrawer(context),
-
-      body:  groupList(),
-
+      appBar: _buildAppBar(context),
+      drawer: _buildDrawer(context),
+      body: groupList(),
       floatingActionButton: _buildFloatingActionButton(context),
     );
   }
@@ -97,36 +101,35 @@ class _HomeScreenState extends State<HomeScreen> {
     return Drawer(
       child: ListView(
         children: [
-            (profilePic).isEmpty
+          (profilePic).isEmpty
               ? const UnconstrainedBox(
-                child: SizedBox(
-                height: 150,
-                  width: 150,
-                  child: CircleAvatar(
-
-            child: Icon(
-                  Icons.person,
-                  color: Colors.black,
-                  size: 130,
-            ),
-          ),
-                ),
-              )
+                  child: SizedBox(
+                    height: 150,
+                    width: 150,
+                    child: CircleAvatar(
+                      child: Icon(
+                        Icons.person,
+                        color: Colors.black,
+                        size: 130,
+                      ),
+                    ),
+                  ),
+                )
               : UnconstrainedBox(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(80),
-              child: Image.network(
-                height: 130,
-                width: 130,
-                profilePic,
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, loading) {
-                  if (loading == null) return child;
-                  return const Center(child: CircularProgressIndicator());
-                },
-              ),
-            ),
-          ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(80),
+                    child: Image.network(
+                      height: 130,
+                      width: 130,
+                      profilePic,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loading) {
+                        if (loading == null) return child;
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                    ),
+                  ),
+                ),
           const SizedBox(
             height: 10,
           ),
@@ -190,7 +193,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         IconButton(
                             onPressed: () {
                               Navigator.pop(context);
-
                             },
                             icon: const Icon(
                               Icons.cancel,
@@ -223,6 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       centerTitle: true,
@@ -261,10 +264,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemCount: snapshot.data["groups"].length,
                   itemBuilder: (BuildContext context, int index) {
                     // reverse the index value
-                    int reverseIndex = snapshot.data["groups"].length - index - 1;
-                    SharedPref.saveGroupId(getId(snapshot.data["groups"][reverseIndex]));
+                    int reverseIndex =
+                        snapshot.data["groups"].length - index - 1;
+                    SharedPref.saveGroupId(
+                        getId(snapshot.data["groups"][reverseIndex]));
                     return GroupTile(
                         groupName: getName(snapshot.data["groups"][reverseIndex]),
+                        userProfile: snapshot.data["profilePic"],
                         username: snapshot.data["fullName"],
                         groupId: getId(snapshot.data["groups"][reverseIndex]));
                   },

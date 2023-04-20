@@ -7,7 +7,6 @@ import 'package:chat/screens/ui/message_tlle.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 // ignore: must_be_immutable
@@ -17,9 +16,11 @@ class ChatPage extends StatefulWidget {
   String groupId;
   String? groupPic;
   String? userProfile;
+  String? userId;
 
   ChatPage(
       {Key? key,
+      this.userId,
       this.groupPic,
       this.userProfile,
       required this.username,
@@ -42,7 +43,6 @@ class _ChatPageState extends State<ChatPage> {
   int maxLines = 10;
   String profilePic = '';
   String groupPicture = "";
-  String userProfile = "";
 
   @override
   void initState() {
@@ -51,14 +51,14 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
     setState(() {
       isLoadingAnimation = true;
+      getImage();
     });
-    getImage();
-    setState(() {});
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    messageController.dispose();
     super.dispose();
   }
 
@@ -109,115 +109,97 @@ class _ChatPageState extends State<ChatPage> {
         key: chatFromKey,
         child: Column(
           children: [
-            Expanded(
-              child: chatMessages(),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-              color: Colors.lightBlue,
-              child: Row(
-                children: [
-                  Expanded(
-                      child: Container(
-                    constraints: BoxConstraints(
-                      minHeight: minHeight,
-                      maxHeight: maxHeight,
-                    ),
-                    child: TextFormField(
-                      maxLines: null,
-                      inputFormatters: [
-                        TrimTextFormatter(),
-                        NewLineTrimTextFormatter(),
-                      ],
-                      cursorColor: Colors.white,
-                      keyboardType: TextInputType.multiline,
-                      controller: messageController,
-                      style: const TextStyle(color: Colors.white),
-                      onChanged: (value) {
-                        final lines = value.split('\n').length;
-                        if (lines < 2) {
-                          setState(() {
-                            minHeight = 60;
-                            maxHeight = 150;
-                          });
-                        } else if (lines < 6) {
-                          setState(() {
-                            minHeight = 66;
-                            maxHeight = 150;
-                          });
-                        } else if (lines <= 10) {
-                          setState(() {
-                            minHeight = 60 + (5 - 1) * 20;
-                            maxHeight = 150 + (lines - 5) * 20;
-                            maxLines = lines;
-                          });
-                        } else {
-                          setState(() {
-                            maxLines = maxLines;
-                          });
-                        }
-                      },
-                      decoration: const InputDecoration(
-                        hintText: "Send a Message",
-                        hintStyle: TextStyle(color: Colors.white),
-                        border: InputBorder.none,
-                        errorStyle:
-                            TextStyle(color: Colors.white, fontSize: 15),
-                      ),
-                    ),
-                  )),
-                  GestureDetector(
-                      onTap: () {
-                        ProfileController().pickImage(context);
-                      },
-                      child: const Icon(
-                        Icons.image,
-                        size: 40,
-                      )),
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      if (chatFromKey.currentState!.validate()) {
-                        sendMessages();
-                        resetHeight();
-                      }
-                    },
-                    child: Container(
-                      height: 50,
-                      width: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(21),
-                        color: Colors.blue,
-                      ),
-                      child: const Icon(
-                        Icons.send,
-                        color: Colors.white,
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
+            // CHAT MESSAGE DESIGN
+            _buildChatMessages(),
+            // SEND MESSAGE BUTTON
+            _buildSendMessageButton(context)
           ],
         ),
       ),
     );
   }
 
+  // SEND MESSAGE BUTTON EXTRACT AS A METHOD
+  Container _buildSendMessageButton(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          IconButton(
+            onPressed: () {
+              ProfileController().pickImage(context);
+            },
+            icon: const Icon(
+              Icons.camera_alt,
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: TextFormField(
+              maxLines: null,
+              inputFormatters: [
+                TrimTextFormatter(),
+                NewLineTrimTextFormatter(),
+              ],
+              keyboardType: TextInputType.multiline,
+              controller: messageController,
+              decoration: const InputDecoration.collapsed(
+                hintText: "Type a message",
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          GestureDetector(
+            onTap: () {
+              if (chatFromKey.currentState!.validate()) {
+                sendMessages();
+                resetHeight();
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.blue,
+              ),
+              child: const Icon(
+                Icons.send,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // CHAT MESSAGE  EXTRACT AS A METHOD
+  Expanded _buildChatMessages() {
+    return Expanded(
+      child: chatMessages(),
+    );
+  }
+
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       centerTitle: true,
-      title: Text(
-        widget.groupName.toString(),
-        style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-      ),
       elevation: 0,
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 3.0),
-          child: ClipRRect(
+      title: Row(
+        children: [
+          ClipRRect(
               borderRadius: BorderRadius.circular(100),
               child: (widget.groupPic ?? "").isEmpty
                   ? const Center(
@@ -226,28 +208,41 @@ class _ChatPageState extends State<ChatPage> {
                       size: 30,
                     ))
                   : Image.network(widget.groupPic.toString(),
-                      height: 50, width: 55, fit: BoxFit.cover,
+                      height: 50, width: 50, fit: BoxFit.cover,
                       loadingBuilder: (context, child, loading) {
                       if (loading == null) return child;
                       return const Center(child: CircularProgressIndicator());
                     })),
-        ),
-        const SizedBox(
-          width: 15,
-        ),
-        GestureDetector(
-            onTap: () {
-              nextPage(
-                  context,
-                  GroupInfo(
-                      groupPic: groupPicture,
-                      adminName: adminName,
-                      groupName: widget.groupName,
-                      groupId: widget.groupId));
-            },
-            child: const Icon(Icons.info)),
-        const SizedBox(
-          width: 20,
+          const SizedBox(width: 80),
+          Expanded(
+            child: Text(
+              widget.groupName.toString(),
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        IconButton(
+          onPressed: () {
+            nextPage(
+              context,
+              GroupInfo(
+                groupPic: groupPicture,
+                adminName: adminName,
+                groupName: widget.groupName,
+                groupId: widget.groupId,
+              ),
+            );
+          },
+          icon: const Icon(
+            Icons.info_outline_rounded,
+            size: 30,
+          ),
         ),
       ],
     );
@@ -308,10 +303,8 @@ class _ChatPageState extends State<ChatPage> {
                         controller: _scrollController,
                         itemCount: snapshot.data.docs.length,
                         itemBuilder: (context, index) {
-                          /*print(snapshot.data.docs[index]["userProfile"].toString());*/
                           bool isSameDate = false;
                           String? newDate = '';
-
                           if (index == 0) {
                             newDate = groupMessageDateAndTime(snapshot
                                     .data.docs[index]["time"]
@@ -356,9 +349,8 @@ class _ChatPageState extends State<ChatPage> {
                                 sender: snapshot.data.docs[index]["sender"],
                                 time: snapshot.data.docs[index]["time"]
                                     .toString(),
-                                userProfile: userProfile = snapshot
-                                    .data.docs[index]["userProfile"]
-                                    .toString(),
+                                userProfile: snapshot.data.docs[index]
+                                    ["userProfile"],
                                 /*  groupPic: groupPicture = snapshot.data.docs[index]["groupPic"].toString(),*/
                               ),
                             ],
@@ -384,7 +376,7 @@ class _ChatPageState extends State<ChatPage> {
         "sender": widget.username,
         "time": DateTime.now().microsecondsSinceEpoch,
         /* "groupPic":groupPicture,*/
-        "userProfile": userProfile
+        "userProfile": widget.userProfile
       };
       DatabaseServices().sendMessage(widget.groupId, chatMessageMap);
       setState(() {

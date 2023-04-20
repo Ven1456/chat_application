@@ -1,12 +1,8 @@
 
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/profile_Controller.dart';
-import 'package:chat/services/database_services.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import "package:flutter/foundation.dart";
 import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
@@ -15,16 +11,10 @@ class MessageTile extends StatefulWidget {
   String sender;
   String time;
   bool sendByMe;
-  String? groupPic;
-  String userProfile;
-
-
-
-
+  String? userProfile;
   MessageTile(
       {Key? key,
-        this.groupPic,
-        required  this.userProfile,
+      this.userProfile,
       required this.time,
       required this.message,
       required this.sendByMe,
@@ -39,7 +29,6 @@ class MessageTile extends StatefulWidget {
 class _MessageTileState extends State<MessageTile> {
   String datetime = DateFormat("hh:mm a").format(DateTime.now());
   String email = '';
-  String profilePic = '';
   String senderProfile = "";
 
 
@@ -47,64 +36,23 @@ class _MessageTileState extends State<MessageTile> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
-    getProfilePic();
     setState(() {
-    });
-
-/*    getUser();*/
-  /*  getUser();*/
-  }
- /* getImage() async {
-    QuerySnapshot snapshot = await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
-        .gettingUserPic();
-    setState(() {
-      senderProfile = snapshot.docs[0]["profilePic"];
-      profilePic = snapshot.docs[0]["profilePic"];
+      getProfilePic();
     });
   }
-  getSendByImage() async {
+
+/*  getImage() async {
     QuerySnapshot snapshot = await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
         .gettingUserEmail(email);
     setState(() {
-      profilePic = snapshot.docs[0]["profilePic"];
+
     });
   }*/
   getProfilePic() async {
-    await SharedPref.getProfilePic().then((value) {
-      setState(() {
-       profilePic = value!;
-     /*   getImage();
-       getSendByImage();*/
-      });
+    await SharedPref.getEmail().then((value) {
+        email = value!;
     });
   }
- /* getUser() async {
-    await SharedPref.getProfilePic().then((value) {
-      setState(() {
-        profilePic = value ?? "";
-        final user = AuthService().firebaseAuth.currentUser!.uid;
-        DatabaseServices(uid: user);
-      });
-    });
-  }*/
-/*getProfilePic()async{
-  QuerySnapshot snapshot = await DatabaseServices(
-      uid: FirebaseAuth.instance.currentUser!.uid).gettingUserEmail(email);
-  if (snapshot.docs.isNotEmpty){
-    String value = snapshot.docs[0]["profilePic"];
-    setState(() {
-      profilePic = value;
-    });
-  }*/
-
-  /*DatabaseServices().setUserProfilePicture(profilePic).then((value) {
-      setState(() {
-        profilePic = value;
-      });
-    });*/
-
-
   static String getDateForChat(String datetime) {
     double time = int.parse(datetime) / 1000;
     // Create a DateTime object from the millisecond timestamp
@@ -143,7 +91,7 @@ class _MessageTileState extends State<MessageTile> {
           ),
           child:ClipRRect(
             borderRadius: BorderRadius.circular(100),
-            child: senderProfile.isEmpty ?  Center(
+            child: (widget.userProfile ?? '').isEmpty ?  Center(
                 child: Text(
                   widget.sender.substring(0, 2).toUpperCase(),
                   style:  TextStyle(
@@ -155,11 +103,11 @@ class _MessageTileState extends State<MessageTile> {
             ) :  Image.network(
                 height: 50,
                 width: 50,
-              senderProfile.toString(),
+              widget.userProfile .toString(),
               fit: BoxFit.cover,
               loadingBuilder: (context, child, loading) {
                 if (loading == null) return child;
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               },
             ),
           ),
@@ -227,13 +175,13 @@ class _MessageTileState extends State<MessageTile> {
                   ),
                   child: Center(
                       // ignore: unnecessary_null_comparison
-                      child: profilePic != null
+                      child: widget.userProfile != null
                           ? Consumer<ProfileController>(
                 builder: (context, provider, child) {
                             return ClipRRect(
                               borderRadius: BorderRadius.circular(100),
                               child: provider.image == null
-                                  ? (profilePic).isEmpty
+                                  ? (widget.userProfile ??"").isEmpty
                                   ? const Center(
                                     child: Icon(
                                 Icons.person,
@@ -243,11 +191,11 @@ class _MessageTileState extends State<MessageTile> {
                                   : Image.network(
                                 height: 50,
                                 width: 50,
-                                profilePic,
+                                widget.userProfile ?? '',
                                 fit: BoxFit.cover,
                                 loadingBuilder: (context, child, loading) {
                                   if (loading == null) return child;
-                                  return Center(child: CircularProgressIndicator());
+                                  return const Center(child: CircularProgressIndicator());
                                 },
                               ) : Container()
                             );
@@ -255,7 +203,7 @@ class _MessageTileState extends State<MessageTile> {
     )
                           : Text(
                               widget.sender.toUpperCase().substring(0, 2),
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                             )),
                 ),
               )

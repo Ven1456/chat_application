@@ -30,7 +30,6 @@ class GroupInfo extends StatefulWidget {
 
 class _GroupInfoState extends State<GroupInfo> {
   Stream? members;
-  String? groupProfile = " ";
 
   @override
   void initState() {
@@ -69,181 +68,240 @@ class _GroupInfoState extends State<GroupInfo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: _buildAppBar(context),
-        body: ChangeNotifierProvider(
-            create: (_) => ProfileController(),
-            child: Consumer<ProfileController>(
-                builder: (context, provider, child) {
-              return Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
-                          Container(
-                            height: 200,
-                            width: 200,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.black),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(100),
-                              child: provider.groupImage == null
-                                  ? (widget.groupPic ?? "").isEmpty
-                                      ? Container(
-                                          color: Colors.orange,
-                                          child: Center(
-                                            child: Text(
-                                              widget.groupName
-                                                  .substring(0, 2)
-                                                  .toUpperCase(),
-                                              style: const TextStyle(
-                                                  fontSize: 30,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                        )
-                                      : Image.network(
-                                          height: 150,
-                                          width: 150,
-                                          widget.groupPic ?? "",
-                                          fit: BoxFit.cover,
-                                          loadingBuilder:
-                                              (context, child, loading) {
-                                            if (loading == null) return child;
-                                            return const Center(
-                                                child:
-                                                    CircularProgressIndicator());
-                                          },
-                                        )
-                                  : Stack(children: [
-                                      Image.file(
-                                        File(provider.groupImage!.path)
-                                            .absolute,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ]),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              provider.pickGroupImage(context);
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 35.0, vertical: 0),
-                              child: Container(
-                                  height: 40,
-                                  width: 40,
-                                  decoration: const BoxDecoration(
-                                      color: Colors.blue,
-                                      shape: BoxShape.circle),
-                                  child: const Icon(Icons.edit)),
-                            ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(21),
-                          color: Colors.blue.withOpacity(0.4),
-                        ),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              child: Text(widget.groupName.substring(0, 2)),
-                            ),
-                            const SizedBox(
-                              width: 15,
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Group : ${widget.groupName}"),
-                                Text("Admin : ${getName(widget.adminName)}"),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      memberList()
-                    ],
-                  ),
+      appBar: _buildAppBar(context),
+      body: ChangeNotifierProvider(
+        create: (_) => ProfileController(),
+        child: Consumer<ProfileController>(
+          builder: (context, provider, child) {
+            return Container(
+              padding: const EdgeInsets.all(16),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // GROUP IMAGE
+                    _buildGroupImage(provider, context),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    // GROUP AND ADMIN NAME
+                    _buildGroupAndAdminNameText(),
+                    const SizedBox(height: 20),
+                    // MEMBERS IN THAT GROUP
+                    memberList()
+                  ],
                 ),
-              );
-            })));
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
 
-  AppBar _buildAppBar(BuildContext context) {
-    return AppBar(
-      title: const Text("Group Info"),
-      centerTitle: true,
-      actions: [
-        GestureDetector(
-            onTap: () {
-              showDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: const Text(
-                        "LogOut",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+  // GROUP AND ADMIN NAME TEXT EXTRACT AS A METHOD
+  Container _buildGroupAndAdminNameText() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(21),
+        color: Colors.blue.withOpacity(0.2),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            child: Text(
+              widget.groupName.substring(0, 2).toUpperCase(),
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(
+            width: 15,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Group : ${widget.groupName}",
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                "Admin : ${getName(widget.adminName)}",
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // GROUP IMAGE  EXTRACT AS A METHOD
+  Stack _buildGroupImage(ProfileController provider, BuildContext context) {
+    return Stack(
+      alignment: Alignment.bottomRight,
+      children: [
+        Container(
+          height: 200,
+          width: 200,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.black),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(100),
+            child: provider.groupImage == null
+                ? (widget.groupPic ?? "").isEmpty
+                    ? Container(
+                        color: Colors.orange,
+                        child: Center(
+                          child: Text(
+                            widget.groupName.substring(0, 2).toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 48,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
-                      ),
-                      content: const Text(
-                        "Are you sure you want Exit this Group",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      actions: [
-                        IconButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: const Icon(
-                              Icons.cancel,
-                              color: Colors.red,
-                            )),
-                        IconButton(
-                            onPressed: () async {
-                              DatabaseServices(
-                                      uid: FirebaseAuth
-                                          .instance.currentUser!.uid)
-                                  .toggleGroupJoin(
-                                      widget.groupId,
-                                      getName(widget.adminName),
-                                      widget.groupName)
-                                  .whenComplete(() {
-                                nextPage(context, HomeScreen());
-                              });
-                            },
-                            icon: const Icon(
-                              Icons.done,
-                              color: Colors.green,
-                            )),
-                      ],
-                    );
-                  });
-            },
-            child: const Icon(Icons.exit_to_app)),
-        const SizedBox(
-          width: 20,
+                      )
+                    : Image.network(
+                        height: 150,
+                        width: 150,
+                        widget.groupPic ?? "",
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loading) {
+                          if (loading == null) return child;
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        },
+                      )
+                : Stack(children: [
+                    Image.file(
+                      File(provider.groupImage!.path).absolute,
+                      fit: BoxFit.cover,
+                    ),
+                  ]),
+          ),
         ),
+        GestureDetector(
+          onTap: () {
+            provider.pickGroupImage(context);
+          },
+          child: Container(
+            margin: const EdgeInsets.all(8),
+            height: 40,
+            width: 40,
+            decoration: const BoxDecoration(
+              color: Colors.blue,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.edit),
+          ),
+        )
       ],
     );
   }
 
+  // APP BAR  EXTRACT AS A METHOD
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      backgroundColor: Colors.blue,
+      elevation: 0,
+      leading: IconButton(
+        icon: const Icon(
+          Icons.arrow_back_ios,
+          color: Colors.white,
+        ),
+        onPressed: () => Navigator.pop(context),
+      ),
+      centerTitle: true,
+      title: const Text(
+        "Group Info",
+        style: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+      actions: [
+        IconButton(
+          icon: const Icon(
+            Icons.exit_to_app,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            showDialog(
+              barrierDismissible: false,
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text(
+                    "Leave Group?",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  content: const Text(
+                    "Are you sure you want to leave this group?",
+                    style: TextStyle(
+                      color: Colors.black,
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        "CANCEL",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        DatabaseServices(
+                                uid: FirebaseAuth.instance.currentUser!.uid)
+                            .toggleGroupJoin(
+                          widget.groupId,
+                          getName(widget.adminName),
+                          widget.groupName,
+                        )
+                            .whenComplete(() {
+                          nextPage(context, const HomeScreen());
+                        });
+                      },
+                      child: const Text(
+                        "LEAVE",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
+        const SizedBox(width: 20),
+      ],
+    );
+  }
+
+  // MEMBERS LIST METHOD
   memberList() {
     return StreamBuilder(
         stream: members,
@@ -262,7 +320,8 @@ class _GroupInfoState extends State<GroupInfo> {
                             leading: CircleAvatar(
                               child: Text(
                                 getName(snapshot.data["members"][index])
-                                    .substring(0, 2),
+                                    .substring(0, 2)
+                                    .toUpperCase(),
                                 style: const TextStyle(
                                     fontSize: 18, fontWeight: FontWeight.bold),
                               ),

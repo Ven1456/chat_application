@@ -2,7 +2,6 @@ import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/ui/chat_page.dart';
 import 'package:chat/services/auth_service.dart';
-import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -12,11 +11,13 @@ class GroupTile extends StatefulWidget {
   String username;
   String groupName;
   String? groupPic;
+  String? userId;
   String userProfile;
 
   GroupTile(
       {Key? key,
       this.groupPic,
+      this.userId,
       required this.userProfile,
       required this.groupName,
       required this.username,
@@ -32,29 +33,15 @@ class _GroupTileState extends State<GroupTile> {
     return res.substring(0, res.indexOf("_"));
   }
 
-  getImage() async {
-    DatabaseServices().getGroupIcon(widget.groupId).then((value) {
-      setState(() {
-        widget.groupPic = value;
-      });
-    });
-  }
-
   AuthService authService = AuthService();
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    getImage();
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        nextPage(
+      onTap: () async {
+        await nextPage(
             context,
             ChatPage(
+              userId: widget.userId,
               groupPic: widget.groupPic,
               username: widget.username,
               groupName: widget.groupName,
@@ -92,26 +79,50 @@ class _GroupTileState extends State<GroupTile> {
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
-        child: ListTile(
-          leading: CircleAvatar(
-            child: (widget.groupPic ?? "").isEmpty
-                ? Text(
-                    widget.groupName.substring(0, 2).toUpperCase(),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  )
-                : ClipRRect(child: Image.network(widget.groupPic.toString())),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.3),
+                spreadRadius: 1,
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
-          title: Text(
-            widget.groupName.toString(),
-            style: const TextStyle(fontWeight: FontWeight.bold),
+          child: ListTile(
+            leading: _buildCircleAvatar(),
+            title: _buildTitleText(),
+            subtitle: _buildSubTitleText(),
           ),
-          subtitle: Text(
-              "Join the Conversation as the ${widget.username.toString()}",
-              style:
-                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
         ),
       ),
     );
+  }
+
+  // SUB TITLE TEXT EXTRACT AS A METHOD
+  Text _buildSubTitleText() {
+    return Text("Join the Conversation as the ${widget.username.toString()}",
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13));
+  }
+
+  // TITLE TEXT EXTRACT AS A METHOD
+  Text _buildTitleText() {
+    return Text(
+      widget.groupName.toString(),
+      style: const TextStyle(fontWeight: FontWeight.bold),
+    );
+  }
+
+  // CIRCLE AVATAR EXTRACT AS A METHOD
+  CircleAvatar _buildCircleAvatar() {
+    return CircleAvatar(
+        child: Text(
+      widget.groupName.substring(0, 2).toUpperCase(),
+      textAlign: TextAlign.center,
+      style: const TextStyle(fontWeight: FontWeight.bold),
+    ));
   }
 }

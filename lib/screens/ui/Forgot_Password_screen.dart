@@ -35,6 +35,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         if (_start == 0) {
           setState(() {
             timer.cancel();
+            Navigator.pop(context);
           });
         } else {
           setState(() {
@@ -63,31 +64,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Reset Password"),
-        centerTitle: true,
-      ),
+      // APP BAR
+      appBar: _buildAppBar(),
       body: _isLoading
-          ? Center(
-              child: SizedBox(
-                  height: 150,
-                  width: 100,
-                  child: Lottie.network(
-                      "https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")))
+          ?
+          // LOADING ANIMATION
+          _buildLoadingAnimation()
           : Form(
               key: formKey,
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(250),
-                      child: Image.asset("assets/images/reset.jpg",height: 300,)
-                      /*Image.network(
-                        imagePath,
-                        height: 310,
-                      ),*/
-                    ),
+                    // IMAGE
+                    _buildImage(),
                     const SizedBox(
                       height: 50,
                     ),
@@ -95,69 +85,35 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       width: 320,
                       child: isButton
                           ? Container()
-                          : TextFormField(
-
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              onChanged: (val) {
-                                setState(() {
-                                  email = val;
-                                });
-                              },
-                              validator: (val) {
-                                return RegExp(
-                                            r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
-                                        .hasMatch(val!)
-                                    ? null
-                                    : "Please Enter Correct Email";
-                              },
-                              decoration: textInputDecoration.copyWith(
-                                labelText: "Enter Your Email",
-                                prefixIcon: const Icon(Icons.email)
-                              ),
-                            ),
+                          :
+                          // EMAIL  TEXT FIELD
+                          _buildEmailTextFormField(),
                     ),
                     const SizedBox(
                       height: 15,
                     ),
                     isButton
                         ? Container()
-                        : ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(21))),
-                            onPressed: () {
-                              forgot();
-                            },
-                            child: const Text("Send Request")),
+                        :
+                        // SEND REQUEST BUTTON
+                        _buildSendRequestButton(),
                     isButton
                         ? Column(
                             children: [
-                              const Center(
-                                  child: Icon(
-                                Icons.timer,
-                                size: 150,
-                              )),
-                              Text(
-                                "$_start",
-                                style: const TextStyle(fontSize: 25),
-                              ),
+                              // TIMER ICON
+                              _buildTimerIcon(),
+                              // TIMER START ICON
+                              _buildTimeStartText(),
                               const SizedBox(
                                 height: 10,
                               ),
-                              const Text(
-                                "                   Please Check Your Email \n If Link is Not Their Please Check Spam Box\n            Set Must 6 Character Password",
-                                style: TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.bold),
-                              ),
+                              // DESCRIPTION TEXT
+                              _buildDescriptionText(),
                               const SizedBox(
                                 height: 10,
                               ),
-                              ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text("Close")),
+                              // CLOSE ICON
+                              _buildCloseButton(context),
                             ],
                           )
                         : Container()
@@ -165,6 +121,103 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ),
               ),
             ),
+    );
+  }
+
+  // CLOSE BUTTON EXTRACT AS A METHOD
+  ElevatedButton _buildCloseButton(BuildContext context) {
+    return ElevatedButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        child: const Text("Close"));
+  }
+
+  // DESCRIPTION TEXT  EXTRACT AS A METHOD
+  Text _buildDescriptionText() {
+    return const Text(
+      "                   Please Check Your Email "
+      "\n If Link is Not Their Please Check Spam Box"
+      "\n            Set Must 6 Character Password",
+      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+    );
+  }
+
+  // TIMER START TEXT  EXTRACT AS A METHOD
+  Text _buildTimeStartText() {
+    return Text(
+      "$_start",
+      style: const TextStyle(fontSize: 25),
+    );
+  }
+
+  // TIMER ICON  EXTRACT AS A METHOD
+  Center _buildTimerIcon() {
+    return const Center(
+        child: Icon(
+      Icons.timer,
+      size: 150,
+    ));
+  }
+
+  // SEND REQUEST BUTTON  EXTRACT AS A METHOD
+  ElevatedButton _buildSendRequestButton() {
+    return ElevatedButton(
+        style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(21))),
+        onPressed: () {
+          forgot();
+        },
+        child: const Text("Send Request"));
+  }
+
+  // EMAIL  TEXT FIELD  EXTRACT AS A METHOD
+  TextFormField _buildEmailTextFormField() {
+    return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      onChanged: (val) {
+        setState(() {
+          email = val;
+        });
+      },
+      validator: (val) {
+        return RegExp(
+                    r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
+                .hasMatch(val!)
+            ? null
+            : "Please Enter Correct Email";
+      },
+      decoration: textInputDecoration.copyWith(
+          labelText: "Enter Your Email", prefixIcon: const Icon(Icons.email)),
+    );
+  }
+
+  // IMAGE EXTRACT AS A METHOD
+  ClipRRect _buildImage() {
+    return ClipRRect(
+        borderRadius: BorderRadius.circular(250),
+        child: Image.asset(
+          "assets/images/reset.jpg",
+          height: 300,
+        ));
+  }
+
+  // LOADING ANIMATION   EXTRACT AS A METHOD
+  Center _buildLoadingAnimation() {
+    return Center(
+        child: SizedBox(
+            height: 150,
+            width: 100,
+            child: Lottie.network(
+                "https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")));
+  }
+
+  // APP BAR  EXTRACT AS A METHOD
+  AppBar _buildAppBar() {
+    return AppBar(
+      title: const Text("Reset Password"),
+      centerTitle: true,
     );
   }
 
@@ -206,30 +259,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           );
         }
       });
-      /*    try {
-        // Password reset email sent successfully
-        ToastContext toastContext = ToastContext();
-        toastContext.init(context);
-        Toast.show(
-          "Reset Password link sent to Email Successfully",
-          duration: Toast.lengthShort,
-          gravity: Toast.bottom,
-          webShowClose: true,
-          backgroundColor: Colors.green,
-        );
-      } catch (e) {
-        // An error occurred while sending the password reset email
-        ToastContext toastContext = ToastContext();
-        toastContext.init(context);
-        Toast.show(
-          "Error sending password reset email: ${e.toString()}",
-          duration: Toast.lengthShort,
-          rootNavigator: true,
-          gravity: Toast.bottom,
-          webShowClose: true,
-          backgroundColor: Colors.red,
-        );
-      }*/
     }
   }
 }

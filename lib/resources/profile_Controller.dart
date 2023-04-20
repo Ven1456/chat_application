@@ -1,8 +1,5 @@
 import 'dart:io';
-import 'package:chat/screens/ui/chat_page.dart';
-import 'package:chat/screens/ui/group_info.dart';
 import 'package:chat/services/auth_service.dart';
-import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
@@ -81,32 +78,6 @@ class ProfileController extends ChangeNotifier {
       url = downloadUrl;
       await SharedPref.saveProfilePic(downloadUrl);
     }
-
-    // await FirebaseFirestore.instance.collection('users').doc(userId).update({
-    //   'profilePic': downloadUrl,
-    // }).then((value) {
-    //   ToastContext toastContext = ToastContext();
-    //   toastContext.init(context);
-    //   Toast.show(
-    //     "Profile Pic Update Successfully",
-    //     duration: Toast.lengthShort,
-    //     rootNavigator: true,
-    //     gravity: Toast.bottom,
-    //     webShowClose: true,
-    //     backgroundColor: Colors.green,
-    //   );
-    // }).onError((error, stackTrace) {
-    //   ToastContext toastContext = ToastContext();
-    //   toastContext.init(context);
-    //   Toast.show(
-    //     "Profile Pic Update Failed",
-    //     duration: Toast.lengthShort,
-    //     rootNavigator: true,
-    //     gravity: Toast.bottom,
-    //     webShowClose: true,
-    //     backgroundColor: Colors.green,
-    //   );
-    // });
   }
 
 

@@ -207,12 +207,24 @@ class _ChatPageState extends State<ChatPage> {
                       Icons.person,
                       size: 30,
                     ))
-                  : Image.network(widget.groupPic.toString(),
-                      height: 50, width: 50, fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loading) {
-                      if (loading == null) return child;
-                      return const Center(child: CircularProgressIndicator());
-                    })),
+                  : Image.network(
+                      widget.groupPic.toString(),
+                      height: 50,
+                      width: 50,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (BuildContext context, Widget child,
+                          ImageChunkEvent? loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        );
+                      },
+                    )),
           const SizedBox(width: 80),
           Expanded(
             child: Text(

@@ -179,10 +179,17 @@ class _GroupInfoState extends State<GroupInfo> {
                         width: 150,
                         widget.groupPic ?? "",
                         fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loading) {
-                          if (loading == null) return child;
-                          return const Center(
-                              child: CircularProgressIndicator());
+                        loadingBuilder: (BuildContext context, Widget child,
+                            ImageChunkEvent? loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          );
                         },
                       )
                 : Stack(children: [

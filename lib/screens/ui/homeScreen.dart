@@ -133,10 +133,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                   width: 130,
                                   profilePic,
                                   fit: BoxFit.cover,
-                                  loadingBuilder: (context, child, loading) {
-                                    if (loading == null) return child;
-                                    return const Center(
-                                        child: CircularProgressIndicator());
+                                  loadingBuilder: (BuildContext context, Widget child,
+                                      ImageChunkEvent? loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Center(
+                                      child: CircularProgressIndicator(
+                                        value: loadingProgress.expectedTotalBytes != null
+                                            ? loadingProgress.cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                            : null,
+                                      ),
+                                    );
                                   },
                                 ),
                               ),
@@ -290,6 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 return ListView.builder(
                   itemCount: snapshot.data["groups"].length,
                   itemBuilder: (BuildContext context, int index) {
+
                     // reverse the index value
                     int reverseIndex =
                         snapshot.data["groups"].length - index - 1;

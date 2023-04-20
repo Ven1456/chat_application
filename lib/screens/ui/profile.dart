@@ -1,7 +1,6 @@
 // ignore_for_file: invalid_use_of_visible_for_testing_member, must_be_immutable
 
 import 'dart:io';
-import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/database_services.dart';
@@ -89,10 +88,22 @@ class _ProfileState extends State<Profile> {
                                     width: 150,
                                     widget.profilePicTest ?? "",
                                     fit: BoxFit.cover,
-                                    loadingBuilder: (context, child, loading) {
-                                      if (loading == null) return child;
-                                      return const Center(
-                                          child: CircularProgressIndicator());
+                                    loadingBuilder: (BuildContext context,
+                                        Widget child,
+                                        ImageChunkEvent? loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          value: loadingProgress
+                                                      .expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
+                                        ),
+                                      );
                                     },
                                   )
                             : Stack(children: [

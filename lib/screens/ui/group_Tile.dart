@@ -2,6 +2,7 @@ import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/ui/chat_page.dart';
 import 'package:chat/services/auth_service.dart';
+import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -29,13 +30,37 @@ class GroupTile extends StatefulWidget {
 }
 
 class _GroupTileState extends State<GroupTile> {
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      getImage();
+    });
+  }
   String getId(String res) {
     return res.substring(0, res.indexOf("_"));
+  }
+  getGroupImage() async {
+    DatabaseServices().getGroupIcon(widget.groupId).then((value) {
+      setState(() {
+        widget.groupPic = value;
+      });
+    });
+  }
+  getImage() async {
+    await SharedPref.getGroupPic().then((value) {
+      setState(() {
+       String profilePic = value ?? "";
+        getGroupImage();
+        /*  getGroupPic();*/
+      });
+    });
   }
 
   AuthService authService = AuthService();
   @override
   Widget build(BuildContext context) {
+
     return GestureDetector(
       onTap: () async {
         await nextPage(
@@ -92,11 +117,46 @@ class _GroupTileState extends State<GroupTile> {
               ),
             ],
           ),
-          child: ListTile(
-            leading: _buildCircleAvatar(),
-            title: _buildTitleText(),
-            subtitle: _buildSubTitleText(),
+          child:SizedBox(
+            width: 150, // set the desired width here
+            child: ListTile(
+              leading: SizedBox(
+                width: 50,
+                child: (widget.groupPic ?? "").isEmpty
+                    ? CircleAvatar(
+                  child: Text(
+                    widget.groupName.substring(0, 2).toUpperCase(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                )
+                    : ClipRRect(
+                  borderRadius: BorderRadius.circular(80),
+                  child: Image.network(
+                    widget.groupPic ?? "",
+                    height: 50,
+                    width: 50,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (BuildContext context, Widget child,
+                        ImageChunkEvent? loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                              : null,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              title: _buildTitleText(),
+              subtitle: _buildSubTitleText(),
+            ),
           ),
+
         ),
       ),
     );
@@ -116,13 +176,5 @@ class _GroupTileState extends State<GroupTile> {
     );
   }
 
-  // CIRCLE AVATAR EXTRACT AS A METHOD
-  CircleAvatar _buildCircleAvatar() {
-    return CircleAvatar(
-        child: Text(
-      widget.groupName.substring(0, 2).toUpperCase(),
-      textAlign: TextAlign.center,
-      style: const TextStyle(fontWeight: FontWeight.bold),
-    ));
-  }
+
 }

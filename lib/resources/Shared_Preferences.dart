@@ -7,10 +7,19 @@ class SharedPref {
   static String profilePic = "profilePic";
   static String groupPic = "GroupPic";
   static String groupId = "GroupId";
+  // 21/04/23
+  static String messageUrl= "messageUrl";
   // SAVE THE USER LOGIN STATUS SHARED PREFERENCE
   static Future<bool?> saveUserLoginStatus(bool isUserLogged) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setBool(userLogin, isUserLogged);
+    return null;
+  }
+  // 21/04/23
+  // SAVE THE MESSAGE URL STATUS SHARED PREFERENCE
+  static Future<bool?> saveMessageUrl(String isMessageUrl) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString(messageUrl, isMessageUrl);
     return null;
   }
 
@@ -68,7 +77,11 @@ class SharedPref {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return sharedPreferences.getString(profilePic);
   }
-
+  // 21/04/23
+  static Future<String?> getMessageUrl() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return sharedPreferences.getString(messageUrl);
+  }
 
   static Future<String?> getGroupId() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();

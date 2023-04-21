@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
@@ -6,6 +7,8 @@ import 'package:chat/screens/ui/group_info.dart';
 import 'package:chat/screens/ui/message_tlle.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -43,6 +46,8 @@ class _ChatPageState extends State<ChatPage> {
   int maxLines = 10;
   String profilePic = '';
   String groupPicture = "";
+  // 21/04/23
+  String messageChatUrl="";
 
   @override
   void initState() {
@@ -98,22 +103,60 @@ class _ChatPageState extends State<ChatPage> {
         /*  getGroupPic();*/
       });
     });
+    // 21/04/23
+    await SharedPref.getMessageUrl().then((value) {
+      setState(() {
+        messageChatUrl = value ?? "";
+        print(messageChatUrl);
+        /*  getGroupPic();*/
+      });
+    });
   }
 
+  bool _isShowEmoji= false;
   final chatFromKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(context),
-      body: Form(
-        key: chatFromKey,
-        child: Column(
-          children: [
-            // CHAT MESSAGE DESIGN
-            _buildChatMessages(),
-            // SEND MESSAGE BUTTON
-            _buildSendMessageButton(context)
-          ],
+    return GestureDetector(
+      onTap: (){
+        FocusScope.of(context).unfocus();
+      },
+      child: WillPopScope(
+        onWillPop: (){
+          if(_isShowEmoji){
+            setState(() {
+              _isShowEmoji=!_isShowEmoji;
+            });
+            return Future.value(false);
+          }
+          else{
+            return Future.value(true);
+          }
+        },
+        child: Scaffold(
+          appBar: _buildAppBar(context),
+          body: Form(
+            key: chatFromKey,
+            child: Column(
+              children: [
+                // CHAT MESSAGE DESIGN
+                _buildChatMessages(),
+                // SEND MESSAGE BUTTON
+                _buildSendMessageButton(context),
+                if(_isShowEmoji) SizedBox(
+                  height: MediaQuery.of(context).size.height * .35,
+                  child: EmojiPicker(
+                    textEditingController: messageController,
+                    config: Config(
+                      bgColor: Colors.white,
+                      columns: 8,
+                      emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0 )
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -139,13 +182,16 @@ class _ChatPageState extends State<ChatPage> {
         children: [
           IconButton(
             onPressed: () {
-              ProfileController().pickImage(context);
+              setState(() {
+                _isShowEmoji =!_isShowEmoji;
+              });
             },
             icon: const Icon(
-              Icons.camera_alt,
+         CupertinoIcons.smiley,
               color: Colors.grey,
             ),
           ),
+
           const SizedBox(width: 10),
           Expanded(
             child: Container(
@@ -154,6 +200,13 @@ class _ChatPageState extends State<ChatPage> {
                 maxHeight: maxHeight,
               ),
               child: TextFormField(
+                onTap: (){
+                  if(_isShowEmoji) {
+                    setState(() {
+                    _isShowEmoji =!_isShowEmoji;
+                  });
+                  }
+                },
                 maxLines: null,
                 inputFormatters: [
                   TrimTextFormatter(),
@@ -193,7 +246,18 @@ class _ChatPageState extends State<ChatPage> {
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          IconButton(
+            onPressed: () {
+              // 21/04/23
+              ProfileController().pickMessageImage(context);
+            },
+            icon: const Icon(
+              Icons.camera_alt,
+              color: Colors.grey,
+            ),
+          ),
+
+          const SizedBox(width: 5),
           GestureDetector(
             onTap: () {
               if (chatFromKey.currentState!.validate()) {
@@ -415,6 +479,10 @@ class _ChatPageState extends State<ChatPage> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
+      // 21/04/23
+      print(":dsdfklhfjksjfkdsjkfsdj:${messageChatUrl}");
+      // 21/04/23
+      ProfileController().messageUrl;
       Map<String, dynamic> chatMessageMap = {
         "message": messageController.text.trim(),
         "sender": widget.username,

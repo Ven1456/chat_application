@@ -12,12 +12,18 @@ class ProfileController extends ChangeNotifier {
 
   final picker = ImagePicker();
   AuthService authService = AuthService();
-  XFile? _image;
+  // 21/04/23
+  XFile? _messageImage;
+  // 21/04/23
+  XFile? get messageImage => _messageImage;
   XFile? _groupImage;
   XFile? get groupImage => _groupImage;
+  XFile? _image;
   XFile? get image => _image;
   String getId = "";
   String url = "";
+  // 21/04/23
+  String messageUrl ="";
   firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instanceFor(bucket: 'gs://chatapp-4f907.appspot.com');
   // IMAGE PICK FROM GALLERY
   Future pickGalleryImage(BuildContext context) async {
@@ -196,6 +202,96 @@ class ProfileController extends ChangeNotifier {
     });
       url = downloadUrl;
      /* await SharedPref.saveGroupPic(downloadUrl);*/
+    }
+  }
+
+  // 21/04/23
+  // MESSAGE UPLOAD IMAGE
+  void uploadMessageImage(BuildContext context) async {
+    if (_messageImage == null) {
+      return;
+    }
+
+    getId =(await SharedPref.getGroupId())!;
+    firebase_storage.Reference reference = firebase_storage
+        .FirebaseStorage.instance
+        .ref()
+        .child("/messagePhoto")
+        .child(getId);
+    firebase_storage.UploadTask uploadTask =
+    reference.putFile(File(_messageImage!.path).absolute);
+    await Future.value(uploadTask);
+    String downloadUrl = await reference.getDownloadURL();
+    String userId = getId;
+    DocumentSnapshot snapshot =
+    await FirebaseFirestore.instance.collection('groups').doc(userId).get();
+    if (snapshot.exists) {
+      await FirebaseFirestore.instance.collection('groups').doc(userId).update({
+        'recentMessage': downloadUrl,
+      });
+      messageUrl = downloadUrl;
+      await SharedPref.saveMessageUrl(messageUrl);
+      print("dfbsngfdhsgdfgdfj:$messageUrl");
+      /* await SharedPref.saveGroupPic(downloadUrl);*/
+    }
+  }
+  // 21/04/23
+// MESSAGE IMAGE
+  void pickMessageImage(context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: SizedBox(
+              height: 120,
+              width: 120,
+              child: Column(
+                children: [
+                  ListTile(
+                    onTap: () {
+                      pickCameraMessageImage(context);
+                      Navigator.pop(context);
+                    },
+                    leading: const Icon(Icons.camera),
+                    title: const Text("Camera"),
+                  ),
+                  ListTile(
+                    onTap: () {
+                      pickGalleryMessageImage(context);
+                      Navigator.pop(context);
+                    },
+                    leading: const Icon(Icons.image),
+                    title: const Text("Image"),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+  // 21/04/23
+  // IMAGE PICK FROM GALLERY
+  Future pickGalleryMessageImage(BuildContext context) async {
+    final pickedFile = await picker.pickImage(
+        source: ImageSource.gallery, imageQuality: 100);
+    if (pickedFile != null) {
+      _messageImage = XFile(pickedFile.path);
+      _messageImage = await _CropImage(imageFile: _messageImage);
+      // ignore: use_build_context_synchronously
+      uploadMessageImage(context);
+      notifyListeners();
+    }
+  }
+  // 21/04/23
+  // IMAGE PICK FROM CAMERA
+  Future pickCameraMessageImage(BuildContext context) async {
+    final pickedFile =
+    await picker.pickImage(source: ImageSource.camera, imageQuality: 100);
+    if (pickedFile != null) {
+      _messageImage = XFile(pickedFile.path);
+      // ignore: use_build_context_synchronously
+      uploadMessageImage(context);
+      notifyListeners();
     }
   }
 }

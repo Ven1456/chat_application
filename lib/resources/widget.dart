@@ -73,3 +73,5 @@ extension StringExtension on String {
     return "${this[0].toUpperCase()}${this.substring(1)}";
   }
 }
+// 21/04/23
+enum Type{text,image}

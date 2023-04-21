@@ -3,10 +3,8 @@ import 'dart:io';
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
-import 'package:chat/screens/auth/login_screen.dart';
 import 'package:chat/screens/ui/group_Tile.dart';
 import 'package:chat/screens/ui/profile.dart';
-import 'package:chat/screens/ui/search_page.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -39,9 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   initState() {
     super.initState();
-    setState(() {
       gettingUserData();
-    });
   }
 
   @override
@@ -93,181 +89,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: _buildAppBar(context),
-      drawer: _buildChangeNotifierProvider(),
       body: groupList(),
       floatingActionButton: _buildFloatingActionButton(context),
     );
   }
 
-  // DRAWER EXTRACT AS A METHOD
-  ChangeNotifierProvider<ProfileController> _buildChangeNotifierProvider() {
-    return ChangeNotifierProvider(
-        create: (_) => ProfileController(),
-        child: Consumer<ProfileController>(
-          builder: (context, provider, child) {
-            return Drawer(
-              child: ListView(
-                children: [
-                  provider.image == null
-                      ? (profilePic).isEmpty
-                          ? const UnconstrainedBox(
-                              child: SizedBox(
-                                height: 150,
-                                width: 150,
-                                child: CircleAvatar(
-                                  child: Icon(
-                                    Icons.person,
-                                    color: Colors.black,
-                                    size: 130,
-                                  ),
-                                ),
-                              ),
-                            )
-                          : UnconstrainedBox(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(80),
-                                child: Image.network(
-                                  height: 130,
-                                  width: 130,
-                                  profilePic,
-                                  fit: BoxFit.cover,
-                                  loadingBuilder: (BuildContext context, Widget child,
-                                      ImageChunkEvent? loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return Center(
-                                      child: CircularProgressIndicator(
-                                        value: loadingProgress.expectedTotalBytes != null
-                                            ? loadingProgress.cumulativeBytesLoaded /
-                                            loadingProgress.expectedTotalBytes!
-                                            : null,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            )
-                      : Stack(children: [
-                          Image.file(
-                            File(provider.image!.path).absolute,
-                            fit: BoxFit.cover,
-                          ),
-                        ]),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    username,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Divider(
-                    height: 5,
-                  ),
-                  ListTile(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    leading: const Icon(Icons.group),
-                    title: const Text(
-                      "Chats",
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  ListTile(
-                    onTap: () {
-                      nextPage(
-                          context,
-                          Profile(
-                            profilePicTest: profilePic,
-                            username: username,
-                            email: email,
-                          ));
-                    },
-                    leading: const Icon(Icons.person),
-                    title: const Text(
-                      "Profile",
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  ListTile(
-                    onTap: () {
-                      showDialog(
-                          barrierDismissible: false,
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text(
-                                "LogOut",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              content: const Text(
-                                "Are you sure you want Logout",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              actions: [
-                                IconButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    icon: const Icon(
-                                      Icons.cancel,
-                                      color: Colors.red,
-                                    )),
-                                IconButton(
-                                    onPressed: () {
-                                      authService.signOut();
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const LoginPage()),
-                                          (route) => false);
-                                    },
-                                    icon: const Icon(
-                                      Icons.done,
-                                      color: Colors.green,
-                                    )),
-                              ],
-                            );
-                          });
-                    },
-                    leading: const Icon(Icons.logout),
-                    title: const Text(
-                      "Log Out",
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ));
-  }
 
   // APP BAR  EXTRACT AS A METHOD
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       centerTitle: true,
-      actions: [
-        IconButton(
-            onPressed: () {
-              nextPage(context, const Search());
-            },
-            icon: const Icon(Icons.search))
-      ],
       title: const Text(
         "Chats",
         style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),

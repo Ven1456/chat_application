@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'package:chat/resources/profile_Controller.dart';
+import 'package:chat/screens/auth/login_screen.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,7 +28,9 @@ class _ProfileState extends State<Profile> {
   @override
   void initState() {
     super.initState();
-    getImage();
+    setState(() {
+      getImage();
+    });
 /*    getImage();*/
   }
 
@@ -53,7 +56,7 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("profile"),
+        title: const Text("Profile",style: TextStyle(fontWeight: FontWeight.bold),),
       ),
       body: ChangeNotifierProvider(
         create: (_) => ProfileController(),
@@ -63,7 +66,7 @@ class _ProfileState extends State<Profile> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 const SizedBox(
-                  height: 75,
+                  height: 25,
                 ),
                 Stack(
                   alignment: Alignment.bottomRight,
@@ -167,6 +170,77 @@ class _ProfileState extends State<Profile> {
                   ],
                 ),
                 _buildEmailContainer(),
+                const SizedBox(
+                  height: 60,
+                ),
+
+                GestureDetector(
+                  onTap: (){
+                    showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text(
+                              "Log Out",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            content: const Text(
+                              "Are you sure you want Logout ? ",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            actions: [
+                              IconButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  icon: const Icon(
+                                    Icons.cancel,
+                                    color: Colors.red,
+                                  )),
+                              IconButton(
+                                  onPressed: () {
+                                    authService.signOut();
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                            const LoginPage()),
+                                            (route) => false);
+                                  },
+                                  icon: const Icon(
+                                    Icons.done,
+                                    color: Colors.green,
+                                  )),
+                            ],
+                          );
+                        });
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: 40,
+                          width: 50,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(21),
+                            color: Colors.blueGrey
+                          ),
+                          child: const Icon(Icons.logout)
+
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      const Text("Logout",  style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16),)
+                    ],
+                  ),
+                )
+                
               ],
             );
           },
@@ -177,7 +251,7 @@ class _ProfileState extends State<Profile> {
 
   Container _buildUsernameContainer() {
     return Container(
-      height: 60,
+      height: 45,
       width: 250,
       decoration: BoxDecoration(
         color: Colors.blueGrey[700],
@@ -206,7 +280,7 @@ class _ProfileState extends State<Profile> {
 
   Container _buildEmailContainer() {
     return Container(
-      height: 60,
+      height: 45,
       width: 250,
       decoration: BoxDecoration(
         color: Colors.blueGrey[700],

@@ -75,67 +75,79 @@ class _SearchState extends State<Search> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
-                color: Colors.blue,
+              const SizedBox(
+                height: 15,
+              ),
+              SizedBox(
+                width: 350,
                 child: Row(
                   children: [
                     Expanded(
-                        child: TextFormField(
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      cursorColor: Colors.white,
-                      controller: searchController,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        errorStyle: TextStyle(color: Colors.white),
-                        hintText: "Search Groups Here....",
-                        hintStyle: TextStyle(color: Colors.white),
-                      ),
-                      validator: (val) {
-                        if (val!.isEmpty) {
-                          return "Please Enter AtLeast 1 Characters";
-                        } else if (val.trim().isEmpty) {
-                          return "Please Search A Group Without Spaces";
-                        } else if (val.trim().replaceAll(' ', '').isEmpty) {
-                          return "Please Search A Group That Contains Text";
-                        }
-                        return null;
-                      },
-                      onChanged: (value) {
-                        setState(() {
-                          isTextFieldEmpty = value.isEmpty;
-                          if (isTextFieldEmpty) {
-                            _isLoading = false;
+                      child: TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        cursorColor: Colors.black,
+                        controller: searchController,
+                        style: const TextStyle(color: Colors.black),
+                        decoration: InputDecoration(
+                            errorStyle: const TextStyle(color: Colors.red),
+                            hintText: "Search Groups Here....",
+                            hintStyle: const TextStyle(color: Colors.grey),
+                            enabledBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(12.0)),
+                              borderSide:
+                                  BorderSide(color: Colors.grey, width: 2),
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
+                              borderSide: BorderSide(color: Colors.blueGrey),
+                            ),
+                            suffixIcon: GestureDetector(
+                              onTap: () {
+                                if (searchFromKey.currentState!.validate()) {
+                                  if (!isTextFieldEmpty) {
+                                    setState(() {
+                                      hasUserSearched = true;
+                                    });
+                                    hasUserSearched
+                                        ? initiateSearchMethod()
+                                        : dataNotFound();
+                                  }
+                                }
+                              },
+                              child: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(21)),
+                                child: const Icon(
+                                  Icons.search,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            )),
+                        validator: (val) {
+                          if (val!.isEmpty) {
+                            return "Please Enter AtLeast 1 Characters";
+                          } else if (val.trim().isEmpty) {
+                            return "Please Search A Group Without Spaces";
+                          } else if (val.trim().replaceAll(' ', '').isEmpty) {
+                            return "Please Search A Group That Contains Text";
                           }
-                        });
-                      },
-                    )),
-                    GestureDetector(
-                      onTap: () {
-                        if (searchFromKey.currentState!.validate()) {
-                          if (!isTextFieldEmpty) {
-                            setState(() {
-                              hasUserSearched = true;
-                            });
-                            hasUserSearched
-                                ? initiateSearchMethod()
-                                : dataNotFound();
-                          }
-                        }
-                      },
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(21)),
-                        child: const Icon(
-                          Icons.search,
-                          color: Colors.white,
-                        ),
+                          return null;
+                        },
+                        onChanged: (value) {
+                          setState(() {
+                            isTextFieldEmpty = value.isEmpty;
+                            if (isTextFieldEmpty) {
+                              _isLoading = false;
+                            }
+                          });
+                        },
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -172,12 +184,26 @@ class _SearchState extends State<Search> {
                       searchSnapshot!.docs[index]["groupName"],
                       searchSnapshot!.docs[index]["admin"]);
                 })
-            : const SizedBox(
+            : SizedBox(
                 height: 650,
                 child: Center(
-                  child: Text(
-                    "NO DATA FOUND",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox(
+                          height: 400,
+                          width: 350,
+                          child: Lottie.network(
+                              "https://assets1.lottiefiles.com/packages/lf20_PjZ5YynQSK.json")),
+                      const Positioned(
+                        bottom: 35,
+                        child: Text(
+                          "NO GROUP FOUND",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                      ),
+                    ],
                   ),
                 ))
         : searchController.text.isEmpty
@@ -193,7 +219,7 @@ class _SearchState extends State<Search> {
                 height: 650,
                 child: Center(
                   child: Text(
-                    "NO DATA FOUND",
+                    "NO GROUP FOUND",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ));
@@ -267,70 +293,74 @@ class _SearchState extends State<Search> {
                     groupName: groupName,
                     groupId: groupId));
           } else {
-              ToastContext toastContext = ToastContext();
-              toastContext.init(context);
-              Toast.show(
-                "Left the  Group $groupName",
-                duration: Toast.lengthShort,
-                rootNavigator: true,
-                gravity: Toast.bottom,
-                webShowClose: true,
-                backgroundColor: Colors.red,
-              );
+            ToastContext toastContext = ToastContext();
+            toastContext.init(context);
+            Toast.show(
+              "Left the  Group $groupName",
+              duration: Toast.lengthShort,
+              rootNavigator: true,
+              gravity: Toast.bottom,
+              webShowClose: true,
+              backgroundColor: Colors.red,
+            );
           }
-
         },
         child: SizedBox(
           height: 100,
           width: 80,
           child: Row(children: [
-            if (isUserJoined) Container(
-                    height: 40,
-                    width: 75,
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.blue,
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.white,
-                            offset: Offset(0.0, 0.0),
-                            blurRadius: 0.0,
-                            spreadRadius: 0.0,
-                          ), //
-                        ],
-                        border: Border.all(color: Colors.white)),
-                    child: const Center(
-                      child: Text(
-                        "left",
-                        style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ) else Container(
-              height: 40,
-              width: 75,
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.blue,
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.white,
-                            offset: Offset(0.0, 0.0),
-                            blurRadius: 0.0,
-                            spreadRadius: 0.0,
-                          ), //
-                        ],
-                        border: Border.all(color: Colors.white)),
-                    child: const Center(
-                      child: Text(
-                        "join",
-                        style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
-                      ),
-                    ),
+            if (isUserJoined)
+              Container(
+                height: 40,
+                width: 75,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.blue,
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.white,
+                        offset: Offset(0.0, 0.0),
+                        blurRadius: 0.0,
+                        spreadRadius: 0.0,
+                      ), //
+                    ],
+                    border: Border.all(color: Colors.white)),
+                child: const Center(
+                  child: Text(
+                    "left",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
                   ),
+                ),
+              )
+            else
+              Container(
+                height: 40,
+                width: 75,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.blue,
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.white,
+                        offset: Offset(0.0, 0.0),
+                        blurRadius: 0.0,
+                        spreadRadius: 0.0,
+                      ), //
+                    ],
+                    border: Border.all(color: Colors.white)),
+                child: const Center(
+                  child: Text(
+                    "join",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
           ]),
         ),
       ),

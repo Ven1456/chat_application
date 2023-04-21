@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:chat/screens/auth/login_screen.dart';
-import 'package:chat/screens/ui/homeScreen.dart';
+import 'package:chat/screens/ui/BottomSheet.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
             context,
             MaterialPageRoute(
                 builder: (context) =>
-                isLogin ?  HomeScreen() : const LoginPage())));
+                isLogin ? const BottomSheetTest() : const LoginPage())));
   }
   isUserLogin() async {
     await SharedPref.isUserLogin().then((value) {

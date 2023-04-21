@@ -148,16 +148,48 @@ class _ChatPageState extends State<ChatPage> {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: TextFormField(
-              maxLines: null,
-              inputFormatters: [
-                TrimTextFormatter(),
-                NewLineTrimTextFormatter(),
-              ],
-              keyboardType: TextInputType.multiline,
-              controller: messageController,
-              decoration: const InputDecoration.collapsed(
-                hintText: "Type a message",
+            child: Container(
+              constraints: BoxConstraints(
+                minHeight: minHeight,
+                maxHeight: maxHeight,
+              ),
+              child: TextFormField(
+                maxLines: null,
+                inputFormatters: [
+                  TrimTextFormatter(),
+                  NewLineTrimTextFormatter(),
+                ],
+                onChanged: (value) {
+                  final lines = value.split('\n').length;
+                  if (lines < 2) {
+                    setState(() {
+                      minHeight = 60;
+                      maxHeight = 150;
+                    });
+                  } else if (lines < 6) {
+                    setState(() {
+                      minHeight = 66;
+                      maxHeight = 150;
+                    });
+                  } else if (lines <= 10) {
+                    setState(() {
+                      minHeight = 60 + (5 - 1) * 20;
+                      maxHeight = 150 + (lines - 5) * 20;
+                      maxLines = lines;
+                    });
+                  } else {
+                    setState(() {
+                      maxLines = maxLines;
+                    });
+                  }
+                },
+                keyboardType: TextInputType.multiline,
+                controller: messageController,
+                decoration:const InputDecoration(
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  hintText: "Send Message"
+                )
               ),
             ),
           ),

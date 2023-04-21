@@ -30,6 +30,7 @@ class GroupTile extends StatefulWidget {
 }
 
 class _GroupTileState extends State<GroupTile> {
+  String profilePic = "";
   @override
   void initState() {
     super.initState();
@@ -50,14 +51,16 @@ class _GroupTileState extends State<GroupTile> {
   getImage() async {
     await SharedPref.getGroupPic().then((value) {
       setState(() {
-       String profilePic = value ?? "";
+        profilePic = value ?? "";
         getGroupImage();
         /*  getGroupPic();*/
       });
     });
   }
 
-  AuthService authService = AuthService();
+
+
+AuthService authService = AuthService();
   @override
   Widget build(BuildContext context) {
 
@@ -171,7 +174,7 @@ class _GroupTileState extends State<GroupTile> {
   // TITLE TEXT EXTRACT AS A METHOD
   Text _buildTitleText() {
     return Text(
-      widget.groupName.toString(),
+      widget.groupName.capitalize().toString(),
       style: const TextStyle(fontWeight: FontWeight.bold),
     );
   }

@@ -62,7 +62,9 @@ class DatabaseServices {
       "groupId": "",
       "recentMessage": "",
       "recentMessageSender": "",
-      "userProfile":""
+      // 24/04/23
+      "userProfile":"",
+      "Type":"",
     });
     // update the members
     await groupDocumentReference.update({
@@ -104,12 +106,6 @@ class DatabaseServices {
     DocumentSnapshot documentSnapshot = await documentReference.get();
     return documentSnapshot["groupIcon"];
   }
-  Future getProfileIcon(String uid) async {
-    DocumentReference documentReference = userCollection.doc(uid);
-    DocumentSnapshot documentSnapshot = await documentReference.get();
-    return documentSnapshot["profilePic"];
-  }
-
 //get group members
   Future getGroupMembers(String groupId) async {
     return groupCollection.doc(groupId).snapshots();
@@ -185,7 +181,10 @@ class DatabaseServices {
       "recentMessageSender": chatMessageData["sender"],
       "recentMessageTime": chatMessageData["time"].toString(),
       /*"groupIcon": chatMessageData["groupPic"].toString(),*/
-      "messageUserIcon": chatMessageData["userProfile"].toString()
+      "messageUserIcon": chatMessageData["userProfile"].toString(),
+      // ignore: unrelated_type_equality_checks
+      // 24/04/23
+      "Type": chatMessageData["Type"].toString(),
     });
   }
 }

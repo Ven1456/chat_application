@@ -20,10 +20,12 @@ class ChatPage extends StatefulWidget {
   String? groupPic;
   String? userProfile;
   String? userId;
+  String? messageImageUrl;
 
   ChatPage(
       {Key? key,
       this.userId,
+      this.messageImageUrl,
       this.groupPic,
       this.userProfile,
       required this.username,
@@ -51,6 +53,8 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void initState() {
+    // 24/04/23
+    SharedPref.saveAllGroupIds(widget.groupId);
     getChatAndAdminName();
     // TODO: implement initState
     super.initState();
@@ -479,8 +483,18 @@ class _ChatPageState extends State<ChatPage> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
+      // 24/04/23
+    /*  Map<String, dynamic> chat = {
+        "message": messageChatUrl,
+        "sender": widget.username,
+        "time": DateTime.now().microsecondsSinceEpoch,
+        *//* "groupPic":groupPicture,*//*
+        "userProfile": widget.userProfile,
+        "Type":"Image",
+      };
+      DatabaseServices().sendMessage(widget.groupId, chat);*/
       // 21/04/23
-      print(":dsdfklhfjksjfkdsjkfsdj:${messageChatUrl}");
+
       // 21/04/23
       ProfileController().messageUrl;
       Map<String, dynamic> chatMessageMap = {
@@ -488,12 +502,13 @@ class _ChatPageState extends State<ChatPage> {
         "sender": widget.username,
         "time": DateTime.now().microsecondsSinceEpoch,
         /* "groupPic":groupPicture,*/
-        "userProfile": widget.userProfile
+        "userProfile": widget.userProfile,
+        "Type":"",
       };
       DatabaseServices().sendMessage(widget.groupId, chatMessageMap);
       setState(() {
         messageController.clear();
       });
     }
+    }
   }
-}

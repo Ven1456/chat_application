@@ -211,8 +211,8 @@ class ProfileController extends ChangeNotifier {
     if (_messageImage == null) {
       return;
     }
-
-    getId =(await SharedPref.getGroupId())!;
+    // @ 24/04/23
+    getId =(await SharedPref.getAllGroupId())!;
     firebase_storage.Reference reference = firebase_storage
         .FirebaseStorage.instance
         .ref()

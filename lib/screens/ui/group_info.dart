@@ -30,12 +30,15 @@ class GroupInfo extends StatefulWidget {
 
 class _GroupInfoState extends State<GroupInfo> {
   Stream? members;
+  String isAdmin = "";
+  String username = "";
 
   @override
   void initState() {
     SharedPref.saveGroupId(widget.groupId);
     // TODO: implement initState
     super.initState();
+    isAdmin = getName(widget.adminName);
     getMembers();
     setState(() {});
   }
@@ -44,6 +47,11 @@ class _GroupInfoState extends State<GroupInfo> {
     DatabaseServices().getGroupIcon(widget.groupId).then((value) {
       setState(() {
         widget.groupPic = value;
+      });
+    });
+    await SharedPref.getName().then((value) {
+      setState(() {
+        username = value!;
       });
     });
   }
@@ -200,21 +208,28 @@ class _GroupInfoState extends State<GroupInfo> {
                   ]),
           ),
         ),
-        GestureDetector(
-          onTap: () {
-            provider.pickGroupImage(context);
-          },
-          child: Container(
-            margin: const EdgeInsets.all(8),
-            height: 40,
-            width: 40,
-            decoration: const BoxDecoration(
-              color: Colors.blue,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.edit),
-          ),
-        )
+
+        isAdmin == username
+            ? GestureDetector(
+                onTap: () {
+                  provider.pickGroupImage(context);
+                },
+                child: Container(
+                  margin: const EdgeInsets.all(8),
+                  height: 40,
+                  width: 40,
+                  decoration: const BoxDecoration(
+                    color: Colors.blue,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.edit),
+                ),
+              )
+            : Container(
+                margin: const EdgeInsets.all(8),
+                height: 40,
+                width: 40,
+              )
       ],
     );
   }

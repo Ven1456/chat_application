@@ -18,15 +18,16 @@ class BottomSheetTest extends StatefulWidget {
 
 class _BottomSheetTestState extends State<BottomSheetTest> {
   String email = "";
-  String profilePic="";
-  String userName="";
+  String phone = "";
+  String dob = "";
+  String profilePic = "";
+  String userName = "";
   int currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
     getProfile();
-    currentIndex = 0;
   }
 
   List<Widget> pages = [const HomeScreen(),];
@@ -35,39 +36,51 @@ class _BottomSheetTestState extends State<BottomSheetTest> {
     pages = [
       const HomeScreen(),
       const Search(),
+      const Search(),
       Profile(
         profilePicTest: profilePic.toString(),
         email: email,
         username: userName,
+        phone: phone,
+        dob: dob,
       ),
     ];
   }
 
- getImage() async {
+  getImage() async {
     QuerySnapshot snapshot =
-    await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
-        .gettingUserEmail(email);
+        await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
+            .gettingUserEmail(email);
     setState(() {
       profilePic = snapshot.docs[0]["profilePic"];
     });
   }
 
- getProfile() async {
+  getProfile() async {
     await SharedPref.getName().then((value) {
       setState(() {
-        userName = value!;
+        userName = value ?? "";
       });
     });
     await SharedPref.getEmail().then((value) {
       setState(() {
-        email = value!;
+        email = value ?? "";
+      });
+    });
+    await SharedPref.getPhone().then((value) {
+      setState(() {
+        phone = value ?? "";
+      });
+    });
+    await SharedPref.getDob().then((value) {
+      setState(() {
+        dob = value ?? "";
       });
     });
     await getImage();
-    buildPages();
-    setState(() {
 
-    });
+    buildPages();
+
   }
 
   void onTap(int index) {

@@ -30,27 +30,11 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   bool isLogin = false;
 
-  // This widget is the root of your application.
-  @override
-  /*void initState() {
-    // TODO: implement initState
-    super.initState();
-    isUserLogin();
-  }*/
-
-  /*isUserLogin() async {
-    await SharedPref.isUserLogin().then((value) {
-      if (value != null) {
-        isLogin = value;
-      }
-    });
-  }*/
-
   @override
   Widget build(BuildContext context) {
 
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Chat',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

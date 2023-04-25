@@ -79,7 +79,7 @@ class _SearchState extends State<Search> {
                 height: 15,
               ),
               SizedBox(
-                width: 350,
+                width: MediaQuery.of(context).size.width * 0.9,
                 child: Row(
                   children: [
                     Expanded(

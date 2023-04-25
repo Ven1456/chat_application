@@ -20,13 +20,14 @@ class AuthService {
   } // register
 
   Future registerWithEmailPass(
-      String fullName, String email, String password) async {
+
+String fullName, String email, String password,String phone ,String dob ,) async {
     try {
       //
       User user = (await firebaseAuth.createUserWithEmailAndPassword(
               email: email, password: password))
           .user!;
-      await DatabaseServices(uid: user.uid).updateUserData(fullName, email);
+      await DatabaseServices(uid: user.uid).updateUserData(fullName, email,phone,dob);
       if (user != null) {
         return true;
       }
@@ -40,6 +41,8 @@ class AuthService {
       await SharedPref.saveUserLoginStatus(false);
       await SharedPref.saveUserName("");
       await SharedPref.saveUserEmail("");
+      await SharedPref.saveUserDob("");
+      await SharedPref.saveUserPhone("");
       await firebaseAuth.signOut();
     } catch (e) {
       return null;

@@ -1,10 +1,13 @@
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/auth/login_screen.dart';
+import 'package:chat/screens/ui/BottomSheet.dart';
 import 'package:chat/screens/ui/homeScreen.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:toast/toast.dart';
 
@@ -16,14 +19,22 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  TextEditingController dateinput = TextEditingController();
   String email = "";
   String password = "";
+  String phone = "";
+  String dob = "";
   String fullName = "";
   bool _isLoading = false;
   AuthService authService = AuthService();
   final registerFormKey = GlobalKey<FormState>();
   bool _passwordVisible = false;
-
+@override
+  void initState() {
+  dateinput.text="";
+    // TODO: implement initState
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,6 +80,79 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(
                           height: 15,
                         ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.85,
+                          child: TextFormField(
+                            keyboardType:TextInputType.phone,
+
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            decoration: textInputDecoration.copyWith(
+                              labelText: "Phone Number",
+                              prefixIcon: const Icon(Icons.phone),
+                            ),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                            onChanged: (val) {
+                              setState(() {
+                                phone = val;
+                              });
+                            },
+                            validator: (val) {
+                              return val!.length < 10
+                                  ? "Please Enter Correct Phone Number"
+                                  : null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.85,
+                          child: TextFormField(
+                            onTap: () async {
+                              DateTime? pickedDate = await showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(1900), //DateTime.now() - not to allow to choose before today.
+                                  lastDate: DateTime(2040));
+
+                              if (pickedDate != null) {
+                                print(pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+                                String formattedDate =
+                                DateFormat('dd-MM-yyyy').format(pickedDate);
+                                print("dhfsghfd:$formattedDate"); //formatted date output using intl package =>  2021-03-16
+                                //you can implement different kind of Date Format here according to your requirement
+
+                                setState(() {
+                                  dateinput.text = formattedDate;
+                                  dob = formattedDate;//set output date to TextField value.
+                                });
+                              } else {
+                                print("Date is not selected");
+                              }
+                            },
+                            readOnly: true,
+                            controller: dateinput,
+                            autovalidateMode:
+                            AutovalidateMode.onUserInteraction,
+                            decoration: textInputDecoration.copyWith(
+                              labelText: "Date Of Birth",
+                              prefixIcon: const Icon(Icons.calendar_month),
+                            ),
+                            validator: (val) {
+                              return val!.isEmpty
+                                  ? "Please Enter Your Date Of Birth"
+                                  : null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+
                         // REGISTER BUTTON
                         _buildRegisterButton(),
                         const SizedBox(
@@ -116,7 +200,7 @@ class _RegisterPageState extends State<RegisterPage> {
 // PASSWORD TEXT FIELD EXTRACT AS A METHOD
   SizedBox _buildPasswordTextField() {
     return SizedBox(
-      width: 320,
+      width: MediaQuery.of(context).size.width * 0.85,
       child: TextFormField(
         autovalidateMode: AutovalidateMode.onUserInteraction,
         obscureText: !_passwordVisible,
@@ -140,7 +224,7 @@ class _RegisterPageState extends State<RegisterPage> {
           });
         },
         validator: (val) {
-          return val!.length < 6 ? "Please Enter Atleast 6 Characters" : null;
+          return val!.length < 6 ? "Please Enter At 6 Characters" : null;
         },
       ),
     );
@@ -148,7 +232,7 @@ class _RegisterPageState extends State<RegisterPage> {
 // EMAIL TEXT FIELD EXTRACT AS A METHOD
   SizedBox _buildEmailTextField() {
     return SizedBox(
-      width: 320,
+      width: MediaQuery.of(context).size.width * 0.85,
       child: TextFormField(
         autovalidateMode: AutovalidateMode.onUserInteraction,
         decoration: textInputDecoration.copyWith(
@@ -173,7 +257,7 @@ class _RegisterPageState extends State<RegisterPage> {
 // FULL NAME TEXT FIELD EXTRACT AS A METHOD
   SizedBox _buildFullNameTextField() {
     return SizedBox(
-      width: 320,
+      width: MediaQuery.of(context).size.width * 0.85,
       child: TextFormField(
         autovalidateMode: AutovalidateMode.onUserInteraction,
         decoration: textInputDecoration.copyWith(
@@ -222,15 +306,15 @@ class _RegisterPageState extends State<RegisterPage> {
       setState(() {
         _isLoading = true;
       });
-      await authService
-          .registerWithEmailPass(fullName, email, password)
-          .then((value) async {
+      await authService.registerWithEmailPass(fullName, email, password,phone,dob).then((value) async {
         if (value == true) {
           await SharedPref.saveUserLoginStatus(true);
           await SharedPref.saveUserName(fullName);
           await SharedPref.saveUserEmail(email);
+          await SharedPref.saveUserPhone(phone);
+          await SharedPref.saveUserDob(dob);
           // ignore: use_build_context_synchronously
-          nextPage(context,  HomeScreen());
+          nextPage(context,  const BottomSheetTest());
         } else {
           setState(() {
             ToastContext toastContext = ToastContext();

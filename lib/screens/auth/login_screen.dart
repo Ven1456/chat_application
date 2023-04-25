@@ -1,6 +1,7 @@
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/auth/RegisterPage.dart';
+import 'package:chat/screens/ui/BottomSheet.dart';
 import 'package:chat/screens/ui/Forgot_Password_screen.dart';
 import 'package:chat/screens/ui/homeScreen.dart';
 import 'package:chat/services/auth_service.dart';
@@ -138,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
   // PASSWORD TEXT FIELD EXTRACT AS A METHOD
   SizedBox _buildPasswordTextField() {
     return SizedBox(
-      width: 320,
+      width: MediaQuery.of(context).size.width * 0.85,
       child: TextFormField(
         controller: passTextEditingController,
         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -173,7 +174,7 @@ class _LoginPageState extends State<LoginPage> {
   // EMAIL TEXT FIELD  EXTRACT AS A METHOD
   SizedBox _buildEmailTextField() {
     return SizedBox(
-      width: 320,
+      width: MediaQuery.of(context).size.width * 0.85,
       child: TextFormField(
         controller: emailTextEditingController,
         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -249,9 +250,11 @@ class _LoginPageState extends State<LoginPage> {
 
           await SharedPref.saveUserEmail(email);
           await SharedPref.saveUserName(snapshot.docs[0]["fullName"]);
+          await SharedPref.saveUserPhone(snapshot.docs[0]["phone"]);
+          await SharedPref.saveUserDob(snapshot.docs[0]["dob"]);
        /*   await SharedPref.saveProfilePic(snapshot.docs[0]["profilePic"]);*/
           // ignore: use_build_context_synchronously
-          nextPage(context,  HomeScreen());
+          nextPage(context,  const BottomSheetTest());
         } else {
           ToastContext toastContext = ToastContext();
           toastContext.init(context);

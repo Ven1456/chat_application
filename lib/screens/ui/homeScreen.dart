@@ -1,10 +1,6 @@
-import 'dart:io';
 
 import 'package:chat/resources/Shared_Preferences.dart';
-import 'package:chat/resources/profile_Controller.dart';
-import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/ui/group_Tile.dart';
-import 'package:chat/screens/ui/profile.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,7 +8,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:lottie/lottie.dart';
-import 'package:provider/provider.dart';
 import 'package:toast/toast.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -37,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   initState() {
     super.initState();
+    textEditingController;
       gettingUserData();
   }
 

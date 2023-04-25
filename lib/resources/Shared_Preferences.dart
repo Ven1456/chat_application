@@ -7,10 +7,11 @@ class SharedPref {
   static String profilePic = "profilePic";
   static String groupPic = "GroupPic";
   static String groupId = "GroupId";
-  // 24/04/23
+  static String phone = "phone";
+  static String dob = "dob";
   static String saveAllGroupId = "SaveAllGroupId";
-  // 21/04/23
   static String messageUrl= "messageUrl";
+
   // SAVE THE USER LOGIN STATUS SHARED PREFERENCE
   static Future<bool?> saveUserLoginStatus(bool isUserLogged) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -30,8 +31,20 @@ class SharedPref {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setString(userName, isUsername);
     return null;
-  } // SAVE THE USER EMAIL STATUS SHARED PREFERENCE
-
+  }
+  // SAVE THE USER PHONE STATUS SHARED PREFERENCE
+  static Future<bool?> saveUserPhone(String isUserPhone) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString(phone, isUserPhone);
+    return null;
+  }
+  // SAVE THE USER DOB STATUS SHARED PREFERENCE
+  static Future<bool?> saveUserDob(String isUserDob) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString(dob, isUserDob);
+    return null;
+  }
+  // SAVE THE USER EMAIL STATUS SHARED PREFERENCE
   static Future<bool?> saveUserEmail(String isUserEmail) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return await sharedPreferences.setString(userEmail, isUserEmail);
@@ -75,6 +88,16 @@ class SharedPref {
   static Future<String?> getEmail() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return sharedPreferences.getString(userEmail);
+  }
+  // GET THE PHONE STATUS SHARED PREFERENCE
+  static Future<String?> getPhone() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return sharedPreferences.getString(phone);
+  }
+  // GET THE DOB STATUS SHARED PREFERENCE
+  static Future<String?> getDob() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return sharedPreferences.getString(dob);
   }
   // GET THE GROUP PIC STATUS SHARED PREFERENCE
   static Future<String?> getGroupPic() async {

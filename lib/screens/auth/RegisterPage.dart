@@ -38,6 +38,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor:HexColor.fromHex('#FFFFFF'),
       body: _isLoading
           ? Center(
               child: SizedBox(
@@ -171,12 +172,12 @@ class _RegisterPageState extends State<RegisterPage> {
   // ALREADY HAVE AN ACCOUNT AND LOGIN TEXT EXTRACT AS A METHOD
   Text _buildAlreadyHaveAccountAndLoginText(BuildContext context) {
     return Text.rich(TextSpan(
-        text: "Already Have An Account? ",
+        text: "Already have An Account? ",
         style: const TextStyle(color: Colors.black, fontSize: 14),
         children: <TextSpan>[
           TextSpan(
               text: "Login Now ",
-              style: const TextStyle(color: Colors.black, fontSize: 14),
+              style: const TextStyle(color: Colors.purpleAccent, fontSize: 14),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
                   nextPage(context, const LoginPage());
@@ -186,6 +187,7 @@ class _RegisterPageState extends State<RegisterPage> {
 // REGISTER BUTTON EXTRACT AS A METHOD
   SizedBox _buildRegisterButton() {
     return SizedBox(
+      height: 50,
       width: 310,
       child: ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -283,7 +285,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Image _buildImage() {
     return Image.asset(
       "assets/images/register.jpg",
-      height: 250,
+      height: 180,
     );
   }
 // REGISTER TEXT EXTRACT AS A METHOD

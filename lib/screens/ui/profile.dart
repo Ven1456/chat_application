@@ -72,9 +72,16 @@ class _ProfileState extends State<Profile> {
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
+                        const Text(
+                          "Profile",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 25),
+                        ),
+                        const SizedBox(width: 118,),
                         GestureDetector(
                           onTap: () {
                             setState(() {

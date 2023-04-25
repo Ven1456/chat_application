@@ -132,8 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     int reverseIndex =
                         snapshot.data["groups"].length - index - 1;
                     return GroupTile(
-                        groupName:
-                            getName(snapshot.data["groups"][reverseIndex]),
+                        groupName: getName(snapshot.data["groups"][reverseIndex]),
                         userProfile: snapshot.data["profilePic"],
                         userId: snapshot.data["uid"],
                         username: snapshot.data["fullName"],

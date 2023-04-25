@@ -108,6 +108,16 @@ class DatabaseServices {
     DocumentSnapshot documentSnapshot = await documentReference.get();
     return documentSnapshot["groupIcon"];
   }
+  Future getUserName(String? userid) async {
+    DocumentReference documentReference = userCollection.doc(userid);
+    DocumentSnapshot documentSnapshot = await documentReference.get();
+    return documentSnapshot["fullName"];
+  }
+  Future getUserProfile(String? userid) async {
+    DocumentReference documentReference = userCollection.doc(userid);
+    DocumentSnapshot documentSnapshot = await documentReference.get();
+    return documentSnapshot["profilePic"];
+  }
 //get group members
   Future getGroupMembers(String groupId) async {
     return groupCollection.doc(groupId).snapshots();

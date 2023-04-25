@@ -36,7 +36,6 @@ class _BottomSheetTestState extends State<BottomSheetTest> {
     pages = [
       const HomeScreen(),
       const Search(),
-      const Search(),
       Profile(
         profilePicTest: profilePic.toString(),
         email: email,

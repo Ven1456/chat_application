@@ -64,6 +64,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor:HexColor.fromHex('#FFFFFF'),
       // APP BAR
       appBar: _buildAppBar(),
       body: _isLoading
@@ -199,7 +200,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         borderRadius: BorderRadius.circular(250),
         child: Image.asset(
           "assets/images/reset.jpg",
-          height: 300,
+          height: 200,
         ));
   }
 

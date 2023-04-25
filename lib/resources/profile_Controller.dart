@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:chat/services/auth_service.dart';
+import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
@@ -22,6 +23,8 @@ class ProfileController extends ChangeNotifier {
   XFile? get image => _image;
   String getId = "";
   String url = "";
+  String userName = "";
+  String userProfile = "";
   // 21/04/23
   String messageUrl ="";
   firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instanceFor(bucket: 'gs://chatapp-4f907.appspot.com');
@@ -229,9 +232,28 @@ class ProfileController extends ChangeNotifier {
       await FirebaseFirestore.instance.collection('groups').doc(userId).update({
         'recentMessage': downloadUrl,
       });
+      DatabaseServices().getUserProfile(authService.firebaseAuth.currentUser!.uid).then((value) {
+        String  userProfile = value;
+         print("popopo:$userProfile");
+         notifyListeners();
+      });
+      DatabaseServices().getUserName(authService.firebaseAuth.currentUser!.uid).then((value) {
+        String userName = value;
+        print("popopo:$userName");
+        notifyListeners();
+
+      });
       messageUrl = downloadUrl;
+      Map<String, dynamic> chatMessag = {
+        "message": messageUrl,
+        "sender":userName,
+        "time": DateTime.now().microsecondsSinceEpoch,
+        /* "groupPic":groupPicture,*/
+        "userProfile": userProfile,
+        "Type":"Image",
+      };
+      DatabaseServices().sendMessage(getId, chatMessag);
       await SharedPref.saveMessageUrl(messageUrl);
-      print("dfbsngfdhsgdfgdfj:$messageUrl");
       /* await SharedPref.saveGroupPic(downloadUrl);*/
     }
   }

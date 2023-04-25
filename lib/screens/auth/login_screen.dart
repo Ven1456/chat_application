@@ -34,57 +34,57 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: _isLoading
-        // LOADING ANIMATION
-            ? _buildLoadingAnimation()
-            : SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 65.0),
-                  child: Form(
-                    key: formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        // CHAT TEXT
-                        _buildChatText(),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        // SUB TITLE TEXT
-                        _buildSubTitleText(),
-                        // IMAGE
-                        _buildImage(),
-                        // EMAIL TEXT FIELD
-                        _buildEmailTextField(),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        // PASSWORD TEXT FIELD
-                        _buildPasswordTextField(),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        // FORGOT PASSWORD  TEXT
-                        _buildForgotPassword(context),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        // SIGN IN BUTTON
-                        _buildSignInButton(),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        // REGISTER AND DON'T HAVE AN ACCOUNT BUTTON TEXT
-                        _buildRegisterAndDoNotHaveAccountText(context)
-                      ],
+      backgroundColor:HexColor.fromHex('#FFFFFF'),
+      body: SafeArea(
+        child: Center(
+          child: _isLoading
+          // LOADING ANIMATION
+              ? _buildLoadingAnimation()
+              : Form(
+                key: formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 40,),
+                    // CHAT TEXT
+                    _buildChatText(),
+                    const SizedBox(
+                      height: 10,
                     ),
-                  ),
+                    // SUB TITLE TEXT
+                    _buildSubTitleText(),
+                    // IMAGE
+                    _buildImage(),
+                    const SizedBox(height: 60,),
+                    // EMAIL TEXT FIELD
+                    _buildEmailTextField(),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    // PASSWORD TEXT FIELD
+                    _buildPasswordTextField(),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    // FORGOT PASSWORD  TEXT
+                    _buildForgotPassword(context),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    // SIGN IN BUTTON
+                    _buildSignInButton(),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    // REGISTER AND DON'T HAVE AN ACCOUNT BUTTON TEXT
+                    _buildRegisterAndDoNotHaveAccountText(context)
+                  ],
                 ),
               ),
+        ),
       ),
     );
   }
@@ -92,12 +92,12 @@ class _LoginPageState extends State<LoginPage> {
   // REGISTER AND DON'T HAVE AN ACCOUNT BUTTON TEXT EXTRACT AS A METHOD
   Text _buildRegisterAndDoNotHaveAccountText(BuildContext context) {
     return Text.rich(TextSpan(
-        text: "Don't Have An Account? ",
+        text: "Don't have An Account? ",
         style: const TextStyle(color: Colors.black, fontSize: 14),
         children: <TextSpan>[
           TextSpan(
               text: "Register ",
-              style: const TextStyle(color: Colors.black, fontSize: 14),
+              style: const TextStyle(color: Colors.purpleAccent, fontSize: 14),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
                   nextPage(context, const RegisterPage());
@@ -108,7 +108,8 @@ class _LoginPageState extends State<LoginPage> {
   // SIGN IN BUTTON EXTRACT AS A METHOD
   SizedBox _buildSignInButton() {
     return SizedBox(
-      width: 320,
+      height: 50,
+      width: MediaQuery.of(context).size.width *0.85,
       child: ElevatedButton(
           style: ElevatedButton.styleFrom(
               shape: RoundedRectangleBorder(
@@ -116,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
           onPressed: () {
             login();
           },
-          child: const Text("Sign in ")),
+          child: const Text("Sign in ",style: const TextStyle(color: Colors.white, fontSize: 20,fontWeight: FontWeight.bold),)),
     );
   }
 
@@ -130,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
         padding: EdgeInsets.only(left: 180.0),
         child: Text.rich(TextSpan(
           text: "Forgot Password? ",
-          style: TextStyle(color: Colors.black, fontSize: 14),
+          style: TextStyle(color: Colors.purpleAccent, fontSize: 14),
         )),
       ),
     );
@@ -203,7 +204,7 @@ class _LoginPageState extends State<LoginPage> {
   Image _buildImage() {
     return Image.asset(
       "assets/images/chat.jpg",
-      height: 350,
+      height: 180,
     );
   }
 

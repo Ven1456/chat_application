@@ -11,8 +11,10 @@ class MessageTile extends StatefulWidget {
   String time;
   bool sendByMe;
   String? userProfile;
+  String? type;
   MessageTile({
     Key? key,
+    this.type,
     this.userProfile,
     required this.time,
     required this.message,
@@ -50,6 +52,7 @@ class _MessageTileState extends State<MessageTile> {
       email = value!;
     });
   }
+
   static String getDateForChat(String datetime) {
     double time = int.parse(datetime) / 1000;
     // Create a DateTime object from the millisecond timestamp
@@ -91,7 +94,8 @@ class _MessageTileState extends State<MessageTile> {
                           child: (widget.userProfile ?? '').isEmpty
                               ? Center(
                                   child: Text(
-                                    widget.sender.substring(0, 2).toUpperCase(),
+                                    "fg",
+                                    // widget.sender.substring(0, 2).toUpperCase(),
                                     style: TextStyle(
                                       fontSize: isSmallScreen ? 12 : 18,
                                       fontWeight: FontWeight.bold,
@@ -142,32 +146,81 @@ class _MessageTileState extends State<MessageTile> {
                             vertical: 4.0,
                             horizontal: 8.0,
                           ),
-                          decoration: BoxDecoration(
-                            color: widget.sendByMe
-                                ? Colors.purple[300]
-                                : Colors.blue[500],
-                            borderRadius: BorderRadius.only(
-                              topLeft: const Radius.circular(12.0),
-                              topRight: const Radius.circular(12.0),
-                              bottomLeft: widget.sendByMe
-                                  ? const Radius.circular(12.0)
-                                  : const Radius.circular(0.0),
-                              bottomRight: widget.sendByMe
-                                  ? const Radius.circular(0.0)
-                                  : const Radius.circular(12.0),
-                            ),
-                          ),
+                          decoration: widget.type.toString() == "text"
+                              ? BoxDecoration(
+                                  color: widget.sendByMe
+                                      ? Colors.purple[300]
+                                      : Colors.blue[500],
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: const Radius.circular(12.0),
+                                    topRight: const Radius.circular(12.0),
+                                    bottomLeft: widget.sendByMe
+                                        ? const Radius.circular(12.0)
+                                        : const Radius.circular(0.0),
+                                    bottomRight: widget.sendByMe
+                                        ? const Radius.circular(0.0)
+                                        : const Radius.circular(12.0),
+                                  ),
+                                )
+                              : widget.sendByMe
+                                  ? BoxDecoration(
+                                      border: Border.all(color: Colors.black),
+                                      borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(18),
+                                        topRight: Radius.circular(18),
+                                        bottomLeft: Radius.circular(18),
+                                      ))
+                                  : BoxDecoration(
+                                      border: Border.all(color: Colors.black),
+                                      borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(18),
+                                        topRight: Radius.circular(18),
+                                        bottomRight: Radius.circular(18),
+                                      )),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                widget.message,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white,
-                                ),
-                              ),
+                              widget.type.toString() == "text"
+                                  ? Text(
+                                      widget.message,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : Row(
+                                      children: [
+                                        Expanded(
+                                          child: Image.network(
+                                            widget.message,
+                                            fit: BoxFit.cover,
+                                            loadingBuilder:
+                                                (BuildContext context,
+                                                    Widget child,
+                                                    ImageChunkEvent?
+                                                        loadingProgress) {
+                                              if (loadingProgress == null) {
+                                                return child;
+                                              }
+                                              return Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  value: loadingProgress
+                                                              .expectedTotalBytes !=
+                                                          null
+                                                      ? loadingProgress
+                                                              .cumulativeBytesLoaded /
+                                                          loadingProgress
+                                                              .expectedTotalBytes!
+                                                      : null,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                               const SizedBox(height: 4.0),
                             ],
                           ),
@@ -207,11 +260,11 @@ class _MessageTileState extends State<MessageTile> {
                                             BorderRadius.circular(100),
                                         child: provider.image == null
                                             ? (widget.userProfile ?? "").isEmpty
-                                                ? const Center(
-                                                    child: Icon(
-                                                      Icons.person,
-                                                      size: 30,
-                                                    ),
+                                                ?  Center(
+                                            child : Text(
+                                              widget.sender.toUpperCase().substring(0, 2),
+                                              style:  TextStyle(color: Colors.black,fontWeight: FontWeight.bold),
+                                            )
                                                   )
                                                 : Image.network(
                                                     height: 50,
@@ -220,8 +273,9 @@ class _MessageTileState extends State<MessageTile> {
                                                     fit: BoxFit.cover,
                                                     loadingBuilder: (context,
                                                         child, loading) {
-                                                      if (loading == null)
+                                                      if (loading == null) {
                                                         return child;
+                                                      }
                                                       return const Center(
                                                           child:
                                                               CircularProgressIndicator());

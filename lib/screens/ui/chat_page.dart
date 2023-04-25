@@ -107,14 +107,6 @@ class _ChatPageState extends State<ChatPage> {
         /*  getGroupPic();*/
       });
     });
-    // 21/04/23
-    await SharedPref.getMessageUrl().then((value) {
-      setState(() {
-        messageChatUrl = value ?? "";
-        print(messageChatUrl);
-        /*  getGroupPic();*/
-      });
-    });
   }
 
   bool _isShowEmoji= false;
@@ -463,6 +455,9 @@ class _ChatPageState extends State<ChatPage> {
                                     .toString(),
                                 userProfile: snapshot.data.docs[index]
                                     ["userProfile"],
+                                type:snapshot.data.docs[index]
+                                ["Type"] ,
+
                                 /*  groupPic: groupPicture = snapshot.data.docs[index]["groupPic"].toString(),*/
                               ),
                             ],
@@ -483,17 +478,6 @@ class _ChatPageState extends State<ChatPage> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
-      // 24/04/23
-    /*  Map<String, dynamic> chat = {
-        "message": messageChatUrl,
-        "sender": widget.username,
-        "time": DateTime.now().microsecondsSinceEpoch,
-        *//* "groupPic":groupPicture,*//*
-        "userProfile": widget.userProfile,
-        "Type":"Image",
-      };
-      DatabaseServices().sendMessage(widget.groupId, chat);*/
-      // 21/04/23
 
       // 21/04/23
       ProfileController().messageUrl;
@@ -503,7 +487,7 @@ class _ChatPageState extends State<ChatPage> {
         "time": DateTime.now().microsecondsSinceEpoch,
         /* "groupPic":groupPicture,*/
         "userProfile": widget.userProfile,
-        "Type":"",
+        "Type":"text",
       };
       DatabaseServices().sendMessage(widget.groupId, chatMessageMap);
       setState(() {

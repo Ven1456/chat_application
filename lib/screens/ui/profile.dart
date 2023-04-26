@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'package:chat/resources/profile_Controller.dart';
+import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/auth/login_screen.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/database_services.dart';
@@ -16,8 +17,16 @@ class Profile extends StatefulWidget {
   String? phone;
   String? dob;
   String? profilePicTest;
-  Profile({Key? key, this.dob,this.phone,this.username, this.profilePicTest, this.email})
+
+  Profile(
+      {Key? key,
+      this.dob,
+      this.phone,
+      this.username,
+      this.profilePicTest,
+      this.email})
       : super(key: key);
+
   @override
   State<Profile> createState() => _ProfileState();
 }
@@ -32,6 +41,7 @@ class _ProfileState extends State<Profile> {
   String user = "";
   File? imageFile;
   bool isDark = false;
+
   @override
   void initState() {
     super.initState();
@@ -60,6 +70,7 @@ class _ProfileState extends State<Profile> {
   bool _isEmailEditable = false;
   bool _isPhoneEditable = false;
   bool _isDobEditable = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,7 +83,6 @@ class _ProfileState extends State<Profile> {
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -81,7 +91,9 @@ class _ProfileState extends State<Profile> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 25),
                         ),
-                        const SizedBox(width: 118,),
+                        const SizedBox(
+                          width: 118,
+                        ),
                         GestureDetector(
                           onTap: () {
                             setState(() {
@@ -195,13 +207,10 @@ class _ProfileState extends State<Profile> {
                       ],
                     ),
                     // USERNAME TEXT FIELD
-                    Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
+                    Stack(alignment: Alignment.bottomRight, children: [
                       SizedBox(
                         width: MediaQuery.of(context).size.width * 0.9,
                         child: TextFormField(
-
                             enabled: _isUsernameEditable,
                             controller: usernameController,
                             decoration: const InputDecoration(
@@ -211,15 +220,15 @@ class _ProfileState extends State<Profile> {
                               enabledBorder: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(12.0)),
-                                borderSide:
-                                    BorderSide(color: Colors.blueGrey, width: 2),
+                                borderSide: BorderSide(
+                                    color: Colors.blueGrey, width: 2),
                               ),
                               border: OutlineInputBorder(
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(12.0)),
-                                borderSide:
-                                BorderSide(color: Colors.blueGrey, width: 2),
-                              ) ,
+                                    BorderRadius.all(Radius.circular(12.0)),
+                                borderSide: BorderSide(
+                                    color: Colors.blueGrey, width: 2),
+                              ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(10.0)),
@@ -233,7 +242,9 @@ class _ProfileState extends State<Profile> {
                             _isUsernameEditable = !_isUsernameEditable;
                           });
                         },
-                        icon: _isUsernameEditable ? const Icon(Icons.done_sharp) : const Icon(Icons.edit),
+                        icon: _isUsernameEditable
+                            ? const Icon(Icons.done_sharp)
+                            : const Icon(Icons.edit),
                       ),
                     ]),
 
@@ -254,46 +265,46 @@ class _ProfileState extends State<Profile> {
                       ],
                     ),
                     // EMAIL TEXT FIELD
-                    Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.9,
-                            child: TextFormField(
-                                enabled: _isEmailEditable,
-                                controller: emailController,
-                                decoration: const InputDecoration(
-                                  suffixIconColor: Colors.grey,
-                                  errorStyle: TextStyle(color: Colors.red),
-                                  hintStyle: TextStyle(color: Colors.grey),
-                                  border: OutlineInputBorder(
-                                    borderRadius:
+                    Stack(alignment: Alignment.bottomRight, children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        child: TextFormField(
+                            enabled: _isEmailEditable,
+                            controller: emailController,
+                            decoration: const InputDecoration(
+                              suffixIconColor: Colors.grey,
+                              errorStyle: TextStyle(color: Colors.red),
+                              hintStyle: TextStyle(color: Colors.grey),
+                              border: OutlineInputBorder(
+                                borderRadius:
                                     BorderRadius.all(Radius.circular(12.0)),
-                                    borderSide:
-                                    BorderSide(color: Colors.blueGrey, width: 2),
-                                  ) ,
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius:
+                                borderSide: BorderSide(
+                                    color: Colors.blueGrey, width: 2),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius:
                                     BorderRadius.all(Radius.circular(12.0)),
-                                    borderSide:
+                                borderSide:
                                     BorderSide(color: Colors.grey, width: 2),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius:
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius:
                                     BorderRadius.all(Radius.circular(10.0)),
-                                    borderSide: BorderSide(color: Colors.blueGrey),
-                                  ),
-                                )),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              setState(() {
-                                _isEmailEditable = !_isEmailEditable;
-                              });
-                            },
-                            icon: _isEmailEditable ? const Icon(Icons.done_sharp) : const Icon(Icons.edit),
-                          ),
-                        ]),
+                                borderSide: BorderSide(color: Colors.blueGrey),
+                              ),
+                            )),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _isEmailEditable = !_isEmailEditable;
+                          });
+                        },
+                        icon: _isEmailEditable
+                            ? const Icon(Icons.done_sharp)
+                            : const Icon(Icons.edit),
+                      ),
+                    ]),
                     const SizedBox(
                       height: 15,
                     ),
@@ -311,46 +322,46 @@ class _ProfileState extends State<Profile> {
                       ],
                     ),
                     // PHONE TEXT FIELD
-                    Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.9,
-                            child: TextFormField(
-                                enabled: _isPhoneEditable,
-                                controller: phoneController,
-                                decoration: const InputDecoration(
-                                  suffixIconColor: Colors.grey,
-                                  errorStyle: TextStyle(color: Colors.red),
-                                  hintStyle: TextStyle(color: Colors.grey),
-                                  border: OutlineInputBorder(
-                                    borderRadius:
+                    Stack(alignment: Alignment.bottomRight, children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        child: TextFormField(
+                            enabled: _isPhoneEditable,
+                            controller: phoneController,
+                            decoration: const InputDecoration(
+                              suffixIconColor: Colors.grey,
+                              errorStyle: TextStyle(color: Colors.red),
+                              hintStyle: TextStyle(color: Colors.grey),
+                              border: OutlineInputBorder(
+                                borderRadius:
                                     BorderRadius.all(Radius.circular(12.0)),
-                                    borderSide:
-                                    BorderSide(color: Colors.blueGrey, width: 2),
-                                  ) ,
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius:
+                                borderSide: BorderSide(
+                                    color: Colors.blueGrey, width: 2),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius:
                                     BorderRadius.all(Radius.circular(12.0)),
-                                    borderSide:
+                                borderSide:
                                     BorderSide(color: Colors.grey, width: 2),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius:
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius:
                                     BorderRadius.all(Radius.circular(10.0)),
-                                    borderSide: BorderSide(color: Colors.blueGrey),
-                                  ),
-                                )),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              setState(() {
-                                _isPhoneEditable = !_isPhoneEditable;
-                              });
-                            },
-                            icon: _isPhoneEditable ? const Icon(Icons.done_sharp) : const Icon(Icons.edit),
-                          ),
-                        ]),
+                                borderSide: BorderSide(color: Colors.blueGrey),
+                              ),
+                            )),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _isPhoneEditable = !_isPhoneEditable;
+                          });
+                        },
+                        icon: _isPhoneEditable
+                            ? const Icon(Icons.done_sharp)
+                            : const Icon(Icons.edit),
+                      ),
+                    ]),
                     const SizedBox(
                       height: 15,
                     ),
@@ -368,117 +379,65 @@ class _ProfileState extends State<Profile> {
                       ],
                     ),
                     // DOB TEXT FIELD
-                    Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.9,
-                            child: TextFormField(
-                                enabled: _isDobEditable,
-                                controller: dobController,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius:
+                    Stack(alignment: Alignment.bottomRight, children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        child: TextFormField(
+                            enabled: _isDobEditable,
+                            controller: dobController,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius:
                                     BorderRadius.all(Radius.circular(12.0)),
-                                    borderSide:
-                                    BorderSide(color: Colors.blueGrey, width: 2),
-                                  ) ,
-                                  suffixIconColor: Colors.grey,
-                                  errorStyle: TextStyle(color: Colors.red),
-                                  hintStyle: TextStyle(color: Colors.grey),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius:
+                                borderSide: BorderSide(
+                                    color: Colors.blueGrey, width: 2),
+                              ),
+                              suffixIconColor: Colors.grey,
+                              errorStyle: TextStyle(color: Colors.red),
+                              hintStyle: TextStyle(color: Colors.grey),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius:
                                     BorderRadius.all(Radius.circular(12.0)),
-                                    borderSide:
+                                borderSide:
                                     BorderSide(color: Colors.grey, width: 2),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius:
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius:
                                     BorderRadius.all(Radius.circular(10.0)),
-                                    borderSide: BorderSide(color: Colors.blueGrey),
-                                  ),
-                                )),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              setState(() {
-                                _isDobEditable = !_isDobEditable;
-                              });
-                            },
-                            icon: _isDobEditable ? const Icon(Icons.done_sharp) : const Icon(Icons.edit),
-                          ),
-                        ]),
+                                borderSide: BorderSide(color: Colors.blueGrey),
+                              ),
+                            )),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _isDobEditable = !_isDobEditable;
+                          });
+                        },
+                        icon: _isDobEditable
+                            ? const Icon(Icons.done_sharp)
+                            : const Icon(Icons.edit),
+                      ),
+                    ]),
                     const SizedBox(
                       height: 20,
                     ),
-
-                    GestureDetector(
-                      onTap: () {
-                        showDialog(
-                            barrierDismissible: false,
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: const Text(
-                                  "Log Out",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                content: const Text(
-                                  "Are you sure you want Logout ? ",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                actions: [
-                                  IconButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      icon: const Icon(
-                                        Icons.cancel,
-                                        color: Colors.red,
-                                      )),
-                                  IconButton(
-                                      onPressed: () {
-                                        authService.signOut();
-                                        Navigator.pushAndRemoveUntil(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const LoginPage()),
-                                            (route) => false);
-                                      },
-                                      icon: const Icon(
-                                        Icons.done,
-                                        color: Colors.green,
-                                      )),
-                                ],
-                              );
-                            });
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                              height: 40,
-                              width: 50,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(21),
-                                  color: Colors.blueGrey),
-                              child: const Icon(Icons.logout)),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          const Text(
-                            "Logout",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16),
-                          )
-                        ],
-                      ),
-                    )
+                    AlertBoxReuse(
+                        leaveOnTap: () {
+                          authService.signOut();
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginPage()),
+                              (route) => false);
+                        },
+                        titleText: "Log Out",
+                        subTitleText: "Are you sure you want Logout ?",
+                        leaveTitleText: "Leave",
+                        cancelTitleText: "Cancel",
+                        cancelOnTap: () {
+                          Navigator.pop(context);
+                        }, ),
                   ],
                 );
               },
@@ -515,35 +474,6 @@ class _ProfileState extends State<Profile> {
               fontSize: 22,
               color: Colors.black,
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Container _buildEmailContainer() {
-    return Container(
-      height: 45,
-      width: 250,
-      decoration: BoxDecoration(
-        color: Colors.blueGrey[700],
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 4), // changes position of shadow
-          ),
-        ],
-      ),
-      child: Center(
-        child: Text(
-          widget.email!,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 22,
-            color: Colors.white,
           ),
         ),
       ),

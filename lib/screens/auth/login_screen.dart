@@ -3,7 +3,6 @@ import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/auth/RegisterPage.dart';
 import 'package:chat/screens/ui/BottomSheet.dart';
 import 'package:chat/screens/ui/Forgot_Password_screen.dart';
-import 'package:chat/screens/ui/homeScreen.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -34,193 +33,125 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:HexColor.fromHex('#FFFFFF'),
+      backgroundColor: HexColor.fromHex('#FFFFFF'),
       body: SafeArea(
         child: Center(
           child: _isLoading
-          // LOADING ANIMATION
-              ? _buildLoadingAnimation()
-              : Form(
-                key: formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
+              // LOADING ANIMATION
+              ? Stack(children: [_buildLoadingAnimation()])
+              : Stack(
                   children: [
-                    const SizedBox(height: 40,),
-                    // CHAT TEXT
-                    _buildChatText(),
-                    const SizedBox(
-                      height: 10,
+                    Form(
+                      key: formKey,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 40,
+                          ),
+                          // CHAT TEXT
+                          boldTitleText("Chats"),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          // SUB TITLE TEXT
+                          semiBoldSubTitleText(
+                              "Login Now To See What Their Are Talking "),
+                          const SizedBox(
+                            height: 40,
+                          ),
+                          // IMAGE
+                          imageBuild("assets/images/chat.jpg"),
+                          const SizedBox(
+                            height: 60,
+                          ),
+                          // EMAIL TEXT FIELD
+                          ReusableTextField(
+                            obSecureText: false,
+                            width: MediaQuery.of(context).size.width * 0.85,
+                            textEditingController: emailTextEditingController,
+                            labelText: "Email",
+                            onChanged: (val) {
+                              setState(() {
+                                email = val;
+                              });
+                            },
+                            prefixIcon: const Icon(Icons.email),
+                            validator: (val) {
+                              return RegExp(
+                                          r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
+                                      .hasMatch(val!)
+                                  ? null
+                                  : "Please Enter Correct Email";
+                            },
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          // PASSWORD TEXT FIELD
+                          ReusableTextField(
+                            obSecureText: !_passwordVisible,
+                            width: MediaQuery.of(context).size.width * 0.85,
+                            textEditingController: passTextEditingController,
+                            labelText: "Password",
+                            prefixIcon: const Icon(Icons.security),
+                            suffixIcon: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  _passwordVisible = !_passwordVisible;
+                                });
+                              },
+                              child: Icon(
+                                _passwordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            onChanged: (val) {
+                              setState(() {
+                                pass = val;
+                              });
+                            },
+                            validator: (val) {
+                              return val!.length < 6
+                                  ? "Please Enter Atleast 6 Characters"
+                                  : null;
+                            },
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          // FORGOT PASSWORD  TEXT
+                          navLinkText(() {
+                            nextPage(context, const ForgotPasswordScreen());
+                          }, "Forgot Password?"),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          // SIGN IN BUTTON
+                          reusableButton(
+                              50, MediaQuery.of(context).size.width * 0.85, () {
+                            login();
+                          }, "Sign in "),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          // REGISTER AND DON'T HAVE AN ACCOUNT BUTTON TEXT
+                          richTextSpan("Don't have An Account? ", "Register ",
+                              () {
+                            nextPage(context, const RegisterPage());
+                          })
+                        ],
+                      ),
                     ),
-                    // SUB TITLE TEXT
-                    _buildSubTitleText(),
-                    // IMAGE
-                    _buildImage(),
-                    const SizedBox(height: 60,),
-                    // EMAIL TEXT FIELD
-                    _buildEmailTextField(),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    // PASSWORD TEXT FIELD
-                    _buildPasswordTextField(),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    // FORGOT PASSWORD  TEXT
-                    _buildForgotPassword(context),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    // SIGN IN BUTTON
-                    _buildSignInButton(),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    // REGISTER AND DON'T HAVE AN ACCOUNT BUTTON TEXT
-                    _buildRegisterAndDoNotHaveAccountText(context)
                   ],
                 ),
-              ),
         ),
       ),
-    );
-  }
-
-  // REGISTER AND DON'T HAVE AN ACCOUNT BUTTON TEXT EXTRACT AS A METHOD
-  Text _buildRegisterAndDoNotHaveAccountText(BuildContext context) {
-    return Text.rich(TextSpan(
-        text: "Don't have An Account? ",
-        style: const TextStyle(color: Colors.black, fontSize: 14),
-        children: <TextSpan>[
-          TextSpan(
-              text: "Register ",
-              style: const TextStyle(color: Colors.purpleAccent, fontSize: 14),
-              recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  nextPage(context, const RegisterPage());
-                })
-        ]));
-  }
-
-  // SIGN IN BUTTON EXTRACT AS A METHOD
-  SizedBox _buildSignInButton() {
-    return SizedBox(
-      height: 50,
-      width: MediaQuery.of(context).size.width *0.85,
-      child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(21))),
-          onPressed: () {
-            login();
-          },
-          child: const Text("Sign in ",style: const TextStyle(color: Colors.white, fontSize: 20,fontWeight: FontWeight.bold),)),
-    );
-  }
-
-  // FORGOT PASSWORD EXTRACT AS A METHOD
-  GestureDetector _buildForgotPassword(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        nextPage(context, const ForgotPasswordScreen());
-      },
-      child: const Padding(
-        padding: EdgeInsets.only(left: 180.0),
-        child: Text.rich(TextSpan(
-          text: "Forgot Password? ",
-          style: TextStyle(color: Colors.purpleAccent, fontSize: 14),
-        )),
-      ),
-    );
-  }
-
-  // PASSWORD TEXT FIELD EXTRACT AS A METHOD
-  SizedBox _buildPasswordTextField() {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.85,
-      child: TextFormField(
-        controller: passTextEditingController,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        obscureText: !_passwordVisible,
-        // key: _passkey,
-        decoration: textInputDecoration.copyWith(
-            labelText: "Password",
-            prefixIcon: const Icon(Icons.security),
-            suffixIcon: InkWell(
-              onTap: () {
-                setState(() {
-                  _passwordVisible = !_passwordVisible;
-                });
-              },
-              child: Icon(
-                _passwordVisible ? Icons.visibility : Icons.visibility_off,
-                color: Colors.grey,
-              ),
-            )),
-        onChanged: (val) {
-          setState(() {
-            pass = val;
-          });
-        },
-        validator: (val) {
-          return val!.length < 6 ? "Please Enter Atleast 6 Characters" : null;
-        },
-      ),
-    );
-  }
-
-  // EMAIL TEXT FIELD  EXTRACT AS A METHOD
-  SizedBox _buildEmailTextField() {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.85,
-      child: TextFormField(
-        controller: emailTextEditingController,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        // key: _emailKey,
-        decoration: textInputDecoration.copyWith(
-          labelText: "Email",
-          prefixIcon: const Icon(Icons.email),
-        ),
-        onChanged: (val) {
-          setState(() {
-            email = val;
-          });
-        },
-        validator: (val) {
-          return RegExp(
-                      r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
-                  .hasMatch(val!)
-              ? null
-              : "Please Enter Correct Email";
-        },
-      ),
-    );
-  }
-
-  // IMAGE EXTRACT AS A METHOD
-  Image _buildImage() {
-    return Image.asset(
-      "assets/images/chat.jpg",
-      height: 180,
-    );
-  }
-
-  // SUB TITLE EXTRACT AS A METHOD
-  Text _buildSubTitleText() {
-    return const Text(
-      "Login Now To See What Their Are Talking ",
-      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-    );
-  }
-
-  // CHAT TEXT  EXTRACT AS A METHOD
-  Text _buildChatText() {
-    return const Text(
-      "Chats",
-      style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
     );
   }
 
@@ -253,9 +184,9 @@ class _LoginPageState extends State<LoginPage> {
           await SharedPref.saveUserName(snapshot.docs[0]["fullName"]);
           await SharedPref.saveUserPhone(snapshot.docs[0]["phone"]);
           await SharedPref.saveUserDob(snapshot.docs[0]["dob"]);
-       /*   await SharedPref.saveProfilePic(snapshot.docs[0]["profilePic"]);*/
+          /*   await SharedPref.saveProfilePic(snapshot.docs[0]["profilePic"]);*/
           // ignore: use_build_context_synchronously
-          nextPage(context,  const BottomSheetTest());
+          nextPage(context, const BottomSheetTest());
         } else {
           ToastContext toastContext = ToastContext();
           toastContext.init(context);

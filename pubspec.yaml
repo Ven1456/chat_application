@@ -47,6 +47,7 @@ dependencies:
   awesome_snackbar_content: ^0.1.2
   curved_navigation_bar: ^1.0.3
   persistent_bottom_nav_bar: ^5.0.2
+  intl_phone_field: ^3.1.0
   string_extensions: ^0.5.0
   emoji_picker_flutter: ^1.5.4
   intl: ^0.17.0

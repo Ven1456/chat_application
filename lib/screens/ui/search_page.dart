@@ -64,6 +64,7 @@ class _SearchState extends State<Search> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(
           "Search",
           style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),

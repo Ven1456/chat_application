@@ -8,6 +8,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:lottie/lottie.dart';
 import 'package:toast/toast.dart';
 
@@ -22,23 +23,24 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController dateinput = TextEditingController();
   String email = "";
   String password = "";
-  String phone = "";
+  String phoneNumber = "";
   String dob = "";
   String fullName = "";
   bool _isLoading = false;
   AuthService authService = AuthService();
   final registerFormKey = GlobalKey<FormState>();
   bool _passwordVisible = false;
-@override
+  @override
   void initState() {
-  dateinput.text="";
+    dateinput.text = "";
     // TODO: implement initState
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:HexColor.fromHex('#FFFFFF'),
+      backgroundColor: HexColor.fromHex('#FFFFFF'),
       body: _isLoading
           ? Center(
               child: SizedBox(
@@ -56,56 +58,92 @@ class _RegisterPageState extends State<RegisterPage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         //CHAT TEXT
-                        _buildChatText(),
+                        boldTitleText("Chats"),
                         const SizedBox(
                           height: 10,
                         ),
                         // REGISTER TEXT
-                        _buildRegisterText(),
+                        semiBoldSubTitleText(
+                            "Register Now To See What Their Are Talking "),
                         // REGISTER IMAGE
-                        _buildImage(),
+                        imageBuild("assets/images/register.jpg"),
                         const SizedBox(
                           height: 15,
                         ),
                         // FULL NAME TEXT FIELD
-                        _buildFullNameTextField(),
+                        ReusableTextField(
+                          obSecureText: false,
+                          width: MediaQuery.of(context).size.width * 0.85,
+                          labelText: "Full Name",
+                          onChanged: (val) {
+                            setState(() {
+                              fullName = val;
+                            });
+                          },
+                          validator: (val) {
+                            if (val!.isNotEmpty && val.length > 2) {
+                              return null;
+                            } else {
+                              return "Please Enter Your Full Name ";
+                            }
+                          },
+                          prefixIcon: const Icon(Icons.account_circle),
+                        ),
                         const SizedBox(
                           height: 15,
                         ),
                         // EMAIL TEXT FIELD
-                        _buildEmailTextField(),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        _buildPasswordTextField(),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        SizedBox(
+                        ReusableTextField(
+                          obSecureText: false,
                           width: MediaQuery.of(context).size.width * 0.85,
-                          child: TextFormField(
-                            keyboardType:TextInputType.phone,
-
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
-                            decoration: textInputDecoration.copyWith(
-                              labelText: "Phone Number",
-                              prefixIcon: const Icon(Icons.phone),
-                            ),
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
-                            ],
-                            onChanged: (val) {
+                          labelText: "Email",
+                          onChanged: (val) {
+                            setState(() {
+                              email = val;
+                            });
+                          },
+                          validator: (val) {
+                            return RegExp(
+                                        r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
+                                    .hasMatch(val!)
+                                ? null
+                                : "Please Enter Correct Email";
+                          },
+                          prefixIcon: const Icon(Icons.email),
+                        ),
+                        // _buildEmailTextField(),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        // PASSWORD TEXT FIELD
+                        ReusableTextField(
+                          obSecureText: !_passwordVisible,
+                          width: MediaQuery.of(context).size.width * 0.85,
+                          labelText: "Password",
+                          suffixIcon: InkWell(
+                            onTap: () {
                               setState(() {
-                                phone = val;
+                                _passwordVisible = !_passwordVisible;
                               });
                             },
-                            validator: (val) {
-                              return val!.length < 10
-                                  ? "Please Enter Correct Phone Number"
-                                  : null;
-                            },
+                            child: Icon(
+                              _passwordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Colors.grey,
+                            ),
                           ),
+                          onChanged: (val) {
+                            setState(() {
+                              password = val;
+                            });
+                          },
+                          validator: (val) {
+                            return val!.length < 6
+                                ? "Please Enter At 6 Characters"
+                                : null;
+                          },
+                          prefixIcon: const Icon(Icons.security),
                         ),
                         const SizedBox(
                           height: 15,
@@ -116,23 +154,18 @@ class _RegisterPageState extends State<RegisterPage> {
                             onTap: () async {
                               DateTime? pickedDate = await showDatePicker(
                                   context: context,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime(1900), //DateTime.now() - not to allow to choose before today.
-                                  lastDate: DateTime(2040));
+                                  initialDate: DateTime.now().subtract(Duration(days: 2555)),
+                                  firstDate: DateTime(1900),
+                                  lastDate: DateTime(2017));
 
                               if (pickedDate != null) {
-                                print(pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
                                 String formattedDate =
                                 DateFormat('dd-MM-yyyy').format(pickedDate);
-                                print("dhfsghfd:$formattedDate"); //formatted date output using intl package =>  2021-03-16
-                                //you can implement different kind of Date Format here according to your requirement
-
                                 setState(() {
                                   dateinput.text = formattedDate;
-                                  dob = formattedDate;//set output date to TextField value.
+                                  dob =
+                                      formattedDate; //set output date to TextField value.
                                 });
-                              } else {
-                                print("Date is not selected");
                               }
                             },
                             readOnly: true,
@@ -153,14 +186,45 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(
                           height: 15,
                         ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.85,
+                          child: IntlPhoneField(
+                            keyboardType: TextInputType.phone,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                            decoration: textInputDecoration.copyWith(
+                                    labelText: "Phone Number",
+                                    prefixIcon: const Icon(Icons.phone),
+                                  ),
+                            initialCountryCode: 'IN',
+                            autovalidateMode:AutovalidateMode.onUserInteraction,
+                            onChanged: (phone) {
+                              setState(() {
+                                phoneNumber = phone.completeNumber;
+                              });
+                            },
+                          ),
+                        ),
+
+
+                        const SizedBox(
+                          height: 15,
+                        ),
 
                         // REGISTER BUTTON
-                        _buildRegisterButton(),
+                        reusableButton(
+                            50, MediaQuery.of(context).size.width * 0.85, () {
+                          register();
+                        }, "Register Now "),
                         const SizedBox(
                           height: 15,
                         ),
                         // ALREADY HAVE AN ACCOUNT AND LOGIN TEXT
-                        _buildAlreadyHaveAccountAndLoginText(context)
+                        richTextSpan("Already have An Account? ", "Login Now ",
+                            () {
+                          nextPage(context, const LoginPage());
+                        })
                       ],
                     ),
                   ),
@@ -169,154 +233,23 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
     );
   }
-  // ALREADY HAVE AN ACCOUNT AND LOGIN TEXT EXTRACT AS A METHOD
-  Text _buildAlreadyHaveAccountAndLoginText(BuildContext context) {
-    return Text.rich(TextSpan(
-        text: "Already have An Account? ",
-        style: const TextStyle(color: Colors.black, fontSize: 14),
-        children: <TextSpan>[
-          TextSpan(
-              text: "Login Now ",
-              style: const TextStyle(color: Colors.purpleAccent, fontSize: 14),
-              recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  nextPage(context, const LoginPage());
-                })
-        ]));
-  }
-// REGISTER BUTTON EXTRACT AS A METHOD
-  SizedBox _buildRegisterButton() {
-    return SizedBox(
-      height: 50,
-      width: 310,
-      child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(21))),
-          onPressed: () {
-            register();
-          },
-          child: const Text("Register Now")),
-    );
-  }
-// PASSWORD TEXT FIELD EXTRACT AS A METHOD
-  SizedBox _buildPasswordTextField() {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.85,
-      child: TextFormField(
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        obscureText: !_passwordVisible,
-        decoration: textInputDecoration.copyWith(
-            labelText: "Password",
-            prefixIcon: const Icon(Icons.security),
-            suffixIcon: InkWell(
-              onTap: () {
-                setState(() {
-                  _passwordVisible = !_passwordVisible;
-                });
-              },
-              child: Icon(
-                _passwordVisible ? Icons.visibility : Icons.visibility_off,
-                color: Colors.grey,
-              ),
-            )),
-        onChanged: (val) {
-          setState(() {
-            password = val;
-          });
-        },
-        validator: (val) {
-          return val!.length < 6 ? "Please Enter At 6 Characters" : null;
-        },
-      ),
-    );
-  }
-// EMAIL TEXT FIELD EXTRACT AS A METHOD
-  SizedBox _buildEmailTextField() {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.85,
-      child: TextFormField(
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        decoration: textInputDecoration.copyWith(
-          labelText: "Email",
-          prefixIcon: const Icon(Icons.email),
-        ),
-        onChanged: (val) {
-          setState(() {
-            email = val;
-          });
-        },
-        validator: (val) {
-          return RegExp(
-                      r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
-                  .hasMatch(val!)
-              ? null
-              : "Please Enter Correct Email";
-        },
-      ),
-    );
-  }
-// FULL NAME TEXT FIELD EXTRACT AS A METHOD
-  SizedBox _buildFullNameTextField() {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.85,
-      child: TextFormField(
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        decoration: textInputDecoration.copyWith(
-          labelText: "Full Name",
-          prefixIcon: const Icon(Icons.account_circle),
-        ),
-        onChanged: (val) {
-          setState(() {
-            fullName = val;
-          });
-        },
-        validator: (val) {
-          if (val!.isNotEmpty && val.length > 2) {
-            return null;
-          } else {
-            return "Please Enter Your Full Name ";
-          }
-        },
-      ),
-    );
-  }
-// IMAGE EXTRACT AS A METHOD
-  Image _buildImage() {
-    return Image.asset(
-      "assets/images/register.jpg",
-      height: 180,
-    );
-  }
-// REGISTER TEXT EXTRACT AS A METHOD
-  Text _buildRegisterText() {
-    return const Text(
-      "Register Now To See What Their Are Talking ",
-      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-    );
-  }
-// CHAT TEXT EXTRACT AS A METHOD
-  Text _buildChatText() {
-    return const Text(
-      "Chats",
-      style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-    );
-  }
-  // REGISTER METHOD
+
   void register() async {
     if (registerFormKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
-      await authService.registerWithEmailPass(fullName, email, password,phone,dob).then((value) async {
+      await authService
+          .registerWithEmailPass(fullName, email, password, phoneNumber, dob)
+          .then((value) async {
         if (value == true) {
           await SharedPref.saveUserLoginStatus(true);
           await SharedPref.saveUserName(fullName);
           await SharedPref.saveUserEmail(email);
-          await SharedPref.saveUserPhone(phone);
+          await SharedPref.saveUserPhone(phoneNumber);
           await SharedPref.saveUserDob(dob);
           // ignore: use_build_context_synchronously
-          nextPage(context,  const BottomSheetTest());
+          nextPage(context, const BottomSheetTest());
         } else {
           setState(() {
             ToastContext toastContext = ToastContext();

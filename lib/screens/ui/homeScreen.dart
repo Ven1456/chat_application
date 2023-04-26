@@ -97,6 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // APP BAR  EXTRACT AS A METHOD
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
+      automaticallyImplyLeading: false,
       centerTitle: true,
       title: const Text(
         "Chats",

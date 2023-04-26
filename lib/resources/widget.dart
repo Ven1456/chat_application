@@ -1,3 +1,7 @@
+import 'dart:async';
+import 'dart:ui';
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -68,6 +72,7 @@ class NewLineTrimTextFormatter extends TextInputFormatter {
             : newValue.selection);
   }
 }
+
 extension StringExtension on String {
   String capitalize() {
     return "${this[0].toUpperCase()}${this.substring(1)}";
@@ -90,4 +95,299 @@ extension HexColor on Color {
       '${red.toRadixString(16).padLeft(2, '0')}'
       '${green.toRadixString(16).padLeft(2, '0')}'
       '${blue.toRadixString(16).padLeft(2, '0')}';
+}
+
+class AlertBoxReuse extends StatelessWidget {
+  final String titleText;
+  final String subTitleText;
+  final String leaveTitleText;
+  final String cancelTitleText;
+  final VoidCallback leaveOnTap;
+  final VoidCallback cancelOnTap;
+
+  const AlertBoxReuse({
+    Key? key,
+    required this.leaveOnTap,
+    required this.titleText,
+    required this.subTitleText,
+    required this.leaveTitleText,
+    required this.cancelTitleText,
+    required this.cancelOnTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+            barrierDismissible: true,
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text(
+                  titleText,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                content: Text(
+                  subTitleText,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                actions: [
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(21))),
+                      onPressed: () {
+                        cancelOnTap();
+                      },
+                      child: Text(
+                        cancelTitleText,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      )),
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(21))),
+                      onPressed: () {
+                        leaveOnTap();
+                      },
+                      child: Text(
+                        leaveTitleText,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      )),
+                ],
+              );
+            });
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+              height: 40,
+              width: 50,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(21),
+                  color: Colors.blueGrey),
+              child: const Icon(Icons.logout)),
+          const SizedBox(
+            width: 10,
+          ),
+          const Text(
+            "Logout",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class IconButtonAlertReuse extends StatelessWidget {
+  final String titleText;
+  final String subTitleText;
+  final String leaveTitleText;
+  final String cancelTitleText;
+  final VoidCallback leaveOnTap;
+  final VoidCallback cancelOnTap;
+
+  const IconButtonAlertReuse({
+    Key? key,
+    required this.leaveOnTap,
+    required this.titleText,
+    required this.subTitleText,
+    required this.leaveTitleText,
+    required this.cancelTitleText,
+    required this.cancelOnTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+        onTap: () {
+          showDialog(
+              barrierDismissible: true,
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: Text(
+                    titleText,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  content: Text(
+                    subTitleText,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  actions: [
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(21))),
+                        onPressed: () {
+                          cancelOnTap();
+                        },
+                        child: Text(
+                          cancelTitleText,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        )),
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(21))),
+                        onPressed: () {
+                          leaveOnTap();
+                        },
+                        child: Text(
+                          leaveTitleText,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        )),
+                  ],
+                );
+              });
+        },
+        child: const Icon(Icons.exit_to_app));
+  }
+}
+
+reusableButton(double height, double width, VoidCallback onTap, String text) {
+  return SizedBox(
+    height: height,
+    width: width,
+    child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(21))),
+        onPressed: () {
+          onTap();
+        },
+        child: Text(
+          text,
+          style: const TextStyle(
+              color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+        )),
+  );
+}
+
+class ReusableTextField extends StatefulWidget {
+  final double width;
+  final String labelText;
+  final bool? obSecureText;
+  final TextInputType? textInputType;
+  final List<TextInputFormatter>? textInputFormatter;
+  final TextEditingController? textEditingController;
+  final Function(String)? onChanged;
+  final VoidCallback? onTap;
+  final Widget? suffixIcon;
+  final Widget? prefixIcon;
+  final String? Function(String?)? validator;
+
+  const ReusableTextField(
+      {Key? key,
+      required this.width,
+      this.textEditingController,
+      required this.labelText,
+      this.onChanged,
+      this.validator,
+      this.obSecureText,
+      this.suffixIcon,
+      this.prefixIcon,
+      this.textInputType,
+      this.textInputFormatter,
+      this.onTap})
+      : super(key: key);
+
+  @override
+  State<ReusableTextField> createState() => _ReusableTextFieldState();
+}
+
+class _ReusableTextFieldState extends State<ReusableTextField> {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: widget.width,
+      child: TextFormField(
+          obscureText: (widget.obSecureText!) ? true : false,
+          controller: widget.textEditingController,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          keyboardType: widget.textInputType,
+          inputFormatters: widget.textInputFormatter,
+          // key: _emailKey,
+          decoration: textInputDecoration.copyWith(
+            suffixIcon: widget.suffixIcon,
+            labelText: widget.labelText,
+            prefixIcon: widget.prefixIcon,
+          ),
+          onChanged: widget.onChanged,
+          validator: widget.validator),
+    );
+  }
+}
+
+boldTitleText(String text) {
+  return Text(
+    text,
+    style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+  );
+}
+
+semiBoldSubTitleText(String text) {
+  return Text(
+    text,
+    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+  );
+}
+
+imageBuild(String path) {
+  return Image.asset(
+    path,
+    height: 180,
+  );
+}
+
+navLinkText(VoidCallback onTap, String text) {
+  return GestureDetector(
+    onTap: onTap,
+    child: Padding(
+      padding: const EdgeInsets.only(left: 180.0),
+      child: Text.rich(TextSpan(
+        text: text,
+        style: const TextStyle(color: Colors.purpleAccent, fontSize: 14),
+      )),
+    ),
+  );
+}
+
+richTextSpan(String text1, String text2, VoidCallback onTap) {
+  return Text.rich(TextSpan(
+      text: text1,
+      style: const TextStyle(color: Colors.black, fontSize: 14),
+      children: <TextSpan>[
+        TextSpan(
+            text: text2,
+            style: const TextStyle(color: Colors.purpleAccent, fontSize: 14),
+            recognizer: TapGestureRecognizer()..onTap = onTap)
+      ]));
 }

@@ -208,7 +208,6 @@ class _GroupInfoState extends State<GroupInfo> {
                   ]),
           ),
         ),
-
         isAdmin == username
             ? GestureDetector(
                 onTap: () {
@@ -256,68 +255,25 @@ class _GroupInfoState extends State<GroupInfo> {
         ),
       ),
       actions: [
-        IconButton(
-          icon: const Icon(
-            Icons.exit_to_app,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            showDialog(
-              barrierDismissible: false,
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title: const Text(
-                    "Leave Group?",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  content: const Text(
-                    "Are you sure you want to leave this group?",
-                    style: TextStyle(
-                      color: Colors.black,
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(
-                        "CANCEL",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[700],
-                        ),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        DatabaseServices(
-                                uid: FirebaseAuth.instance.currentUser!.uid)
-                            .toggleGroupJoin(
-                          widget.groupId,
-                          getName(widget.adminName),
-                          widget.groupName,
-                        )
-                            .whenComplete(() {
-                          nextPage(context, const HomeScreen());
-                        });
-                      },
-                      child: const Text(
-                        "LEAVE",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-        ),
+        IconButtonAlertReuse(
+            leaveOnTap: () {
+              DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
+                  .toggleGroupJoin(
+                widget.groupId,
+                getName(widget.adminName),
+                widget.groupName,
+              )
+                  .whenComplete(() {
+                nextPage(context, const HomeScreen());
+              });
+            },
+            titleText: "Leave Group?",
+            subTitleText: "Are you sure you want to leave this group ?",
+            leaveTitleText: "LEAVE",
+            cancelTitleText: "CANCEL",
+            cancelOnTap: () {
+              Navigator.pop(context);
+            }),
         const SizedBox(width: 20),
       ],
     );

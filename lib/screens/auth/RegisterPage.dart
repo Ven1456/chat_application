@@ -239,7 +239,7 @@ class _RegisterPageState extends State<RegisterPage> {
           await SharedPref.saveUserPhone(phoneNumber);
           await SharedPref.saveUserDob(dob);
           // ignore: use_build_context_synchronously
-          nextPage(context, const BottomSheetTest());
+          nextPagePushAndRemoveUntil(context, const BottomSheetTest());
         } else {
           setState(() {
             ToastContext toastContext = ToastContext();

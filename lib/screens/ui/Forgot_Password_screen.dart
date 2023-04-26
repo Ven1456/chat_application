@@ -67,72 +67,74 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       appBar: _buildAppBar(),
       body:  Stack(
         children: [
-          Form(
-            key: formKey,
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  sizeBoxH80(),
-                  // IMAGE
-                  imageBuild("assets/images/forgot.jpg", 200),
-                 sizeBoxH100(),
+          SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    sizeBoxH80(),
+                    // IMAGE
+                    imageBuild("assets/images/forgot.jpg", 200),
+                   sizeBoxH100(),
 
-                  SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.85,
-                      child: isButton
-                          ? Container()
-                          :
-                      // EMAIL  TEXT FIELD
-                      ReusableTextField(
+                    SizedBox(
                         width: MediaQuery.of(context).size.width * 0.85,
-                        obSecureText: false,
-                        labelText: "Enter Your Email",
-                        prefixIcon: Icon(Icons.email),
-                        onChanged: (val) {
-                          setState(() {
-                            email = val;
-                          });
-                        },
-                        validator: (val) {
-                          return RegExp(
-                              r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
-                              .hasMatch(val!)
-                              ? null
-                              : "Please Enter Correct Email";
-                        },
-                      )),
-                 sizeBoxH15(),
-                  isButton
-                      ? Container()
-                      :
-                  // SEND REQUEST BUTTON
-                  reusableButton(40, 180, () {
-                    forgot();
-                  }, "Send Request"),
-                  isButton
-                      ? Column(
-                    children: [
-                      // TIMER ICON
-                      _buildTimerIcon(),
-                      // TIMER START ICON
-                      _buildTimeStartText(),
-                      sizeBoxH10(),
-                      // DESCRIPTION TEXT
-                      semiBoldSubTitleText(
-                        "                   Please Check Your Email "
-                            "\n If Link is Not Their Please Check Spam Box"
-                            "\n            Set Must 6 Character Password",
-                      ),
-                      sizeBoxH10(),
-                      // CLOSE ICON
-                      reusableButton(40, 100, () {
-                        Navigator.pop(context);
-                      }, "Close"),
-                    ],
-                  )
-                      : Container()
-                ],
+                        child: isButton
+                            ? Container()
+                            :
+                        // EMAIL  TEXT FIELD
+                        ReusableTextField(
+                          width: MediaQuery.of(context).size.width * 0.85,
+                          obSecureText: false,
+                          labelText: "Enter Your Email",
+                          prefixIcon: Icon(Icons.email),
+                          onChanged: (val) {
+                            setState(() {
+                              email = val;
+                            });
+                          },
+                          validator: (val) {
+                            return RegExp(
+                                r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
+                                .hasMatch(val!)
+                                ? null
+                                : "Please Enter Correct Email";
+                          },
+                        )),
+                   sizeBoxH15(),
+                    isButton
+                        ? Container()
+                        :
+                    // SEND REQUEST BUTTON
+                    reusableButton(40, 180, () {
+                      forgot();
+                    }, "Send Request"),
+                    isButton
+                        ? Column(
+                      children: [
+                        // TIMER ICON
+                        _buildTimerIcon(),
+                        // TIMER START ICON
+                        _buildTimeStartText(),
+                        sizeBoxH10(),
+                        // DESCRIPTION TEXT
+                        semiBoldSubTitleText(
+                          "                   Please Check Your Email "
+                              "\n If Link is Not Their Please Check Spam Box"
+                              "\n            Set Must 6 Character Password",
+                        ),
+                        sizeBoxH10(),
+                        // CLOSE ICON
+                        reusableButton(40, 100, () {
+                          Navigator.pop(context);
+                        }, "Close"),
+                      ],
+                    )
+                        : Container()
+                  ],
+                ),
               ),
             ),
           ),

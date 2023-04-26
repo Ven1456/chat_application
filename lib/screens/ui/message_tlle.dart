@@ -30,6 +30,7 @@ class _MessageTileState extends State<MessageTile> {
   String datetime = DateFormat("hh:mm a").format(DateTime.now());
   String email = '';
   String senderProfile = "";
+  bool isLoadingImage = false;
 
   @override
   void initState() {
@@ -180,47 +181,51 @@ class _MessageTileState extends State<MessageTile> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              widget.type.toString() == "text"
-                                  ? Text(
-                                      widget.message,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.white,
+                              if (widget.type.toString() == "text")
+                                Text(
+                                  widget.message,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              else
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: FadeInImage.assetNetwork(
+                                        placeholder: 'assets/images/gallery.jpg',
+                                        placeholderErrorBuilder: (context, url, error) => Image.asset('assets/images/404.jpg', fit: BoxFit.cover),
+                                        image: widget.message,
+                                        height: 200,
+                                        width: 150,
+                                        fit: BoxFit.cover,
+                                        imageErrorBuilder: (context, url, error) => Image.asset('assets/images/error.jpg', fit: BoxFit.cover),
                                       ),
-                                    )
-                                  : Row(
-                                      children: [
-                                        Expanded(
-                                          child: Image.network(
-                                            widget.message,
-                                            fit: BoxFit.cover,
-                                            loadingBuilder:
-                                                (BuildContext context,
-                                                    Widget child,
-                                                    ImageChunkEvent?
-                                                        loadingProgress) {
-                                              if (loadingProgress == null) {
-                                                return child;
-                                              }
-                                              return Center(
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  value: loadingProgress
-                                                              .expectedTotalBytes !=
-                                                          null
-                                                      ? loadingProgress
-                                                              .cumulativeBytesLoaded /
-                                                          loadingProgress
-                                                              .expectedTotalBytes!
-                                                      : null,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ],
+
+                                      // Image.network(
+                                      //   widget.message,
+                                      //   fit: BoxFit.cover,
+                                      //   loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                                      //     if (loadingProgress == null) {
+                                      //       return child;
+                                      //     }
+                                      //     return Center(
+                                      //       child: CircularProgressIndicator(
+                                      //         value: loadingProgress.expectedTotalBytes != null
+                                      //             ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                      //             : null,
+                                      //       ),
+                                      //     );
+                                      //   },
+                                      //   errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                                      //     return Image.asset('assets/images/chat.jpg', fit: BoxFit.cover);
+                                      //   },
+                                      // ),
                                     ),
+                                  ],
+                                ),
                               const SizedBox(height: 4.0),
                             ],
                           ),
@@ -260,12 +265,16 @@ class _MessageTileState extends State<MessageTile> {
                                             BorderRadius.circular(100),
                                         child: provider.image == null
                                             ? (widget.userProfile ?? "").isEmpty
-                                                ?  Center(
-                                            child : Text(
-                                              widget.sender.toUpperCase().substring(0, 2),
-                                              style:  TextStyle(color: Colors.black,fontWeight: FontWeight.bold),
-                                            )
-                                                  )
+                                                ? Center(
+                                                    child: Text(
+                                                    widget.sender
+                                                        .toUpperCase()
+                                                        .substring(0, 2),
+                                                    style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ))
                                                 : Image.network(
                                                     height: 50,
                                                     width: 50,

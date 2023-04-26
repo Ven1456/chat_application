@@ -21,6 +21,9 @@ const textInputDecoration = InputDecoration(
 nextPage(context, page) {
   Navigator.push(context, MaterialPageRoute(builder: (context) => page));
 }
+nextPagePushAndRemoveUntil(context, page){
+  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => page), (route) => false);
+}
 
 // REPLACE THE SCREEN
 void replaceScreen(context, page) {

@@ -278,6 +278,7 @@ reusableButton(double height, double width, VoidCallback onTap, String text) {
     width: width,
     child: ElevatedButton(
         style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.cyan,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(21))),
         onPressed: () {
@@ -360,10 +361,10 @@ semiBoldSubTitleText(String text) {
   );
 }
 
-imageBuild(String path) {
+imageBuild(String path, double size) {
   return Image.asset(
     path,
-    height: 180,
+    height: size,
   );
 }
 
@@ -374,7 +375,7 @@ navLinkText(VoidCallback onTap, String text) {
       padding: const EdgeInsets.only(left: 180.0),
       child: Text.rich(TextSpan(
         text: text,
-        style: const TextStyle(color: Colors.purpleAccent, fontSize: 14),
+        style: const TextStyle(color: Colors.pink, fontSize: 17),
       )),
     ),
   );
@@ -383,11 +384,130 @@ navLinkText(VoidCallback onTap, String text) {
 richTextSpan(String text1, String text2, VoidCallback onTap) {
   return Text.rich(TextSpan(
       text: text1,
-      style: const TextStyle(color: Colors.black, fontSize: 14),
+      style: const TextStyle(color: Colors.black, fontSize: 17),
       children: <TextSpan>[
         TextSpan(
             text: text2,
-            style: const TextStyle(color: Colors.purpleAccent, fontSize: 14),
+            style: const TextStyle(color: Colors.pink, fontSize: 17),
             recognizer: TapGestureRecognizer()..onTap = onTap)
       ]));
+}
+
+profileSubText(String text) {
+  return Row(
+    children: [
+      Padding(
+        padding: const EdgeInsets.only(left: 32.0, bottom: 10),
+        child: Text(
+          text,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+        ),
+      )
+    ],
+  );
+}
+
+class ProfileTextField extends StatefulWidget {
+  final TextEditingController? textEditingController;
+  final VoidCallback? onTap;
+  final Widget? icon;
+  final bool? isEnable;
+
+  const ProfileTextField(
+      {Key? key,
+      this.textEditingController,
+      this.onTap,
+      this.icon,
+      this.isEnable})
+      : super(key: key);
+
+  @override
+  State<ProfileTextField> createState() => _ProfileTextFieldState();
+}
+
+class _ProfileTextFieldState extends State<ProfileTextField> {
+  @override
+  Widget build(BuildContext context) {
+    return Stack(alignment: Alignment.bottomRight, children: [
+      SizedBox(
+        width: MediaQuery.of(context).size.width * 0.85,
+        child: TextFormField(
+            enabled: widget.isEnable,
+            controller: widget.textEditingController,
+            decoration: const InputDecoration(
+              suffixIconColor: Colors.grey,
+              errorStyle: TextStyle(color: Colors.red),
+              hintStyle: TextStyle(color: Colors.grey),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                borderSide: BorderSide(color: Colors.blueGrey, width: 2),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                borderSide: BorderSide(color: Colors.blueGrey, width: 2),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                borderSide: BorderSide(color: Colors.blueGrey),
+              ),
+            )),
+      ),
+      IconButton(
+        onPressed: widget.onTap!,
+        icon: widget.isEnable!
+            ?  const Icon(Icons.done_sharp)
+            :  const Icon(Icons.edit),
+      ),
+    ]);
+  }
+}
+sizeBoxH15(){
+  return const SizedBox(
+    height: 15,
+  );
+}
+sizeBoxH20(){
+  return const SizedBox(
+    height: 20,
+  );
+}
+sizeBoxH60(){
+  return const SizedBox(
+    height: 60,
+  );
+}
+sizeBoxH100(){
+  return const SizedBox(
+    height: 100,
+  );
+}
+sizeBoxH80(){
+  return const SizedBox(
+    height: 80,
+  );
+}
+sizeBoxH45(){
+  return const SizedBox(
+    height: 45,
+  );
+}
+sizeBoxH5(){
+  return const SizedBox(
+    height: 5,
+  );
+}
+sizeBoxH10(){
+  return const SizedBox(
+    height: 10,
+  );
+}
+sizeBoxH25(){
+  return const SizedBox(
+    height: 25,
+  );
+}
+sizeBoxW118(){
+  return const SizedBox(
+    width: 118,
+  );
 }

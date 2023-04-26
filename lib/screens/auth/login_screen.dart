@@ -34,135 +34,116 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: HexColor.fromHex('#FFFFFF'),
-      body: SafeArea(
-        child: Center(
-          child: _isLoading
-              // LOADING ANIMATION
-              ? Stack(children: [_buildLoadingAnimation()])
-              : Stack(
+      body: Stack(
+        children: [ Center(
+          child:Column(
+            children: [
+              Form(
+                key: formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Form(
-                      key: formKey,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const SizedBox(
-                            height: 40,
-                          ),
-                          // CHAT TEXT
-                          boldTitleText("Chats"),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          // SUB TITLE TEXT
-                          semiBoldSubTitleText(
-                              "Login Now To See What Their Are Talking "),
-                          const SizedBox(
-                            height: 40,
-                          ),
-                          // IMAGE
-                          imageBuild("assets/images/chat.jpg"),
-                          const SizedBox(
-                            height: 60,
-                          ),
-                          // EMAIL TEXT FIELD
-                          ReusableTextField(
-                            obSecureText: false,
-                            width: MediaQuery.of(context).size.width * 0.85,
-                            textEditingController: emailTextEditingController,
-                            labelText: "Email",
-                            onChanged: (val) {
-                              setState(() {
-                                email = val;
-                              });
-                            },
-                            prefixIcon: const Icon(Icons.email),
-                            validator: (val) {
-                              return RegExp(
-                                          r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
-                                      .hasMatch(val!)
-                                  ? null
-                                  : "Please Enter Correct Email";
-                            },
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          // PASSWORD TEXT FIELD
-                          ReusableTextField(
-                            obSecureText: !_passwordVisible,
-                            width: MediaQuery.of(context).size.width * 0.85,
-                            textEditingController: passTextEditingController,
-                            labelText: "Password",
-                            prefixIcon: const Icon(Icons.security),
-                            suffixIcon: InkWell(
-                              onTap: () {
-                                setState(() {
-                                  _passwordVisible = !_passwordVisible;
-                                });
-                              },
-                              child: Icon(
-                                _passwordVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            onChanged: (val) {
-                              setState(() {
-                                pass = val;
-                              });
-                            },
-                            validator: (val) {
-                              return val!.length < 6
-                                  ? "Please Enter Atleast 6 Characters"
-                                  : null;
-                            },
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          // FORGOT PASSWORD  TEXT
-                          navLinkText(() {
-                            nextPage(context, const ForgotPasswordScreen());
-                          }, "Forgot Password?"),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          // SIGN IN BUTTON
-                          reusableButton(
-                              50, MediaQuery.of(context).size.width * 0.85, () {
-                            login();
-                          }, "Sign in "),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          // REGISTER AND DON'T HAVE AN ACCOUNT BUTTON TEXT
-                          richTextSpan("Don't have An Account? ", "Register ",
-                              () {
-                            nextPage(context, const RegisterPage());
-                          })
-                        ],
-                      ),
+                   sizeBoxH80(),
+                    // CHAT TEXT
+                    boldTitleText("Chats"),
+                   sizeBoxH10(),
+                    // SUB TITLE TEXT
+                    semiBoldSubTitleText(
+                        "Login Now To See What Their Are Talking "),
+                    sizeBoxH45(),
+                    // IMAGE
+                    imageBuild("assets/images/chat.jpg",180),
+                    sizeBoxH80(),
+                    // EMAIL TEXT FIELD
+                    ReusableTextField(
+                      obSecureText: false,
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      textEditingController: emailTextEditingController,
+                      labelText: "Email",
+                      onChanged: (val) {
+                        setState(() {
+                          email = val;
+                        });
+                      },
+                      prefixIcon: const Icon(Icons.email),
+                      validator: (val) {
+                        return RegExp(
+                            r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
+                            .hasMatch(val!)
+                            ? null
+                            : "Please Enter Correct Email";
+                      },
                     ),
+                    sizeBoxH15(),
+                    // PASSWORD TEXT FIELD
+                    ReusableTextField(
+                      obSecureText: !_passwordVisible,
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      textEditingController: passTextEditingController,
+                      labelText: "Password",
+                      prefixIcon: const Icon(Icons.security),
+                      suffixIcon: InkWell(
+                        onTap: () {
+                          setState(() {
+                            _passwordVisible = !_passwordVisible;
+                          });
+                        },
+                        child: Icon(
+                          _passwordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      onChanged: (val) {
+                        setState(() {
+                          pass = val;
+                        });
+                      },
+                      validator: (val) {
+                        return val!.length < 6
+                            ? "Please Enter Atleast 6 Characters"
+                            : null;
+                      },
+                    ),
+                   sizeBoxH15(),
+                    // FORGOT PASSWORD  TEXT
+                    navLinkText(() {
+                      nextPage(context, const ForgotPasswordScreen());
+                    }, "Forgot Password?"),
+                    sizeBoxH10(),
+                    // SIGN IN BUTTON
+                    reusableButton(
+                        50, MediaQuery.of(context).size.width * 0.85, () {
+                      login();
+                    }, "Sign in "),
+                    sizeBoxH10(),
+                    // REGISTER AND DON'T HAVE AN ACCOUNT BUTTON TEXT
+                    richTextSpan("Don't have An Account? ", "Register ",
+                            () {
+                          nextPage(context, const RegisterPage());
+                        })
                   ],
                 ),
+              ),
+            ],
+          ),
         ),
+          if(_isLoading)
+            _buildLoadingAnimation()
+        ],
       ),
     );
   }
 
   // LOADING ANIMATION  EXTRACT AS A METHOD
-  Center _buildLoadingAnimation() {
-    return Center(
-        child: SizedBox(
-            height: 150,
-            width: 100,
-            child: Lottie.network(
-                "https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")));
+  Container _buildLoadingAnimation() {
+    return  Container(
+        color: Colors.black.withOpacity(0.1),
+        child: Center(
+          child: Lottie.network(
+              "https://assets4.lottiefiles.com/private_files/lf30_fjjj1m44.json", height: 180),
+        ));
   }
 
   login() async {

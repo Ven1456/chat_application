@@ -91,9 +91,7 @@ class _ProfileState extends State<Profile> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 25),
                         ),
-                        const SizedBox(
-                          width: 118,
-                        ),
+                        sizeBoxW118(),
                         GestureDetector(
                           onTap: () {
                             setState(() {
@@ -111,333 +109,87 @@ class _ProfileState extends State<Profile> {
                       ],
                     ),
 
-                    const SizedBox(
-                      height: 25,
-                    ),
-                    Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        Container(
-                          height: 150,
-                          width: 150,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.black),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(100),
-                            child: provider.image == null
-                                ? (widget.profilePicTest ?? "").isEmpty
-                                    ? const Icon(
-                                        Icons.person,
-                                        size: 120,
-                                      )
-                                    : Image.network(
-                                        height: 120,
-                                        width: 120,
-                                        widget.profilePicTest ?? "",
-                                        fit: BoxFit.cover,
-                                        loadingBuilder: (BuildContext context,
-                                            Widget child,
-                                            ImageChunkEvent? loadingProgress) {
-                                          if (loadingProgress == null)
-                                            return child;
-                                          return Center(
-                                            child: CircularProgressIndicator(
-                                              value: loadingProgress
-                                                          .expectedTotalBytes !=
-                                                      null
-                                                  ? loadingProgress
-                                                          .cumulativeBytesLoaded /
-                                                      loadingProgress
-                                                          .expectedTotalBytes!
-                                                  : null,
-                                            ),
-                                          );
-                                        },
-                                      )
-                                : Stack(children: [
-                                    Image.file(
-                                      File(provider.image!.path).absolute,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ]),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            provider.pickImage(context);
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 25.0, vertical: 0),
-                            child: Container(
-                                height: 30,
-                                width: 30,
-                                decoration: const BoxDecoration(
-                                    color: Colors.blue, shape: BoxShape.circle),
-                                child: const Icon(Icons.edit)),
-                          ),
-                        )
-                      ],
-                    ),
+                    sizeBoxH25(),
+                    _buildProfilePic(provider, context),
                     const SizedBox(
                       height: 5,
                     ),
 
-                    const SizedBox(
-                      height: 10,
-                    ),
+                    sizeBoxH10(),
                     _buildEditProfileContainer(),
 
-                    const SizedBox(
-                      height: 60,
-                    ),
-                    // USERNAME
-                    Row(
-                      children: const [
-                        Padding(
-                          padding: EdgeInsets.only(left: 25.0, bottom: 10),
-                          child: Text(
-                            "Username",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 15),
-                          ),
-                        )
-                      ],
-                    ),
+                    sizeBoxH60(),// USERNAME
+                    profileSubText("Username"),
                     // USERNAME TEXT FIELD
-                    Stack(alignment: Alignment.bottomRight, children: [
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        child: TextFormField(
-                            enabled: _isUsernameEditable,
-                            controller: usernameController,
-                            decoration: const InputDecoration(
-                              suffixIconColor: Colors.grey,
-                              errorStyle: TextStyle(color: Colors.red),
-                              hintStyle: TextStyle(color: Colors.grey),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(12.0)),
-                                borderSide: BorderSide(
-                                    color: Colors.blueGrey, width: 2),
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(12.0)),
-                                borderSide: BorderSide(
-                                    color: Colors.blueGrey, width: 2),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10.0)),
-                                borderSide: BorderSide(color: Colors.blueGrey),
-                              ),
-                            )),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _isUsernameEditable = !_isUsernameEditable;
-                          });
-                        },
-                        icon: _isUsernameEditable
-                            ? const Icon(Icons.done_sharp)
-                            : const Icon(Icons.edit),
-                      ),
-                    ]),
+                    ProfileTextField(
+                      isEnable: _isUsernameEditable,
+                      textEditingController: usernameController,
+                      onTap: () {
+                        setState(() {
+                          _isUsernameEditable = !_isUsernameEditable;
+                        });
+                      },
+                    ),
 
-                    const SizedBox(
-                      height: 15,
-                    ),
+                    sizeBoxH15(),
                     // EMAIL
-                    Row(
-                      children: const [
-                        Padding(
-                          padding: EdgeInsets.only(left: 25.0, bottom: 10),
-                          child: Text(
-                            "Email",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 15),
-                          ),
-                        )
-                      ],
-                    ),
+                    profileSubText("Email"),
                     // EMAIL TEXT FIELD
-                    Stack(alignment: Alignment.bottomRight, children: [
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        child: TextFormField(
-                            enabled: _isEmailEditable,
-                            controller: emailController,
-                            decoration: const InputDecoration(
-                              suffixIconColor: Colors.grey,
-                              errorStyle: TextStyle(color: Colors.red),
-                              hintStyle: TextStyle(color: Colors.grey),
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(12.0)),
-                                borderSide: BorderSide(
-                                    color: Colors.blueGrey, width: 2),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(12.0)),
-                                borderSide:
-                                    BorderSide(color: Colors.grey, width: 2),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10.0)),
-                                borderSide: BorderSide(color: Colors.blueGrey),
-                              ),
-                            )),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _isEmailEditable = !_isEmailEditable;
-                          });
-                        },
-                        icon: _isEmailEditable
-                            ? const Icon(Icons.done_sharp)
-                            : const Icon(Icons.edit),
-                      ),
-                    ]),
-                    const SizedBox(
-                      height: 15,
+                    ProfileTextField(
+                      isEnable: _isEmailEditable,
+                      textEditingController: emailController,
+                      onTap: () {
+                        setState(() {
+                          _isEmailEditable = !_isEmailEditable;
+                        });
+                      },
                     ),
+                sizeBoxH15(),
                     // PHONE
-                    Row(
-                      children: const [
-                        Padding(
-                          padding: EdgeInsets.only(left: 25.0, bottom: 10),
-                          child: Text(
-                            "Phone",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 15),
-                          ),
-                        )
-                      ],
-                    ),
+                    profileSubText("Phone"),
                     // PHONE TEXT FIELD
-                    Stack(alignment: Alignment.bottomRight, children: [
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        child: TextFormField(
-                            enabled: _isPhoneEditable,
-                            controller: phoneController,
-                            decoration: const InputDecoration(
-                              suffixIconColor: Colors.grey,
-                              errorStyle: TextStyle(color: Colors.red),
-                              hintStyle: TextStyle(color: Colors.grey),
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(12.0)),
-                                borderSide: BorderSide(
-                                    color: Colors.blueGrey, width: 2),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(12.0)),
-                                borderSide:
-                                    BorderSide(color: Colors.grey, width: 2),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10.0)),
-                                borderSide: BorderSide(color: Colors.blueGrey),
-                              ),
-                            )),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _isPhoneEditable = !_isPhoneEditable;
-                          });
-                        },
-                        icon: _isPhoneEditable
-                            ? const Icon(Icons.done_sharp)
-                            : const Icon(Icons.edit),
-                      ),
-                    ]),
-                    const SizedBox(
-                      height: 15,
+                    ProfileTextField(
+                      isEnable: _isPhoneEditable,
+                      textEditingController: phoneController,
+                      onTap: () {
+                        setState(() {
+                          _isPhoneEditable = !_isPhoneEditable;
+                        });
+                      },
                     ),
+                    sizeBoxH15(),
                     // DOB
-                    Row(
-                      children: const [
-                        Padding(
-                          padding: EdgeInsets.only(left: 25.0, bottom: 10),
-                          child: Text(
-                            "Date Of Birth ",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 15),
-                          ),
-                        )
-                      ],
-                    ),
+                    profileSubText("Date Of Birth"),
                     // DOB TEXT FIELD
-                    Stack(alignment: Alignment.bottomRight, children: [
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        child: TextFormField(
-                            enabled: _isDobEditable,
-                            controller: dobController,
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(12.0)),
-                                borderSide: BorderSide(
-                                    color: Colors.blueGrey, width: 2),
-                              ),
-                              suffixIconColor: Colors.grey,
-                              errorStyle: TextStyle(color: Colors.red),
-                              hintStyle: TextStyle(color: Colors.grey),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(12.0)),
-                                borderSide:
-                                    BorderSide(color: Colors.grey, width: 2),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10.0)),
-                                borderSide: BorderSide(color: Colors.blueGrey),
-                              ),
-                            )),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _isDobEditable = !_isDobEditable;
-                          });
-                        },
-                        icon: _isDobEditable
-                            ? const Icon(Icons.done_sharp)
-                            : const Icon(Icons.edit),
-                      ),
-                    ]),
-                    const SizedBox(
-                      height: 20,
+                    ProfileTextField(
+                      isEnable: _isDobEditable,
+                      textEditingController: dobController,
+                      onTap: () {
+                        setState(() {
+                          _isDobEditable = !_isDobEditable;
+                        });
+                      },
                     ),
+
+                   sizeBoxH15(),
+                    sizeBoxH20(),
                     AlertBoxReuse(
-                        leaveOnTap: () {
-                          authService.signOut();
-                          Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginPage()),
-                              (route) => false);
-                        },
-                        titleText: "Log Out",
-                        subTitleText: "Are you sure you want Logout ?",
-                        leaveTitleText: "Leave",
-                        cancelTitleText: "Cancel",
-                        cancelOnTap: () {
-                          Navigator.pop(context);
-                        }, ),
+                      leaveOnTap: () {
+                        authService.signOut();
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LoginPage()),
+                            (route) => false);
+                      },
+                      titleText: "Log Out",
+                      subTitleText: "Are you sure you want Logout ?",
+                      leaveTitleText: "Leave",
+                      cancelTitleText: "Cancel",
+                      cancelOnTap: () {
+                        Navigator.pop(context);
+                      },
+                    ),
                   ],
                 );
               },
@@ -445,6 +197,71 @@ class _ProfileState extends State<Profile> {
           ),
         ),
       ),
+    );
+  }
+  // PROFILE PIC EXTRACT AS A METHOD
+  Stack _buildProfilePic(ProfileController provider, BuildContext context) {
+    return Stack(
+      alignment: Alignment.bottomRight,
+      children: [
+        Container(
+          height: 150,
+          width: 150,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.black),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(100),
+            child: provider.image == null
+                ? (widget.profilePicTest ?? "").isEmpty
+                    ? const Icon(
+                        Icons.person,
+                        size: 120,
+                      )
+                    : Image.network(
+                        height: 120,
+                        width: 120,
+                        widget.profilePicTest ?? "",
+                        fit: BoxFit.cover,
+                        loadingBuilder: (BuildContext context, Widget child,
+                            ImageChunkEvent? loadingProgress) {
+                          if (loadingProgress == null) {
+                            return child;
+                          }
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          );
+                        },
+                      )
+                : Stack(children: [
+                    Image.file(
+                      File(provider.image!.path).absolute,
+                      fit: BoxFit.cover,
+                    ),
+                  ]),
+          ),
+        ),
+        GestureDetector(
+          onTap: () {
+            provider.pickImage(context);
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 0),
+            child: Container(
+                height: 30,
+                width: 30,
+                decoration: const BoxDecoration(
+                    color: Colors.blue, shape: BoxShape.circle),
+                child: const Icon(Icons.edit)),
+          ),
+        )
+      ],
     );
   }
 

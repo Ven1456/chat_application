@@ -17,12 +17,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final formKey = GlobalKey<FormState>();
   AuthService authService = AuthService();
   String email = "";
-  String imagePath =
-      "https://img.freepik.com/free-vector/secure-login-concept-illustration_114360-4685.jpg?w=740&t=st=1681119046~exp=1681119646~hmac=30b8f90d889d274933a6493c9dfe8a01fedb390b4891e2b32c1d7e4769f6ab22";
-
   bool _isLoading = false;
   bool isEmail = true;
   bool isButton = false;
+  bool isCenter = false;
 
   Timer? _timer;
   int _start = 180;
@@ -64,85 +62,87 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:HexColor.fromHex('#FFFFFF'),
+      backgroundColor: HexColor.fromHex('#FFFFFF'),
       // APP BAR
       appBar: _buildAppBar(),
-      body: _isLoading
-          ?
-          // LOADING ANIMATION
-          _buildLoadingAnimation()
-          : Form(
-              key: formKey,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // IMAGE
-                    _buildImage(),
-                    const SizedBox(
-                      height: 50,
-                    ),
-                    SizedBox(
-                      width: 320,
+      body:  Stack(
+        children: [
+          Form(
+            key: formKey,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  sizeBoxH80(),
+                  // IMAGE
+                  imageBuild("assets/images/forgot.jpg", 200),
+                 sizeBoxH100(),
+
+                  SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.85,
                       child: isButton
                           ? Container()
                           :
-                          // EMAIL  TEXT FIELD
-                          _buildEmailTextFormField(),
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    isButton
-                        ? Container()
-                        :
-                        // SEND REQUEST BUTTON
-                        _buildSendRequestButton(),
-                    isButton
-                        ? Column(
-                            children: [
-                              // TIMER ICON
-                              _buildTimerIcon(),
-                              // TIMER START ICON
-                              _buildTimeStartText(),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              // DESCRIPTION TEXT
-                              _buildDescriptionText(),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              // CLOSE ICON
-                              _buildCloseButton(context),
-                            ],
-                          )
-                        : Container()
-                  ],
-                ),
+                      // EMAIL  TEXT FIELD
+                      ReusableTextField(
+                        width: MediaQuery.of(context).size.width * 0.85,
+                        obSecureText: false,
+                        labelText: "Enter Your Email",
+                        prefixIcon: Icon(Icons.email),
+                        onChanged: (val) {
+                          setState(() {
+                            email = val;
+                          });
+                        },
+                        validator: (val) {
+                          return RegExp(
+                              r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
+                              .hasMatch(val!)
+                              ? null
+                              : "Please Enter Correct Email";
+                        },
+                      )),
+                 sizeBoxH15(),
+                  isButton
+                      ? Container()
+                      :
+                  // SEND REQUEST BUTTON
+                  reusableButton(40, 180, () {
+                    forgot();
+                  }, "Send Request"),
+                  isButton
+                      ? Column(
+                    children: [
+                      // TIMER ICON
+                      _buildTimerIcon(),
+                      // TIMER START ICON
+                      _buildTimeStartText(),
+                      sizeBoxH10(),
+                      // DESCRIPTION TEXT
+                      semiBoldSubTitleText(
+                        "                   Please Check Your Email "
+                            "\n If Link is Not Their Please Check Spam Box"
+                            "\n            Set Must 6 Character Password",
+                      ),
+                      sizeBoxH10(),
+                      // CLOSE ICON
+                      reusableButton(40, 100, () {
+                        Navigator.pop(context);
+                      }, "Close"),
+                    ],
+                  )
+                      : Container()
+                ],
               ),
             ),
+          ),
+          if(_isLoading)
+            _buildLoadingAnimation()
+        ],
+      ),
     );
   }
 
-  // CLOSE BUTTON EXTRACT AS A METHOD
-  ElevatedButton _buildCloseButton(BuildContext context) {
-    return ElevatedButton(
-        onPressed: () {
-          Navigator.pop(context);
-        },
-        child: const Text("Close"));
-  }
-
-  // DESCRIPTION TEXT  EXTRACT AS A METHOD
-  Text _buildDescriptionText() {
-    return const Text(
-      "                   Please Check Your Email "
-      "\n If Link is Not Their Please Check Spam Box"
-      "\n            Set Must 6 Character Password",
-      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-    );
-  }
 
   // TIMER START TEXT  EXTRACT AS A METHOD
   Text _buildTimeStartText() {
@@ -161,57 +161,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     ));
   }
 
-  // SEND REQUEST BUTTON  EXTRACT AS A METHOD
-  ElevatedButton _buildSendRequestButton() {
-    return ElevatedButton(
-        style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(21))),
-        onPressed: () {
-          forgot();
-        },
-        child: const Text("Send Request"));
-  }
-
-  // EMAIL  TEXT FIELD  EXTRACT AS A METHOD
-  TextFormField _buildEmailTextFormField() {
-    return TextFormField(
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      onChanged: (val) {
-        setState(() {
-          email = val;
-        });
-      },
-      validator: (val) {
-        return RegExp(
-                    r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
-                .hasMatch(val!)
-            ? null
-            : "Please Enter Correct Email";
-      },
-      decoration: textInputDecoration.copyWith(
-          labelText: "Enter Your Email", prefixIcon: const Icon(Icons.email)),
-    );
-  }
-
-  // IMAGE EXTRACT AS A METHOD
-  ClipRRect _buildImage() {
-    return ClipRRect(
-        borderRadius: BorderRadius.circular(250),
-        child: Image.asset(
-          "assets/images/reset.jpg",
-          height: 200,
-        ));
-  }
-
   // LOADING ANIMATION   EXTRACT AS A METHOD
-  Center _buildLoadingAnimation() {
-    return Center(
-        child: SizedBox(
-            height: 150,
-            width: 100,
-            child: Lottie.network(
-                "https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")));
+  Container _buildLoadingAnimation() {
+    return Container(
+        color: Colors.black.withOpacity(0.1),
+        child: Center(
+          child: Lottie.network(
+              "https://assets4.lottiefiles.com/private_files/lf30_fjjj1m44.json", height: 180),
+        ));
   }
 
   // APP BAR  EXTRACT AS A METHOD

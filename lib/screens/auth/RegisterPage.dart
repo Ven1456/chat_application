@@ -41,196 +41,186 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: HexColor.fromHex('#FFFFFF'),
-      body: _isLoading
-          ? Center(
-              child: SizedBox(
-                  height: 150,
-                  width: 100,
-                  child: Lottie.network(
-                      "https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")))
-          : SingleChildScrollView(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 65.0),
-                  child: Form(
-                    key: registerFormKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        //CHAT TEXT
-                        boldTitleText("Chats"),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        // REGISTER TEXT
-                        semiBoldSubTitleText(
-                            "Register Now To See What Their Are Talking "),
-                        // REGISTER IMAGE
-                        imageBuild("assets/images/register.jpg"),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        // FULL NAME TEXT FIELD
-                        ReusableTextField(
-                          obSecureText: false,
-                          width: MediaQuery.of(context).size.width * 0.85,
-                          labelText: "Full Name",
-                          onChanged: (val) {
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 65.0),
+                child: Form(
+                  key: registerFormKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      //CHAT TEXT
+                      boldTitleText("Chats"),
+                      sizeBoxH10(),
+                      // REGISTER TEXT
+                      semiBoldSubTitleText(
+                          "Register Now To See What Their Are Talking "),
+                      // REGISTER IMAGE
+                      imageBuild("assets/images/register.jpg", 180),
+                      sizeBoxH15(),
+                      // FULL NAME TEXT FIELD
+                      ReusableTextField(
+                        obSecureText: false,
+                        width: MediaQuery.of(context).size.width * 0.85,
+                        labelText: "Full Name",
+                        onChanged: (val) {
+                          setState(() {
+                            fullName = val;
+                          });
+                        },
+                        validator: (val) {
+                          if (val!.isNotEmpty && val.length > 2) {
+                            return null;
+                          } else {
+                            return "Please Enter Your Full Name ";
+                          }
+                        },
+                        prefixIcon: const Icon(Icons.account_circle),
+                      ),
+                      sizeBoxH15(),
+                      // EMAIL TEXT FIELD
+                      ReusableTextField(
+                        obSecureText: false,
+                        width: MediaQuery.of(context).size.width * 0.85,
+                        labelText: "Email",
+                        onChanged: (val) {
+                          setState(() {
+                            email = val;
+                          });
+                        },
+                        validator: (val) {
+                          return RegExp(
+                                      r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
+                                  .hasMatch(val!)
+                              ? null
+                              : "Please Enter Correct Email";
+                        },
+                        prefixIcon: const Icon(Icons.email),
+                      ),
+                      // _buildEmailTextField(),
+                      sizeBoxH15(),
+                      // PASSWORD TEXT FIELD
+                      ReusableTextField(
+                        obSecureText: !_passwordVisible,
+                        width: MediaQuery.of(context).size.width * 0.85,
+                        labelText: "Password",
+                        suffixIcon: InkWell(
+                          onTap: () {
                             setState(() {
-                              fullName = val;
+                              _passwordVisible = !_passwordVisible;
                             });
                           },
-                          validator: (val) {
-                            if (val!.isNotEmpty && val.length > 2) {
-                              return null;
-                            } else {
-                              return "Please Enter Your Full Name ";
+                          child: Icon(
+                            _passwordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        onChanged: (val) {
+                          setState(() {
+                            password = val;
+                          });
+                        },
+                        validator: (val) {
+                          return val!.length < 6
+                              ? "Please Enter At 6 Characters"
+                              : null;
+                        },
+                        prefixIcon: const Icon(Icons.security),
+                      ),
+                      sizeBoxH15(),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.85,
+                        child: TextFormField(
+                          onTap: () async {
+                            DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now()
+                                    .subtract(Duration(days: 2555)),
+                                firstDate: DateTime(1900),
+                                lastDate: DateTime(2017));
+
+                            if (pickedDate != null) {
+                              String formattedDate =
+                                  DateFormat('dd-MM-yyyy').format(pickedDate);
+                              setState(() {
+                                dateinput.text = formattedDate;
+                                dob =
+                                    formattedDate; //set output date to TextField value.
+                              });
                             }
                           },
-                          prefixIcon: const Icon(Icons.account_circle),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        // EMAIL TEXT FIELD
-                        ReusableTextField(
-                          obSecureText: false,
-                          width: MediaQuery.of(context).size.width * 0.85,
-                          labelText: "Email",
-                          onChanged: (val) {
-                            setState(() {
-                              email = val;
-                            });
-                          },
-                          validator: (val) {
-                            return RegExp(
-                                        r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
-                                    .hasMatch(val!)
-                                ? null
-                                : "Please Enter Correct Email";
-                          },
-                          prefixIcon: const Icon(Icons.email),
-                        ),
-                        // _buildEmailTextField(),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        // PASSWORD TEXT FIELD
-                        ReusableTextField(
-                          obSecureText: !_passwordVisible,
-                          width: MediaQuery.of(context).size.width * 0.85,
-                          labelText: "Password",
-                          suffixIcon: InkWell(
-                            onTap: () {
-                              setState(() {
-                                _passwordVisible = !_passwordVisible;
-                              });
-                            },
-                            child: Icon(
-                              _passwordVisible
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                              color: Colors.grey,
-                            ),
+                          readOnly: true,
+                          controller: dateinput,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          decoration: textInputDecoration.copyWith(
+                            labelText: "Date Of Birth",
+                            prefixIcon: const Icon(Icons.calendar_month),
                           ),
-                          onChanged: (val) {
-                            setState(() {
-                              password = val;
-                            });
-                          },
                           validator: (val) {
-                            return val!.length < 6
-                                ? "Please Enter At 6 Characters"
+                            return val!.isEmpty
+                                ? "Please Enter Your Date Of Birth"
                                 : null;
                           },
-                          prefixIcon: const Icon(Icons.security),
                         ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.85,
-                          child: TextFormField(
-                            onTap: () async {
-                              DateTime? pickedDate = await showDatePicker(
-                                  context: context,
-                                  initialDate: DateTime.now().subtract(Duration(days: 2555)),
-                                  firstDate: DateTime(1900),
-                                  lastDate: DateTime(2017));
-
-                              if (pickedDate != null) {
-                                String formattedDate =
-                                DateFormat('dd-MM-yyyy').format(pickedDate);
-                                setState(() {
-                                  dateinput.text = formattedDate;
-                                  dob =
-                                      formattedDate; //set output date to TextField value.
-                                });
-                              }
-                            },
-                            readOnly: true,
-                            controller: dateinput,
-                            autovalidateMode:
-                            AutovalidateMode.onUserInteraction,
-                            decoration: textInputDecoration.copyWith(
-                              labelText: "Date Of Birth",
-                              prefixIcon: const Icon(Icons.calendar_month),
-                            ),
-                            validator: (val) {
-                              return val!.isEmpty
-                                  ? "Please Enter Your Date Of Birth"
-                                  : null;
-                            },
+                      ),
+                      sizeBoxH15(),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.85,
+                        child: IntlPhoneField(
+                          keyboardType: TextInputType.phone,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          decoration: textInputDecoration.copyWith(
+                            labelText: "Phone Number",
+                            prefixIcon: const Icon(Icons.phone),
                           ),
+                          initialCountryCode: 'IN',
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          onChanged: (phone) {
+                            setState(() {
+                              phoneNumber = phone.completeNumber;
+                            });
+                          },
                         ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.85,
-                          child: IntlPhoneField(
-                            keyboardType: TextInputType.phone,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
-                            ],
-                            decoration: textInputDecoration.copyWith(
-                                    labelText: "Phone Number",
-                                    prefixIcon: const Icon(Icons.phone),
-                                  ),
-                            initialCountryCode: 'IN',
-                            autovalidateMode:AutovalidateMode.onUserInteraction,
-                            onChanged: (phone) {
-                              setState(() {
-                                phoneNumber = phone.completeNumber;
-                              });
-                            },
-                          ),
-                        ),
+                      ),
 
+                      sizeBoxH15(),
 
-                        const SizedBox(
-                          height: 15,
-                        ),
-
-                        // REGISTER BUTTON
-                        reusableButton(
-                            50, MediaQuery.of(context).size.width * 0.85, () {
-                          register();
-                        }, "Register Now "),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        // ALREADY HAVE AN ACCOUNT AND LOGIN TEXT
-                        richTextSpan("Already have An Account? ", "Login Now ",
-                            () {
-                          nextPage(context, const LoginPage());
-                        })
-                      ],
-                    ),
+                      // REGISTER BUTTON
+                      reusableButton(
+                          50, MediaQuery.of(context).size.width * 0.85, () {
+                        register();
+                      }, "Register Now "),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      // ALREADY HAVE AN ACCOUNT AND LOGIN TEXT
+                      richTextSpan("Already have an Account? ", "Login Now ",
+                          () {
+                        nextPage(context, const LoginPage());
+                      })
+                    ],
                   ),
                 ),
               ),
             ),
+          ),
+          if (_isLoading)
+            Container(
+                color: Colors.black.withOpacity(0.1),
+                child: Center(
+                  child: Lottie.network(
+                      "https://assets4.lottiefiles.com/private_files/lf30_fjjj1m44.json",
+                      height: 180),
+                )),
+        ],
+      ),
     );
   }
 

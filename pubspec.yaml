@@ -49,6 +49,7 @@ dependencies:
   persistent_bottom_nav_bar: ^5.0.2
   intl_phone_field: ^3.1.0
   introduction_screen: ^3.1.1
+  quickalert: ^1.0.1
   string_extensions: ^0.5.0
   emoji_picker_flutter: ^1.5.4
   intl: ^0.17.0

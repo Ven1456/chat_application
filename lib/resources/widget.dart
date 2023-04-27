@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lottie/lottie.dart';
 
 // TEXT INPUT DECORATION
 const textInputDecoration = InputDecoration(
@@ -275,6 +276,56 @@ class IconButtonAlertReuse extends StatelessWidget {
   }
 }
 
+Future<void> alertBoxReuse(BuildContext context,VoidCallback cancelOnTap,VoidCallback leaveOnTap,String titleText,String subTitleText,String leaveTitleText,String cancelTitleText)async{
+  return  showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            titleText,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Text(
+            subTitleText,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(21))),
+                onPressed: cancelOnTap,
+                child: Text(
+                  cancelTitleText,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                )),
+            ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(21))),
+                onPressed: leaveOnTap,
+                child: Text(
+                  leaveTitleText,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                )),
+          ],
+        );
+      });
+}
+
 reusableButton(double height, double width, VoidCallback onTap, String text) {
   return SizedBox(
     height: height,
@@ -413,15 +464,21 @@ profileSubText(String text) {
 class ProfileTextField extends StatefulWidget {
   final TextEditingController? textEditingController;
   final VoidCallback? onTap;
+  final TextInputType? textInputType;
+  final List<TextInputFormatter>? textInputFormatter;
   final Widget? icon;
   final bool? isEnable;
+  final Function(String)? onChanged;
+  final String? Function(String?)? validator;
 
   const ProfileTextField(
       {Key? key,
       this.textEditingController,
       this.onTap,
       this.icon,
-      this.isEnable})
+      this.isEnable,
+        this.onChanged, this.textInputType, this.textInputFormatter, this.validator,
+      })
       : super(key: key);
 
   @override
@@ -435,7 +492,12 @@ class _ProfileTextFieldState extends State<ProfileTextField> {
       SizedBox(
         width: MediaQuery.of(context).size.width * 0.85,
         child: TextFormField(
+          onChanged: widget.onChanged,
             enabled: widget.isEnable,
+            onTap: widget.onTap,
+            validator:widget.validator,
+            inputFormatters: widget.textInputFormatter,
+            keyboardType: widget.textInputType,
             controller: widget.textEditingController,
             decoration: const InputDecoration(
               suffixIconColor: Colors.grey,
@@ -456,13 +518,22 @@ class _ProfileTextFieldState extends State<ProfileTextField> {
             )),
       ),
       IconButton(
-        onPressed: widget.onTap!,
+        onPressed: widget.onTap,
         icon: widget.isEnable!
             ?  const Icon(Icons.done_sharp)
             :  const Icon(Icons.edit),
       ),
     ]);
   }
+}
+//
+loadingAnimation(){
+  return  Container(
+      color: Colors.black.withOpacity(0.1),
+      child: Center(
+        child: Lottie.network(
+            "https://assets4.lottiefiles.com/private_files/lf30_fjjj1m44.json", height: 180),
+      ));
 }
 sizeBoxH15(){
   return const SizedBox(

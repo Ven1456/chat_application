@@ -149,8 +149,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   DateFormat('dd-MM-yyyy').format(pickedDate);
                               setState(() {
                                 dateinput.text = formattedDate;
-                                dob =
-                                    formattedDate; //set output date to TextField value.
+                                dob = formattedDate; //set output date to TextField value.
                               });
                             }
                           },
@@ -184,7 +183,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           onChanged: (phone) {
                             setState(() {
-                              phoneNumber = phone.completeNumber;
+                              phoneNumber = phone.number;
                             });
                           },
                         ),
@@ -212,13 +211,7 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
           ),
           if (_isLoading)
-            Container(
-                color: Colors.black.withOpacity(0.1),
-                child: Center(
-                  child: Lottie.network(
-                      "https://assets4.lottiefiles.com/private_files/lf30_fjjj1m44.json",
-                      height: 180),
-                )),
+          loadingAnimation()
         ],
       ),
     );

@@ -58,7 +58,7 @@ class _BottomSheetTestState extends State<BottomSheetTest> {
   getProfile() async {
     await SharedPref.getName().then((value) {
       setState(() {
-        userName = value ?? "";
+         userName = value ?? "";
       });
     });
     await SharedPref.getEmail().then((value) {

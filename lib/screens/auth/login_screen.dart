@@ -133,21 +133,12 @@ class _LoginPageState extends State<LoginPage> {
         ),
           ),
           if(_isLoading)
-            _buildLoadingAnimation()
+            loadingAnimation()
         ],
       ),
     );
   }
 
-  // LOADING ANIMATION  EXTRACT AS A METHOD
-  Container _buildLoadingAnimation() {
-    return  Container(
-        color: Colors.black.withOpacity(0.1),
-        child: Center(
-          child: Lottie.network(
-              "https://assets4.lottiefiles.com/private_files/lf30_fjjj1m44.json", height: 180),
-        ));
-  }
 
   login() async {
     if (formKey.currentState!.validate()) {

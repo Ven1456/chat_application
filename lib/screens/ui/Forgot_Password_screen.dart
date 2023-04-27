@@ -139,7 +139,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
           ),
           if(_isLoading)
-            _buildLoadingAnimation()
+        loadingAnimation()
         ],
       ),
     );
@@ -161,16 +161,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       Icons.timer,
       size: 150,
     ));
-  }
-
-  // LOADING ANIMATION   EXTRACT AS A METHOD
-  Container _buildLoadingAnimation() {
-    return Container(
-        color: Colors.black.withOpacity(0.1),
-        child: Center(
-          child: Lottie.network(
-              "https://assets4.lottiefiles.com/private_files/lf30_fjjj1m44.json", height: 180),
-        ));
   }
 
   // APP BAR  EXTRACT AS A METHOD

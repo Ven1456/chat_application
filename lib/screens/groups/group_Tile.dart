@@ -1,6 +1,6 @@
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/widget.dart';
-import 'package:chat/screens/ui/chat_page.dart';
+import 'package:chat/screens/chat/chat_page.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

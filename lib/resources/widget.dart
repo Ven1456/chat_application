@@ -100,6 +100,23 @@ extension HexColor on Color {
       '${green.toRadixString(16).padLeft(2, '0')}'
       '${blue.toRadixString(16).padLeft(2, '0')}';
 }
+// APP BAR
+appBar(String titleText, BuildContext context){
+  return AppBar(
+    elevation: 0,
+    backgroundColor: Colors.white,
+    title:  Text(
+      titleText,
+      style: const TextStyle(
+          fontWeight: FontWeight.bold, fontSize: 25, color: Colors.black),
+    ),
+    leading: GestureDetector(
+        onTap: ()=> Navigator.pop(context),
+        child: Icon(Icons.arrow_back_ios,color: Colors.black,)),
+    centerTitle: true,
+  );
+}
+
 
 class AlertBoxReuse extends StatelessWidget {
   final String titleText;
@@ -468,6 +485,7 @@ class ProfileTextField extends StatefulWidget {
   final List<TextInputFormatter>? textInputFormatter;
   final Widget? icon;
   final bool? isEnable;
+  final Color? iconColor;
   final Function(String)? onChanged;
   final String? Function(String?)? validator;
 
@@ -477,7 +495,7 @@ class ProfileTextField extends StatefulWidget {
       this.onTap,
       this.icon,
       this.isEnable,
-        this.onChanged, this.textInputType, this.textInputFormatter, this.validator,
+        this.onChanged, this.textInputType, this.textInputFormatter, this.validator, this.iconColor,
       })
       : super(key: key);
 
@@ -515,13 +533,15 @@ class _ProfileTextFieldState extends State<ProfileTextField> {
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
                 borderSide: BorderSide(color: Colors.blueGrey),
               ),
-            )),
+            )
+        ),
       ),
       IconButton(
         onPressed: widget.onTap,
         icon: widget.isEnable!
             ?  const Icon(Icons.done_sharp)
             :  const Icon(Icons.edit),
+        color: widget.iconColor,
       ),
     ]);
   }

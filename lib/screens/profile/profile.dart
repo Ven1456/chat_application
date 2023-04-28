@@ -3,8 +3,8 @@
 import 'dart:io';
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
-import 'package:chat/screens/auth/login_screen.dart';
-import 'package:chat/screens/ui/EditProfile.dart';
+import 'package:chat/screens/auth/login/login_screen.dart';
+import 'package:chat/screens/profile/EditProfile.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

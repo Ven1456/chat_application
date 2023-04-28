@@ -1,4 +1,5 @@
-import 'package:chat/screens/ui/homeScreen.dart';
+
+import 'package:chat/screens/homeScreen/homeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 

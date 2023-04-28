@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:chat/screens/auth/login_screen.dart';
-import 'package:chat/screens/ui/BottomSheet.dart';
+import 'package:chat/screens/auth/login/login_screen.dart';
+import 'package:chat/screens/bottomSheet/BottomSheet.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 

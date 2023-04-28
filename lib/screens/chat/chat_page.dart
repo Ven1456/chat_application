@@ -3,14 +3,16 @@ import 'dart:io';
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
-import 'package:chat/screens/ui/group_info.dart';
-import 'package:chat/screens/ui/message_tlle.dart';
+import 'package:chat/screens/chat/message_tlle.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import '../groups/group_info.dart';
+
 
 // ignore: must_be_immutable
 class ChatPage extends StatefulWidget {

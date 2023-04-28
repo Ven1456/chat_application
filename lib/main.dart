@@ -1,7 +1,6 @@
 import 'dart:async';
-
 import 'package:chat/resources/Constants.dart';
-import 'package:chat/screens/ui/splash_screen.dart';
+import 'package:chat/screens/spalshScreen/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

@@ -19,6 +19,7 @@ class DatabaseServices {
       "email": email,
       "phone":phone,
       "dob":dob,
+      "gender":"",
       "groups": [],
       "profilePic": "",
       "uid": uid,

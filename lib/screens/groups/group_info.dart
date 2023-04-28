@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
-import 'package:chat/screens/ui/homeScreen.dart';
+import 'package:chat/screens/homeScreen/homeScreen.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

@@ -1,9 +1,9 @@
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/widget.dart';
-import 'package:chat/screens/auth/login_screen.dart';
-import 'package:chat/screens/ui/BottomSheet.dart';
-import 'package:chat/screens/ui/homeScreen.dart';
+import 'package:chat/screens/auth/login/login_screen.dart';
+import 'package:chat/screens/bottomSheet/BottomSheet.dart';
 import 'package:chat/services/auth_service.dart';
+import 'package:chat/utils/CustomValidators.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -71,13 +71,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             fullName = val;
                           });
                         },
-                        validator: (val) {
-                          if (val!.isNotEmpty && val.length > 2) {
-                            return null;
-                          } else {
-                            return "Please Enter Your Full Name ";
-                          }
-                        },
+                        validator:(val)=> CustomValidators.fullName(val),
                         prefixIcon: const Icon(Icons.account_circle),
                       ),
                       sizeBoxH15(),
@@ -91,13 +85,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             email = val;
                           });
                         },
-                        validator: (val) {
-                          return RegExp(
-                                      r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
-                                  .hasMatch(val!)
-                              ? null
-                              : "Please Enter Correct Email";
-                        },
+                        validator:(val)=> CustomValidators.email(val),
                         prefixIcon: const Icon(Icons.email),
                       ),
                       // _buildEmailTextField(),
@@ -125,11 +113,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             password = val;
                           });
                         },
-                        validator: (val) {
-                          return val!.length < 6
-                              ? "Please Enter At 6 Characters"
-                              : null;
-                        },
+                        validator:(val)=> CustomValidators.password(val),
                         prefixIcon: const Icon(Icons.security),
                       ),
                       sizeBoxH15(),
@@ -160,11 +144,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             labelText: "Date Of Birth",
                             prefixIcon: const Icon(Icons.calendar_month),
                           ),
-                          validator: (val) {
-                            return val!.isEmpty
-                                ? "Please Enter Your Date Of Birth"
-                                : null;
-                          },
+                          validator: (val)=> CustomValidators.dateOfBirth(val),
                         ),
                       ),
                       sizeBoxH15(),

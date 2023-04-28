@@ -1,13 +1,13 @@
 import 'package:chat/resources/Shared_Preferences.dart';
-import 'package:chat/screens/ui/homeScreen.dart';
-import 'package:chat/screens/ui/profile.dart';
-import 'package:chat/screens/ui/search_page.dart';
+import 'package:chat/screens/homeScreen/homeScreen.dart';
+import 'package:chat/screens/profile/profile.dart';
+import 'package:chat/screens/search/search_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../services/database_services.dart';
+import '../../../services/database_services.dart';
 
 class BottomSheetTest extends StatefulWidget {
   const BottomSheetTest({Key? key}) : super(key: key);

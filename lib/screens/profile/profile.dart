@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
+import 'package:chat/screens/auth/changePassword/change_password.dart';
 import 'package:chat/screens/auth/login/login_screen.dart';
 import 'package:chat/screens/profile/EditProfile.dart';
 import 'package:chat/services/auth_service.dart';
@@ -64,6 +65,7 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: appBar("Profile", context,false),
       body: SafeArea(
         child: SingleChildScrollView(
           child: ChangeNotifierProvider(
@@ -73,32 +75,6 @@ class _ProfileState extends State<Profile> {
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        const Text(
-                          "Profile",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 25),
-                        ),
-                        sizeBoxW118(),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              isDark = !isDark;
-                            });
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 25.0),
-                            child: Icon(
-                              isDark ? Icons.dark_mode : Icons.sunny,
-                              size: 35,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
                     sizeBoxH25(),
                     _buildProfilePic(provider, context),
                     const SizedBox(
@@ -108,53 +84,57 @@ class _ProfileState extends State<Profile> {
                     sizeBoxH10(),
                     _buildEditProfileContainer(),
                     sizeBoxH25(),
-                    ListTile(
-                      title: Text("Edit Profile"),
-                      trailing: Icon(Icons.arrow_forward_ios_sharp),
-                      onTap: () {
-                        nextPage(
-                            context,
-                            EditProfile(
-                              username: widget.username!,
-                              email: widget.email!,
-                              phone: widget.phone!,
-                              dob: widget.dob!,
-                              profilePic: widget.profilePicTest!,
-                            ));
-                      },
-                    ),
-                    ListTile(
-                      title: Text("Change Password"),
-                      trailing: Icon(Icons.arrow_forward_ios_sharp),
-                      onTap: () {},
-                    ),
-                    ListTile(
-                      title: Text("Logout"),
-                      trailing: Icon(Icons.arrow_forward_ios_sharp),
-                      onTap: () {
-                        alertBoxReuse(context,
-                                // CANCEL BUTTON
-                                () {
-                          Navigator.pop(context);
-                        },
-                            // LEAVE
-                                () {
-                          authService.signOut();
-                          Navigator.pushAndRemoveUntil(
+                    Card(
+                      child: ListTile(
+                        title: const Text("Edit Profile"),
+                        trailing: const Icon(Icons.arrow_forward_ios_sharp),
+                        onTap: () {
+                          nextPage(
                               context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginPage()),
-                              (route) => false);
-                        }, "Log Out", "Are you sure you want Logout ?", "Leave",
-                            "Cancel");
-
-                      },
+                              EditProfile(
+                                username: widget.username!,
+                                email: widget.email!,
+                                phone: widget.phone!,
+                                dob: widget.dob!,
+                                profilePic: widget.profilePicTest!,
+                              ));
+                        },
+                      ),
                     ),
+                    Card(
+                      child: ListTile(
+                        title: const Text("Change Password"),
+                        trailing: const Icon(Icons.arrow_forward_ios_sharp),
+                        onTap: () {
+                          nextPage(context,  const ChangePasswordScreen());
+                        },
+                      ),
+                    ),
+                    Card(
+                      child: ListTile(
+                        title: const Text("Logout"),
+                        trailing: const Icon(Icons.arrow_forward_ios_sharp),
+                        onTap: () {
+                          alertBoxReuse(context,
+                                  // CANCEL BUTTON
+                                  () {
+                            Navigator.pop(context);
+                          },
+                              // LEAVE
+                                  () {
+                            authService.signOut();
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const LoginPage()),
+                                (route) => false);
+                          }, "Log Out", "Are you sure you want Logout ?", "Leave",
+                              "Cancel");
 
+                        },
+                      ),
+                    ),
                     sizeBoxH60(), // USERNAME
-
-                    sizeBoxH15(),
-                    sizeBoxH20(),
                   ],
                 );
               },
@@ -236,7 +216,7 @@ class _ProfileState extends State<Profile> {
       child: Center(
         child: Text(
           widget.username!,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 18,
             color: Colors.black,

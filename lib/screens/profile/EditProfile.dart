@@ -104,7 +104,7 @@ class _EditProfileState extends State<EditProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar("Edit Profile",context),
+      appBar: appBar("Edit Profile",context,true),
       body: Form(
         key: editProfileKey,
         child: SingleChildScrollView(

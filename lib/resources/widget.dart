@@ -101,18 +101,19 @@ extension HexColor on Color {
       '${blue.toRadixString(16).padLeft(2, '0')}';
 }
 // APP BAR
-appBar(String titleText, BuildContext context){
+appBar(String titleText, BuildContext context, bool isBack){
   return AppBar(
     elevation: 0,
+
     backgroundColor: Colors.white,
     title:  Text(
       titleText,
       style: const TextStyle(
           fontWeight: FontWeight.bold, fontSize: 25, color: Colors.black),
     ),
-    leading: GestureDetector(
+    leading: isBack ?  GestureDetector(
         onTap: ()=> Navigator.pop(context),
-        child: Icon(Icons.arrow_back_ios,color: Colors.black,)),
+        child: Icon(Icons.arrow_back_ios,color: Colors.black,)) : null,
     centerTitle: true,
   );
 }

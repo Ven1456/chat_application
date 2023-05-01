@@ -94,9 +94,7 @@ class _MessageTileState extends State<MessageTile> {
                           borderRadius: BorderRadius.circular(100),
                           child: (widget.userProfile ?? '').isEmpty
                               ? Center(
-                                  child: Text(
-                                    "fg",
-                                    // widget.sender.substring(0, 2).toUpperCase(),
+                                  child: Text(widget.sender.substring(0, 2).toUpperCase(),
                                     style: TextStyle(
                                       fontSize: isSmallScreen ? 12 : 18,
                                       fontWeight: FontWeight.bold,
@@ -127,14 +125,21 @@ class _MessageTileState extends State<MessageTile> {
                           : MainAxisAlignment.start,
                       children: [
                         widget.sendByMe
-                            ? Text(
-                                getDateForChat(widget.time),
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.black,
+                            ? Padding(
+                          padding: const EdgeInsets.only(left: 12.0),
+                              child: Text(
+                                  getDateForChat(widget.time),
+                                  style:  TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black.withOpacity(0.6),
+                                  ),
                                 ),
-                              )
+                            )
                             : const SizedBox(),
+                        widget.sendByMe
+                            ? const  Spacer()
+                            :const SizedBox(),
+
                         Container(
                           constraints: BoxConstraints(
                             maxWidth: maxWidth,
@@ -144,7 +149,7 @@ class _MessageTileState extends State<MessageTile> {
                             horizontal: 12.0,
                           ),
                           margin: const EdgeInsets.symmetric(
-                            vertical: 4.0,
+                            vertical: 8.0,
                             horizontal: 8.0,
                           ),
                           decoration: widget.type.toString() == "text"
@@ -203,42 +208,30 @@ class _MessageTileState extends State<MessageTile> {
                                         fit: BoxFit.cover,
                                         imageErrorBuilder: (context, url, error) => Image.asset('assets/images/error.jpg', fit: BoxFit.cover),
                                       ),
-
-                                      // Image.network(
-                                      //   widget.message,
-                                      //   fit: BoxFit.cover,
-                                      //   loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                                      //     if (loadingProgress == null) {
-                                      //       return child;
-                                      //     }
-                                      //     return Center(
-                                      //       child: CircularProgressIndicator(
-                                      //         value: loadingProgress.expectedTotalBytes != null
-                                      //             ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                      //             : null,
-                                      //       ),
-                                      //     );
-                                      //   },
-                                      //   errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                                      //     return Image.asset('assets/images/chat.jpg', fit: BoxFit.cover);
-                                      //   },
-                                      // ),
                                     ),
                                   ],
                                 ),
                               const SizedBox(height: 4.0),
                             ],
                           ),
+
                         ),
                         widget.sendByMe
                             ? const SizedBox()
-                            : Text(
-                                getDateForChat(widget.time),
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.black,
+                            :const Spacer(),
+                        widget.sendByMe
+                            ? const SizedBox()
+                            : Padding(
+                          padding: const EdgeInsets.only(right: 12.0),
+                              child: Text(
+                                  getDateForChat(widget.time),
+                                  style:  TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black.withOpacity(0.6),
+                                  ),
                                 ),
-                              )
+                            ),
+
                       ],
                     ),
                   ],
@@ -270,7 +263,7 @@ class _MessageTileState extends State<MessageTile> {
                                                     widget.sender
                                                         .toUpperCase()
                                                         .substring(0, 2),
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                         color: Colors.black,
                                                         fontWeight:
                                                             FontWeight.bold),

@@ -40,6 +40,28 @@ class CustomValidators{
     return null;
   }
 
+  static String? validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Password is required';
+    }
+    if (value.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+    return null;
+  }
+
+  static String? validateConfirmPassword(String? value, String text) {
+    if (value == null || value.isEmpty) {
+      return 'Confirm password is required';
+    }
+    if (value != text.toString()) {
+      return 'Confirm Passwords do not match';
+    }
+    return null;
+  }
+
+
+
 
   static String? phone(String? value) {
     if (value == null || value.isEmpty || value.length != 10) {

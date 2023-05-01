@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -232,17 +233,12 @@ class ProfileController extends ChangeNotifier {
       await FirebaseFirestore.instance.collection('groups').doc(userId).update({
         'recentMessage': downloadUrl,
       });
-      DatabaseServices().getUserProfile(authService.firebaseAuth.currentUser!.uid).then((value) {
-        String  userProfile = value;
-         print("popopo:$userProfile");
-         notifyListeners();
-      });
-      DatabaseServices().getUserName(authService.firebaseAuth.currentUser!.uid).then((value) {
-        String userName = value;
-        print("popopo:$userName");
-        notifyListeners();
-
-      });
+      final user = FirebaseAuth.instance.currentUser!.uid;
+      final docSnapshot = await FirebaseFirestore.instance.collection("users").doc(user).get();
+      userName = docSnapshot.get("fullName");
+      notifyListeners();
+      userProfile = docSnapshot.get("profilePic");
+      notifyListeners();
       messageUrl = downloadUrl;
       Map<String, dynamic> chatMessag = {
         "message": messageUrl,

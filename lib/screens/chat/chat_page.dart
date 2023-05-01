@@ -250,7 +250,7 @@ class _ChatPageState extends State<ChatPage> {
               ProfileController().pickMessageImage(context);
             },
             icon: const Icon(
-              Icons.camera_alt,
+              Icons.photo,
               color: Colors.grey,
             ),
           ),
@@ -450,17 +450,11 @@ class _ChatPageState extends State<ChatPage> {
                                 ),
                               MessageTile(
                                 message: snapshot.data.docs[index]["message"],
-                                sendByMe: widget.username ==
-                                    snapshot.data.docs[index]["sender"],
+                                sendByMe: widget.username == snapshot.data.docs[index]["sender"],
                                 sender: snapshot.data.docs[index]["sender"],
-                                time: snapshot.data.docs[index]["time"]
-                                    .toString(),
-                                userProfile: snapshot.data.docs[index]
-                                    ["userProfile"],
-                                type:snapshot.data.docs[index]
-                                ["Type"] ,
-
-                                /*  groupPic: groupPicture = snapshot.data.docs[index]["groupPic"].toString(),*/
+                                time: snapshot.data.docs[index]["time"].toString(),
+                                userProfile: snapshot.data.docs[index]["userProfile"],
+                                type:snapshot.data.docs[index]["Type"] ,
                               ),
                             ],
                           );

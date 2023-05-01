@@ -8,10 +8,11 @@ class EditProfilePic extends StatelessWidget {
   const EditProfilePic({
     Key? key,
     required this.provider,
-    required this.profilePic,
+    required this.profilePic,  this.userName,
   }) : super(key: key);
   final ProfileController provider;
   final String profilePic;
+  final String? userName;
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -23,15 +24,23 @@ class EditProfilePic extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(color: Colors.black),
+              color: Colors.orange.shade400,
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(100),
             child: provider.image == null
                 ? (profilePic).isEmpty
-                ? const Icon(
-              Icons.person,
-              size: 120,
-            )
+                ? Center(
+                child: Text(
+                 userName!
+                      .toUpperCase()
+                      .substring(0, 2),
+                  style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 30,
+                      fontWeight:
+                      FontWeight.bold),
+                ))
                 : Image.network(
               height: 120,
               width: 120,

@@ -262,16 +262,12 @@ class _SearchState extends State<Search> {
         onTap: () async {
           await DatabaseServices(uid: user!.uid)
               .toggleGroupJoin(groupId, username, groupName);
-          setState(() {
-            isUserJoined;
-          });
-
           if (isUserJoined) {
             if (_isPressed) {
               return;
             }
             _isPressed = true;
-            Future.delayed(const Duration(seconds: 1), () {
+            Future.delayed(const Duration(seconds: 2), () {
               _isPressed = false;
             });
             ToastContext toastContext = ToastContext();
@@ -285,7 +281,6 @@ class _SearchState extends State<Search> {
               webShowClose: true,
               backgroundColor: Colors.green,
             );
-
             // ignore: use_build_context_synchronously
             nextPage(
                 context,
@@ -293,8 +288,10 @@ class _SearchState extends State<Search> {
                     username: username,
                     groupName: groupName,
                     groupId: groupId));
+
           } else {
             ToastContext toastContext = ToastContext();
+            // ignore: use_build_context_synchronously
             toastContext.init(context);
             Toast.show(
               "Left the  Group $groupName",

@@ -32,6 +32,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                sizeBoxH45(),
                 imageBuild("assets/images/reset.jpg", 220),
                 sizeBoxH25(),
                 boldTitleText("Reset Password"),

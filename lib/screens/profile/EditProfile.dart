@@ -119,6 +119,7 @@ class _EditProfileState extends State<EditProfile> {
                     EditProfilePic(
                       provider: provider,
                       profilePic: widget.profilePic ?? "",
+                      userName: widget.username,
                     ),
                     sizeBoxH25(),
                     profileSubText("Username"),
@@ -256,23 +257,6 @@ class _EditProfileState extends State<EditProfile> {
             hasChanges = true;
           });
         }
-
-  AppBar _buildAppBar() {
-    return AppBar(
-      elevation: 0,
-      title: const Text(
-        "Edit Profile",
-        style: TextStyle(
-            fontWeight: FontWeight.bold, fontSize: 25, color: Colors.black),
-      ),
-      leading: GestureDetector(
-          onTap: (){
-            Navigator.pop(context);
-          },
-          child: Icon(Icons.arrow_back_ios)),
-      centerTitle: true,
-    );
-  }
 
   Container _buildIsUpdatedButtonText() {
     return Container(

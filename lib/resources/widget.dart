@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:chat/screens/profile/components.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -104,8 +105,6 @@ extension HexColor on Color {
 appBar(String titleText, BuildContext context, bool isBack){
   return AppBar(
     elevation: 0,
-
-    backgroundColor: Colors.white,
     title:  Text(
       titleText,
       style: const TextStyle(
@@ -479,6 +478,7 @@ profileSubText(String text) {
   );
 }
 
+
 class ProfileTextField extends StatefulWidget {
   final TextEditingController? textEditingController;
   final VoidCallback? onTap;
@@ -561,6 +561,7 @@ sizeBoxH15(){
     height: 15,
   );
 }
+
 sizeBoxH20(){
   return const SizedBox(
     height: 20,

@@ -460,6 +460,7 @@ class _ChatPageState extends State<ChatPage> {
                           );
                         }),
                   ),
+                  sizeBoxH5(),
                 ],
               )
             : Container();

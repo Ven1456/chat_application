@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -26,6 +27,7 @@ class ProfileController extends ChangeNotifier {
   String url = "";
   String userName = "";
   String userProfile = "";
+  bool isUploading=false;
   // 21/04/23
   String messageUrl ="";
   firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instanceFor(bucket: 'gs://chatapp-4f907.appspot.com');
@@ -215,13 +217,14 @@ class ProfileController extends ChangeNotifier {
     if (_messageImage == null) {
       return;
     }
+    String fileName = '${DateTime.now().microsecondsSinceEpoch}.jpg';
     // @ 24/04/23
     getId =(await SharedPref.getAllGroupId())!;
     firebase_storage.Reference reference = firebase_storage
         .FirebaseStorage.instance
         .ref()
         .child("/messagePhoto")
-        .child(getId);
+        .child(getId).child(fileName);
     firebase_storage.UploadTask uploadTask =
     reference.putFile(File(_messageImage!.path).absolute);
     await Future.value(uploadTask);
@@ -236,21 +239,16 @@ class ProfileController extends ChangeNotifier {
       final user = FirebaseAuth.instance.currentUser!.uid;
       final docSnapshot = await FirebaseFirestore.instance.collection("users").doc(user).get();
       userName = docSnapshot.get("fullName");
-      notifyListeners();
       userProfile = docSnapshot.get("profilePic");
-      notifyListeners();
       messageUrl = downloadUrl;
       Map<String, dynamic> chatMessag = {
         "message": messageUrl,
         "sender":userName,
         "time": DateTime.now().microsecondsSinceEpoch,
-        /* "groupPic":groupPicture,*/
         "userProfile": userProfile,
         "Type":"Image",
       };
       DatabaseServices().sendMessage(getId, chatMessag);
-      await SharedPref.saveMessageUrl(messageUrl);
-      /* await SharedPref.saveGroupPic(downloadUrl);*/
     }
   }
   // 21/04/23

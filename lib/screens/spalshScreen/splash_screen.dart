@@ -1,10 +1,9 @@
 import 'dart:async';
-
-import 'package:chat/screens/auth/login/login_screen.dart';
-import 'package:chat/screens/bottomSheet/BottomSheet.dart';
+import 'package:chat/resources/widget.dart';
+import 'package:chat/screens/screens.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../resources/Shared_Preferences.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -16,18 +15,37 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   bool isLogin = false;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     isUserLogin();
+     setValue();
     Timer(
         const Duration(seconds: 3),
             () => Navigator.pushReplacement(
             context,
             MaterialPageRoute(
                 builder: (context) =>
-                isLogin ? const BottomSheetTest() : const LoginPage())));
+                isLogin ? const BottomSheetTest() : const LoginPage())
+            )
+    );
+  }
+  void setValue() async {
+    final prefs = await SharedPreferences.getInstance();
+    int launchCount = prefs.getInt('counter') ?? 0;
+    prefs.setInt('counter', launchCount + 1);
+    if (launchCount == 0) {
+    // ignore: use_build_context_synchronously
+    Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+              isLogin ? const BottomSheetTest() : const IntroScreen()));//setState to refresh or move to some other page
+    } else {
+   return null;
+    }
   }
   isUserLogin() async {
     await SharedPref.isUserLogin().then((value) {

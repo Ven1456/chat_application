@@ -84,54 +84,63 @@ class _ProfileState extends State<Profile> {
                     sizeBoxH10(),
                     _buildEditProfileContainer(),
                     sizeBoxH25(),
-                    Card(
-                      child: ListTile(
-                        title: const Text("Edit Profile"),
-                        trailing: const Icon(Icons.arrow_forward_ios_sharp),
-                        onTap: () {
-                          nextPage(
-                              context,
-                              EditProfile(
-                                username: widget.username!,
-                                email: widget.email!,
-                                phone: widget.phone!,
-                                dob: widget.dob!,
-                                profilePic: widget.profilePicTest!,
-                              ));
-                        },
-                      ),
-                    ),
-                    Card(
-                      child: ListTile(
-                        title: const Text("Change Password"),
-                        trailing: const Icon(Icons.arrow_forward_ios_sharp),
-                        onTap: () {
-                          nextPage(context,  const ChangePasswordScreen());
-                        },
-                      ),
-                    ),
-                    Card(
-                      child: ListTile(
-                        title: const Text("Logout"),
-                        trailing: const Icon(Icons.arrow_forward_ios_sharp),
-                        onTap: () {
-                          alertBoxReuse(context,
-                                  // CANCEL BUTTON
-                                  () {
-                            Navigator.pop(context);
-                          },
-                              // LEAVE
-                                  () {
-                            authService.signOut();
-                            Navigator.pushAndRemoveUntil(
+                    Padding(
+                      padding: const EdgeInsets.only(right: 6.0,left: 6),
+                      child: Card(
+                        child: ListTile(
+                          title: const Text("Edit Profile"),
+                          trailing: const Icon(Icons.arrow_forward_ios_sharp),
+                          onTap: () {
+                            nextPage(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) => const LoginPage()),
-                                (route) => false);
-                          }, "Log Out", "Are you sure you want Logout ?", "Leave",
-                              "Cancel");
+                                EditProfile(
+                                  username: widget.username!,
+                                  email: widget.email!,
+                                  phone: widget.phone!,
+                                  dob: widget.dob!,
+                                  profilePic: widget.profilePicTest!,
+                                ));
+                          },
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 6.0,left: 6),
+                      child: Card(
+                        child: ListTile(
+                          title: const Text("Change Password"),
+                          trailing: const Icon(Icons.arrow_forward_ios_sharp),
+                          onTap: () {
+                            nextPage(context,  const ChangePasswordScreen());
+                          },
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 6.0,left: 6),
+                      child: Card(
+                        child: ListTile(
+                          title: const Text("Logout"),
+                          trailing: const Icon(Icons.arrow_forward_ios_sharp),
+                          onTap: () {
+                            alertBoxReuse(context,
+                                    // CANCEL BUTTON
+                                    () {
+                              Navigator.pop(context);
+                            },
+                                // LEAVE
+                                    () {
+                              authService.signOut();
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const LoginPage()),
+                                  (route) => false);
+                            }, "Log Out", "Are you sure you want Logout ?", "LogOut",
+                                "Cancel");
 
-                        },
+                          },
+                        ),
                       ),
                     ),
                     sizeBoxH60(), // USERNAME
@@ -156,15 +165,23 @@ class _ProfileState extends State<Profile> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(color: Colors.black),
+            color: Colors.orange.shade400
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(100),
             child: provider.image == null
                 ? (widget.profilePicTest ?? "").isEmpty
-                    ? const Icon(
-                        Icons.person,
-                        size: 120,
-                      )
+                    ? Center(
+                child: Text(
+                  widget.username!
+                      .toUpperCase()
+                      .substring(0, 2),
+                  style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 30,
+                      fontWeight:
+                      FontWeight.bold),
+                ))
                     : Image.network(
                         height: 120,
                         width: 120,

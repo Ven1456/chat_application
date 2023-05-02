@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/auth/changePassword/change_password.dart';
+import 'package:chat/screens/auth/fogot_Password/Forgot_Password_screen.dart';
 import 'package:chat/screens/auth/login/login_screen.dart';
 import 'package:chat/screens/profile/EditProfile.dart';
 import 'package:chat/services/auth_service.dart';
@@ -12,6 +13,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../feedback/feedback.dart';
 
 class Profile extends StatefulWidget {
   String? username;
@@ -50,10 +53,12 @@ class _ProfileState extends State<Profile> {
   }
 
   getImage() async {
-    QuerySnapshot snapshot = await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
+    QuerySnapshot snapshot =
+        await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
             .gettingUserEmail(widget.email.toString());
     final user = FirebaseAuth.instance.currentUser!.uid;
-    final docSnapshot = await FirebaseFirestore.instance.collection("users").doc(user).get();
+    final docSnapshot =
+        await FirebaseFirestore.instance.collection("users").doc(user).get();
     setState(() {
       widget.profilePicTest = snapshot.docs[0]["profilePic"];
       widget.username = docSnapshot.get("fullName");
@@ -65,7 +70,7 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar("Profile", context,false),
+      appBar: appBar("Profile", context, false),
       body: SafeArea(
         child: SingleChildScrollView(
           child: ChangeNotifierProvider(
@@ -84,65 +89,40 @@ class _ProfileState extends State<Profile> {
                     sizeBoxH10(),
                     _buildEditProfileContainer(),
                     sizeBoxH25(),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 6.0,left: 6),
-                      child: Card(
-                        child: ListTile(
-                          title: const Text("Edit Profile"),
-                          trailing: const Icon(Icons.arrow_forward_ios_sharp),
-                          onTap: () {
-                            nextPage(
-                                context,
-                                EditProfile(
-                                  username: widget.username!,
-                                  email: widget.email!,
-                                  phone: widget.phone!,
-                                  dob: widget.dob!,
-                                  profilePic: widget.profilePicTest!,
-                                ));
-                          },
-                        ),
-                      ),
+                    listTile(
+                      "Edit Profile",
+                      () => nextPage(
+                          context,
+                          EditProfile(
+                            username: widget.username!,
+                            email: widget.email!,
+                            phone: widget.phone!,
+                            dob: widget.dob!,
+                            profilePic: widget.profilePicTest!,
+                          )),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 6.0,left: 6),
-                      child: Card(
-                        child: ListTile(
-                          title: const Text("Change Password"),
-                          trailing: const Icon(Icons.arrow_forward_ios_sharp),
-                          onTap: () {
-                            nextPage(context,  const ChangePasswordScreen());
-                          },
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 6.0,left: 6),
-                      child: Card(
-                        child: ListTile(
-                          title: const Text("Logout"),
-                          trailing: const Icon(Icons.arrow_forward_ios_sharp),
-                          onTap: () {
-                            alertBoxReuse(context,
-                                    // CANCEL BUTTON
-                                    () {
-                              Navigator.pop(context);
-                            },
-                                // LEAVE
-                                    () {
-                              authService.signOut();
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const LoginPage()),
-                                  (route) => false);
-                            }, "Log Out", "Are you sure you want Logout ?", "LogOut",
-                                "Cancel");
 
-                          },
-                        ),
-                      ),
-                    ),
+                    listTile("Change Password",
+                        () => nextPage(context, const ChangePasswordScreen())),
+                    listTile("Feedback", () { nextPage(context, FeedBackScreen());}),
+                    listTile("Logout", () {
+                      alertBoxReuse(context,
+                          // CANCEL BUTTON
+                          () {
+                        Navigator.pop(context);
+                      },
+                          // LEAVE
+                          () {
+                        authService.signOut();
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LoginPage()),
+                            (route) => false);
+                      }, "Log Out", "Are you sure you want Logout ?", "LogOut",
+                          "Cancel");
+                    }),
+
                     sizeBoxH60(), // USERNAME
                   ],
                 );
@@ -163,25 +143,21 @@ class _ProfileState extends State<Profile> {
           height: 150,
           width: 150,
           decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.black),
-            color: Colors.orange.shade400
-          ),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.black),
+              color: Colors.orange.shade400),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(100),
             child: provider.image == null
                 ? (widget.profilePicTest ?? "").isEmpty
                     ? Center(
-                child: Text(
-                  widget.username!
-                      .toUpperCase()
-                      .substring(0, 2),
-                  style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 30,
-                      fontWeight:
-                      FontWeight.bold),
-                ))
+                        child: Text(
+                        widget.username!.toUpperCase().substring(0, 2),
+                        style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold),
+                      ))
                     : Image.network(
                         height: 120,
                         width: 120,

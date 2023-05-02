@@ -607,3 +607,16 @@ sizeBoxW118(){
     width: 118,
   );
 }
+
+listTile(String text, VoidCallback onTap){
+  return    Padding(
+    padding: const EdgeInsets.only(right: 6.0,left: 6),
+    child: Card(
+      child: ListTile(
+        title:  Text(text),
+        trailing: const Icon(Icons.arrow_forward_ios_sharp),
+        onTap: onTap,
+      ),
+    ),
+  );
+}

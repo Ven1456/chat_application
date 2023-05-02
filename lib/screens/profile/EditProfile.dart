@@ -59,6 +59,9 @@ class _EditProfileState extends State<EditProfile> {
   void initState() {
     super.initState();
     _loadSavedData();
+    setState(() {
+      widget.profilePic;
+    });
   }
 
   void _loadSavedData() async {

@@ -10,6 +10,13 @@ class CustomValidators{
     }
     return null;
   }
+  static String? empty(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter Your Feedback.';
+    }
+    return null;
+  }
+
 
 
   static String? email(String? value) {

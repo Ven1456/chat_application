@@ -217,6 +217,11 @@ class ProfileController extends ChangeNotifier {
     if (_messageImage == null) {
       return;
     }
+    isUploading = true;
+    notifyListeners();
+    if(isUploading == true) {
+     const CircularProgressIndicator();
+    }
     String fileName = '${DateTime.now().microsecondsSinceEpoch}.jpg';
     // @ 24/04/23
     getId =(await SharedPref.getAllGroupId())!;
@@ -228,6 +233,10 @@ class ProfileController extends ChangeNotifier {
     firebase_storage.UploadTask uploadTask =
     reference.putFile(File(_messageImage!.path).absolute);
     await Future.value(uploadTask);
+    uploadTask.whenComplete((){
+    print("uploadfgdhs");
+    });
+
     String downloadUrl = await reference.getDownloadURL();
     String userId = getId;
     DocumentSnapshot snapshot =

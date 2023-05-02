@@ -4,15 +4,19 @@ import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/chat/message_tlle.dart';
+import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/database_services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../groups/group_info.dart';
-
 
 // ignore: must_be_immutable
 class ChatPage extends StatefulWidget {
@@ -50,8 +54,28 @@ class _ChatPageState extends State<ChatPage> {
   int maxLines = 10;
   String profilePic = '';
   String groupPicture = "";
+  final picker = ImagePicker();
+  AuthService authService = AuthService();
   // 21/04/23
-  String messageChatUrl="";
+  XFile? _messageImage;
+  // 21/04/23
+  XFile? get messageImage => _messageImage;
+  XFile? _groupImage;
+  XFile? get groupImage => _groupImage;
+  XFile? _image;
+  XFile? get image => _image;
+  String getId = "";
+  String url = "";
+  String userName = "";
+  String userProfile = "";
+  bool isUploading = false;
+  // 21/04/23
+  String messageUrl = "";
+  firebase_storage.FirebaseStorage storage =
+      firebase_storage.FirebaseStorage.instanceFor(
+          bucket: 'gs://chatapp-4f907.appspot.com');
+  // 21/04/23
+  String messageChatUrl = "";
 
   @override
   void initState() {
@@ -111,23 +135,22 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  bool _isShowEmoji= false;
+  bool _isShowEmoji = false;
   final chatFromKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         FocusScope.of(context).unfocus();
       },
       child: WillPopScope(
-        onWillPop: (){
-          if(_isShowEmoji){
+        onWillPop: () {
+          if (_isShowEmoji) {
             setState(() {
-              _isShowEmoji=!_isShowEmoji;
+              _isShowEmoji = !_isShowEmoji;
             });
             return Future.value(false);
-          }
-          else{
+          } else {
             return Future.value(true);
           }
         },
@@ -141,17 +164,17 @@ class _ChatPageState extends State<ChatPage> {
                 _buildChatMessages(),
                 // SEND MESSAGE BUTTON
                 _buildSendMessageButton(context),
-                if(_isShowEmoji) SizedBox(
-                  height: MediaQuery.of(context).size.height * .35,
-                  child: EmojiPicker(
-                    textEditingController: messageController,
-                    config: Config(
-                      bgColor: Colors.white,
-                      columns: 8,
-                      emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0 )
+                if (_isShowEmoji)
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * .35,
+                    child: EmojiPicker(
+                      textEditingController: messageController,
+                      config: Config(
+                          bgColor: Colors.white,
+                          columns: 8,
+                          emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0)),
                     ),
-                  ),
-                )
+                  )
               ],
             ),
           ),
@@ -166,7 +189,7 @@ class _ChatPageState extends State<ChatPage> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(21),topRight: Radius.circular(21)),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.3),
@@ -181,15 +204,14 @@ class _ChatPageState extends State<ChatPage> {
           IconButton(
             onPressed: () {
               setState(() {
-                _isShowEmoji =!_isShowEmoji;
+                _isShowEmoji = !_isShowEmoji;
               });
             },
             icon: const Icon(
-         CupertinoIcons.smiley,
+              CupertinoIcons.smiley,
               color: Colors.grey,
             ),
           ),
-
           const SizedBox(width: 10),
           Expanded(
             child: Container(
@@ -198,63 +220,60 @@ class _ChatPageState extends State<ChatPage> {
                 maxHeight: maxHeight,
               ),
               child: TextFormField(
-                onTap: (){
-                  if(_isShowEmoji) {
-                    setState(() {
-                    _isShowEmoji =!_isShowEmoji;
-                  });
-                  }
-                },
-                maxLines: null,
-                inputFormatters: [
-                  TrimTextFormatter(),
-                  NewLineTrimTextFormatter(),
-                ],
-                onChanged: (value) {
-                  final lines = value.split('\n').length;
-                  if (lines < 2) {
-                    setState(() {
-                      minHeight = 60;
-                      maxHeight = 150;
-                    });
-                  } else if (lines < 6) {
-                    setState(() {
-                      minHeight = 66;
-                      maxHeight = 150;
-                    });
-                  } else if (lines <= 10) {
-                    setState(() {
-                      minHeight = 60 + (5 - 1) * 20;
-                      maxHeight = 150 + (lines - 5) * 20;
-                      maxLines = lines;
-                    });
-                  } else {
-                    setState(() {
-                      maxLines = maxLines;
-                    });
-                  }
-                },
-                keyboardType: TextInputType.multiline,
-                controller: messageController,
-                decoration:const InputDecoration(
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  hintText: "Send Message"
-                )
-              ),
+                  onTap: () {
+                    if (_isShowEmoji) {
+                      setState(() {
+                        _isShowEmoji = !_isShowEmoji;
+                      });
+                    }
+                  },
+                  maxLines: null,
+                  inputFormatters: [
+                    TrimTextFormatter(),
+                    NewLineTrimTextFormatter(),
+                  ],
+                  onChanged: (value) {
+                    final lines = value.split('\n').length;
+                    if (lines < 2) {
+                      setState(() {
+                        minHeight = 60;
+                        maxHeight = 150;
+                      });
+                    } else if (lines < 6) {
+                      setState(() {
+                        minHeight = 66;
+                        maxHeight = 150;
+                      });
+                    } else if (lines <= 10) {
+                      setState(() {
+                        minHeight = 60 + (5 - 1) * 20;
+                        maxHeight = 150 + (lines - 5) * 20;
+                        maxLines = lines;
+                      });
+                    } else {
+                      setState(() {
+                        maxLines = maxLines;
+                      });
+                    }
+                  },
+                  keyboardType: TextInputType.multiline,
+                  controller: messageController,
+                  decoration: const InputDecoration(
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      hintText: "Send Message")),
             ),
           ),
           IconButton(
             onPressed: () {
               // 21/04/23
-              ProfileController().pickMessageImage(context);
+             pickMessageImage(context);
             },
             icon: const Icon(
               Icons.photo,
               color: Colors.grey,
             ),
           ),
-
           const SizedBox(width: 5),
           GestureDetector(
             onTap: () {
@@ -400,70 +419,83 @@ class _ChatPageState extends State<ChatPage> {
                 }
               })
             : "";
-        return snapshot.hasData
-            ? Column(
-                children: [
-                  Expanded(
-                    child: ListView.builder(
-                        padding: const EdgeInsets.only(bottom: 28.0),
-                        controller: _scrollController,
-                        itemCount: snapshot.data.docs.length,
-                        itemBuilder: (context, index) {
-                          bool isSameDate = false;
-                          String? newDate = '';
-                          if (index == 0) {
-                            newDate = groupMessageDateAndTime(snapshot
-                                    .data.docs[index]["time"]
-                                    .toString())
-                                .toString();
-                          } else {
-                            final DateTime date = returnDateAndTimeFormat(
-                                snapshot.data.docs[index]["time"].toString());
-                            final DateTime prevDate = returnDateAndTimeFormat(
-                                snapshot.data.docs[index - 1]["time"]
-                                    .toString());
-                            isSameDate = date.isAtSameMomentAs(prevDate);
+        return Stack(
+          children: [
+            snapshot.hasData
+                ? Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 28.0),
+                      controller: _scrollController,
+                      itemCount: snapshot.data.docs.length,
+                      itemBuilder: (context, index) {
+                        bool isSameDate = false;
+                        String? newDate = '';
+                        if (index == 0) {
+                          newDate = groupMessageDateAndTime(snapshot
+                              .data.docs[index]["time"]
+                              .toString())
+                              .toString();
+                        } else {
+                          final DateTime date = returnDateAndTimeFormat(
+                              snapshot.data.docs[index]["time"].toString());
+                          final DateTime prevDate = returnDateAndTimeFormat(
+                              snapshot.data.docs[index - 1]["time"]
+                                  .toString());
+                          isSameDate = date.isAtSameMomentAs(prevDate);
 
-                            newDate = isSameDate
-                                ? ''
-                                : groupMessageDateAndTime(snapshot
-                                        .data.docs[index]["time"]
-                                        .toString())
-                                    .toString();
-                          }
-                          return Column(
-                            children: [
-                              if (newDate.isNotEmpty)
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 10),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.lightGreen,
-                                        borderRadius:
-                                            BorderRadius.circular(20)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(newDate),
-                                    ),
+                          newDate = isSameDate
+                              ? ''
+                              : groupMessageDateAndTime(snapshot
+                              .data.docs[index]["time"]
+                              .toString())
+                              .toString();
+                        }
+                        return Column(
+                          children: [
+                            if (newDate.isNotEmpty)
+                              Padding(
+                                padding:
+                                const EdgeInsets.symmetric(vertical: 10),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.lightGreen,
+                                      borderRadius:
+                                      BorderRadius.circular(20)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(newDate),
                                   ),
                                 ),
-                              MessageTile(
-                                message: snapshot.data.docs[index]["message"],
-                                sendByMe: widget.username == snapshot.data.docs[index]["sender"],
-                                sender: snapshot.data.docs[index]["sender"],
-                                time: snapshot.data.docs[index]["time"].toString(),
-                                userProfile: snapshot.data.docs[index]["userProfile"],
-                                type:snapshot.data.docs[index]["Type"] ,
                               ),
-                            ],
-                          );
-                        }),
-                  ),
-                  sizeBoxH5(),
-                ],
-              )
-            : Container();
+                            MessageTile(
+                              message: snapshot.data.docs[index]["message"],
+                              sendByMe: widget.username ==
+                                  snapshot.data.docs[index]["sender"],
+                              sender: snapshot.data.docs[index]["sender"],
+                              time: snapshot.data.docs[index]["time"]
+                                  .toString(),
+                              userProfile: snapshot.data.docs[index]
+                              ["userProfile"],
+                              type: snapshot.data.docs[index]["Type"],
+                            ),
+                          ],
+                        );
+                      }),
+                ),
+              ],
+            ) : Container(),
+            isUploading
+                ? Container(
+              color: Colors.black.withOpacity(0.3),
+                  child: const Center(child: CircularProgressIndicator(
+              color: Colors.white,
+            )),
+                ) // Show a loading widget
+                : Container(),
+          ],
+        );
       },
     );
   }
@@ -484,12 +516,133 @@ class _ChatPageState extends State<ChatPage> {
         "time": DateTime.now().microsecondsSinceEpoch,
         /* "groupPic":groupPicture,*/
         "userProfile": widget.userProfile,
-        "Type":"text",
+        "Type": "text",
       };
       DatabaseServices().sendMessage(widget.groupId, chatMessageMap);
       setState(() {
         messageController.clear();
       });
     }
+  }
+
+  // MESSAGE UPLOAD IMAGE
+  void uploadMessageImage(BuildContext context) async {
+    if (_messageImage == null) {
+      return;
+    }
+    setState(() {
+      isUploading = true;
+    });
+    String fileName = '${DateTime.now().microsecondsSinceEpoch}.jpg';
+    // @ 24/04/23
+    getId = (await SharedPref.getAllGroupId())!;
+    firebase_storage.Reference reference = firebase_storage
+        .FirebaseStorage.instance
+        .ref()
+        .child("/messagePhoto")
+        .child(getId)
+        .child(fileName);
+    firebase_storage.UploadTask uploadTask =
+        reference.putFile(File(_messageImage!.path).absolute);
+    await Future.value(uploadTask);
+    uploadTask.whenComplete(() {
+      setState(() {
+        isUploading = false;
+      });
+    });
+
+    String downloadUrl = await reference.getDownloadURL();
+    String userId = getId;
+    DocumentSnapshot snapshot =
+        await FirebaseFirestore.instance.collection('groups').doc(userId).get();
+    if (snapshot.exists) {
+      await FirebaseFirestore.instance.collection('groups').doc(userId).update({
+        'recentMessage': downloadUrl,
+      });
+      final user = FirebaseAuth.instance.currentUser!.uid;
+      final docSnapshot =
+          await FirebaseFirestore.instance.collection("users").doc(user).get();
+      userName = docSnapshot.get("fullName");
+      userProfile = docSnapshot.get("profilePic");
+      messageUrl = downloadUrl;
+      Map<String, dynamic> chatMessag = {
+        "message": messageUrl,
+        "sender": userName,
+        "time": DateTime.now().microsecondsSinceEpoch,
+        "userProfile": userProfile,
+        "Type": "Image",
+      };
+      DatabaseServices().sendMessage(getId, chatMessag);
     }
   }
+// MESSAGE IMAGE
+  void pickMessageImage(context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: SizedBox(
+              height: 120,
+              width: 120,
+              child: Column(
+                children: [
+                  ListTile(
+                    onTap: () {
+                      pickCameraMessageImage(context);
+                      Navigator.pop(context);
+                    },
+                    leading: const Icon(Icons.camera),
+                    title: const Text("Camera"),
+                  ),
+                  ListTile(
+                    onTap: () {
+                      pickGalleryMessageImage(context);
+                      Navigator.pop(context);
+                    },
+                    leading: const Icon(Icons.image),
+                    title: const Text("Image"),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  // 21/04/23
+  // IMAGE PICK FROM GALLERY
+  Future pickGalleryMessageImage(BuildContext context) async {
+    final pickedFile =
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 100);
+    if (pickedFile != null) {
+      _messageImage = XFile(pickedFile.path);
+      _messageImage = await _CropImage(imageFile: _messageImage);
+      // ignore: use_build_context_synchronously
+      setState(() {
+        uploadMessageImage(context);
+      });
+    }
+  }
+
+  Future<XFile?> _CropImage({XFile? imageFile}) async {
+    if (imageFile == null) return null;
+    CroppedFile? croppedImage =
+        await ImageCropper().cropImage(sourcePath: imageFile.path);
+    if (croppedImage == null) return null;
+    return XFile(croppedImage.path);
+  }
+
+  // 21/04/23
+  // IMAGE PICK FROM CAMERA
+  Future pickCameraMessageImage(BuildContext context) async {
+    final pickedFile =
+        await picker.pickImage(source: ImageSource.camera, imageQuality: 100);
+    if (pickedFile != null) {
+      _messageImage = XFile(pickedFile.path);
+      // ignore: use_build_context_synchronously
+      setState(() {
+        uploadMessageImage(context);
+      });
+    }
+  }
+}

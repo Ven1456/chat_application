@@ -1,7 +1,10 @@
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/profile_Controller.dart';
+import 'package:chat/resources/widget.dart';
+import 'package:chat/screens/chat/image_Viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
@@ -83,18 +86,19 @@ class _MessageTileState extends State<MessageTile> {
                   : Padding(
                       padding: const EdgeInsets.only(left: 10.0),
                       child: Container(
-                        width: isSmallScreen ? 40 : 50,
-                        height: isSmallScreen ? 40 : 50,
+                        width: isSmallScreen ? 35 : 40,
+                        height: isSmallScreen ? 35 : 40,
                         margin: const EdgeInsets.only(right: 8.0),
                         decoration: BoxDecoration(
                           color: Colors.green[300],
                           shape: BoxShape.circle,
                         ),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(100),
+                          borderRadius: BorderRadius.circular(180),
                           child: (widget.userProfile ?? '').isEmpty
                               ? Center(
-                                  child: Text(widget.sender.substring(0, 2).toUpperCase(),
+                                  child: Text(
+                                    widget.sender.substring(0, 2).toUpperCase(),
                                     style: TextStyle(
                                       fontSize: isSmallScreen ? 12 : 18,
                                       fontWeight: FontWeight.bold,
@@ -126,26 +130,23 @@ class _MessageTileState extends State<MessageTile> {
                       children: [
                         widget.sendByMe
                             ? Padding(
-                          padding: const EdgeInsets.only(left: 12.0),
-                              child: Text(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: Text(
                                   getDateForChat(widget.time),
-                                  style:  TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
                                     color: Colors.black.withOpacity(0.6),
                                   ),
                                 ),
-                            )
+                              )
                             : const SizedBox(),
-                        widget.sendByMe
-                            ? const  Spacer()
-                            :const SizedBox(),
-
+                        widget.sendByMe ? const Spacer() : const SizedBox(),
                         Container(
                           constraints: BoxConstraints(
                             maxWidth: maxWidth,
                           ),
                           padding: const EdgeInsets.symmetric(
-                            vertical: 8.0,
+                            vertical: 10.0,
                             horizontal: 12.0,
                           ),
                           margin: const EdgeInsets.symmetric(
@@ -169,26 +170,29 @@ class _MessageTileState extends State<MessageTile> {
                                   ),
                                 )
                               : widget.sendByMe
-                                  ? BoxDecoration(
-                                      border: Border.all(color: Colors.black),
-                                      borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(18),
-                                        topRight: Radius.circular(18),
-                                        bottomLeft: Radius.circular(18),
-                                      ))
-                                  : BoxDecoration(
-                                      border: Border.all(color: Colors.black),
-                                      borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(18),
-                                        topRight: Radius.circular(18),
-                                        bottomRight: Radius.circular(18),
-                                      )),
+                                  ? const BoxDecoration(
+                                      // border: Border.all(color: Colors.black),
+                                      // borderRadius: const BorderRadius.only(
+                                      //   topLeft: Radius.circular(1),
+                                      //   topRight: Radius.circular(18),
+                                      //   bottomLeft: Radius.circular(18),
+                                      // )
+                                      )
+                                  : const BoxDecoration(
+                                      // border: Border.all(color: Colors.black38),
+                                      // borderRadius: const BorderRadius.only(
+                                      //   topLeft: Radius.circular(18),
+                                      //   topRight: Radius.circular(18),
+                                      //   bottomRight: Radius.circular(18),
+                                      // )
+                                      ),
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               if (widget.type.toString() == "text")
                                 Text(
                                   widget.message,
+                                  textAlign: TextAlign.center,
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
@@ -199,14 +203,28 @@ class _MessageTileState extends State<MessageTile> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: FadeInImage.assetNetwork(
-                                        placeholder: 'assets/images/gallery.jpg',
-                                        placeholderErrorBuilder: (context, url, error) => Image.asset('assets/images/404.jpg', fit: BoxFit.cover),
-                                        image: widget.message,
-                                        height: 200,
-                                        width: 150,
-                                        fit: BoxFit.cover,
-                                        imageErrorBuilder: (context, url, error) => Image.asset('assets/images/error.jpg', fit: BoxFit.cover),
+                                      child: GestureDetector(
+                                        onTap: ()=>nextPage(context, FullScreenImagePage( image: widget.message,)),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.only(
+                                              bottomLeft: widget.sendByMe
+                                                  ? const Radius.circular(18)
+                                                  : const Radius.circular(0),
+                                              topRight: const Radius.circular(18),
+                                              topLeft: const Radius.circular(18),
+                                              bottomRight: widget.sendByMe
+                                                  ? const Radius.circular(0)
+                                                  : const Radius.circular(18)),
+                                          child: FadeInImage.assetNetwork(
+                                            placeholder: 'assets/images/gallery.jpg',
+                                            placeholderErrorBuilder: (context, url, error) => Image.asset('assets/images/404.jpg', fit: BoxFit.cover),
+                                            image: widget.message,
+                                            height: 200,
+                                            width: 150,
+                                            fit: BoxFit.cover,
+                                            imageErrorBuilder: (context, url, error) => Image.asset('assets/images/error.jpg', fit: BoxFit.cover),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -214,24 +232,20 @@ class _MessageTileState extends State<MessageTile> {
                               const SizedBox(height: 4.0),
                             ],
                           ),
-
                         ),
-                        widget.sendByMe
-                            ? const SizedBox()
-                            :const Spacer(),
+                        widget.sendByMe ? const SizedBox() : const Spacer(),
                         widget.sendByMe
                             ? const SizedBox()
                             : Padding(
-                          padding: const EdgeInsets.only(right: 12.0),
-                              child: Text(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: Text(
                                   getDateForChat(widget.time),
-                                  style:  TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
                                     color: Colors.black.withOpacity(0.6),
                                   ),
                                 ),
-                            ),
-
+                              ),
                       ],
                     ),
                   ],
@@ -241,8 +255,8 @@ class _MessageTileState extends State<MessageTile> {
                   ? Padding(
                       padding: const EdgeInsets.only(right: 8.0),
                       child: Container(
-                        width: isSmallScreen ? 40 : 50,
-                        height: isSmallScreen ? 40 : 50,
+                        width: isSmallScreen ? 35 : 40,
+                        height: isSmallScreen ? 35 : 40,
                         margin: const EdgeInsets.only(left: 8.0),
                         decoration: const BoxDecoration(
                           color: Colors.redAccent,
@@ -254,8 +268,6 @@ class _MessageTileState extends State<MessageTile> {
                                 ? Consumer<ProfileController>(
                                     builder: (context, provider, child) {
                                     return ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(100),
                                         child: provider.image == null
                                             ? (widget.userProfile ?? "").isEmpty
                                                 ? Center(

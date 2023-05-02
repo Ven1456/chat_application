@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:chat/resources/widget.dart';
 import 'package:chat/services/auth_service.dart';
+import 'package:chat/utils/CustomValidators.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:toast/toast.dart';
@@ -95,13 +96,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               email = val;
                             });
                           },
-                          validator: (val) {
-                            return RegExp(
-                                r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
-                                .hasMatch(val!)
-                                ? null
-                                : "Please Enter Correct Email";
-                          },
+                          validator:  (val) =>  CustomValidators.email(val),
                         )),
                    sizeBoxH15(),
                     isButton

@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:chat/resources/widget.dart';
-import 'package:chat/services/auth_service.dart';
+import 'package:chat/screens/auth/login/login_screen.dart';
+import 'package:chat/services/authentication_services/auth_service.dart';
 import 'package:chat/utils/CustomValidators.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -65,70 +66,87 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Scaffold(
       backgroundColor: HexColor.fromHex('#FFFFFF'),
       // APP BAR
-      appBar: _buildAppBar(),
+      // appBar: _buildAppBar(),
       body:  Stack(
         children: [
-          SingleChildScrollView(
-            child: Form(
-              key: formKey,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    sizeBoxH80(),
-                    // IMAGE
-                    imageBuild("assets/images/forgot.jpg", 200),
-                   sizeBoxH100(),
+          SafeArea(
+            bottom: false,
+            child: SingleChildScrollView(
+              child: Form(
+                key: formKey,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Padding(padding: EdgeInsets.only(left: 16,top: 20),
+                            child:     backButton(context,(){
+                              nextPagePushAndRemoveUntil(context, LoginPage());
+                            }),
+                          ),
 
-                    SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.85,
-                        child: isButton
-                            ? Container()
-                            :
-                        // EMAIL  TEXT FIELD
-                        ReusableTextField(
+                          const Padding(
+                            padding: EdgeInsets.only(top:20.0,left: 65),
+                            child: Text("Reset Password",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25),),
+                          )
+                        ],
+                      ),
+                      sizeBoxH80(),
+                      // IMAGE
+                      imageBuild("assets/images/forgot.jpg", 200),
+                     sizeBoxH100(),
+
+                      SizedBox(
                           width: MediaQuery.of(context).size.width * 0.85,
-                          obSecureText: false,
-                          labelText: "Enter Your Email",
-                          prefixIcon: Icon(Icons.email),
-                          onChanged: (val) {
-                            setState(() {
-                              email = val;
-                            });
-                          },
-                          validator:  (val) =>  CustomValidators.email(val),
-                        )),
-                   sizeBoxH15(),
-                    isButton
-                        ? Container()
-                        :
-                    // SEND REQUEST BUTTON
-                    reusableButton(40, 180, () {
-                      forgot();
-                    }, "Send Request"),
-                    isButton
-                        ? Column(
-                      children: [
-                        // TIMER ICON
-                        _buildTimerIcon(),
-                        // TIMER START ICON
-                        _buildTimeStartText(),
-                        sizeBoxH10(),
-                        // DESCRIPTION TEXT
-                        semiBoldSubTitleText(
-                          "                   Please Check Your Email "
-                              "\n If Link is Not Their Please Check Spam Box"
-                              "\n            Set Must 6 Character Password",
-                        ),
-                        sizeBoxH10(),
-                        // CLOSE ICON
-                        reusableButton(40, 100, () {
-                          Navigator.pop(context);
-                        }, "Close"),
-                      ],
-                    )
-                        : Container()
-                  ],
+                          child: isButton
+                              ? Container()
+                              :
+                          // EMAIL  TEXT FIELD
+                          ReusableTextField(
+                            width: MediaQuery.of(context).size.width * 0.85,
+                            obSecureText: false,
+                            labelText: "Enter Your Email",
+                            prefixIcon: Icon(Icons.email),
+                            onChanged: (val) {
+                              setState(() {
+                                email = val;
+                              });
+                            },
+                            validator:  (val) =>  CustomValidators.email(val),
+                          )),
+                     sizeBoxH15(),
+                      isButton
+                          ? Container()
+                          :
+                      // SEND REQUEST BUTTON
+                      reusableButton(40, 130, () {
+                        forgot();
+                      }, "Submit"),
+                      isButton
+                          ? Column(
+                        children: [
+                          // TIMER ICON
+                          _buildTimerIcon(),
+                          // TIMER START ICON
+                          _buildTimeStartText(),
+                          sizeBoxH10(),
+                          // DESCRIPTION TEXT
+                          semiBoldSubTitleText(
+                            "                   Please Check Your Email "
+                                "\n If Link is Not Their Please Check Spam Box"
+                                "\n            Set Must 6 Character Password",
+                          ),
+                          sizeBoxH10(),
+                          // CLOSE ICON
+                          reusableButton(40, 100, () {
+                            Navigator.pop(context);
+                          }, "Close"),
+                        ],
+                      )
+                          : Container()
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -158,13 +176,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     ));
   }
 
-  // APP BAR  EXTRACT AS A METHOD
-  AppBar _buildAppBar() {
-    return AppBar(
-      title: const Text("Reset Password"),
-      centerTitle: true,
-    );
-  }
 
   forgot() async {
     if (formKey.currentState!.validate()) {

@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 
+import '../../utils/InputFormatters.dart';
 import 'edit_ProfilePic.dart';
 
 class EditProfile extends StatefulWidget {
@@ -44,16 +45,15 @@ class _EditProfileState extends State<EditProfile> {
   bool _isEmailEditable = false;
   bool _isPhoneEditable = false;
   bool _isDobEditable = false;
-  bool _isGenderEditable = false;
   bool isEdit = true;
   String _userName = "";
   String _email = "";
   String _phone = "";
   String _dob = "";
   String _gender = "";
-  bool isGender = false;
   FocusNode isFocus = FocusNode();
   bool hasChanges = false;
+  DateTime? _selectedDate;
 
   @override
   void initState() {
@@ -107,7 +107,8 @@ class _EditProfileState extends State<EditProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar("Edit Profile",context,true),
+      appBar: appBar(
+          "Edit Profile", context, true, Colors.transparent, Colors.black),
       body: Form(
         key: editProfileKey,
         child: SingleChildScrollView(
@@ -129,7 +130,7 @@ class _EditProfileState extends State<EditProfile> {
                     // USERNAME TEXT FIELD
                     ProfileTextField(
                       onChanged: _userNameOnchangedValue,
-                      validator:(val) =>  CustomValidators.fullName(val),
+                      validator: (val) => CustomValidators.fullName(val),
                       isEnable: _isUsernameEditable,
                       textEditingController: usernameController,
                     ),
@@ -145,24 +146,28 @@ class _EditProfileState extends State<EditProfile> {
                           hasChanges = true;
                         });
                       },
-                      validator: (val)=> CustomValidators.email(val),
+                      validator: (val) => CustomValidators.email(val),
                       isEnable: _isEmailEditable,
                       textEditingController: emailController,
                     ),
                     sizeBoxH15(),
+
                     // PHONE
                     profileSubText("Phone"),
                     // PHONE TEXT FIELD
                     ProfileTextField(
+                      maxLength: 10,
                       textInputType: TextInputType.phone,
                       textInputFormatter: [
-                        FilteringTextInputFormatter.digitsOnly,
+                        FilteringTextInputFormatter.digitsOnly
                       ],
                       validator: (val) => CustomValidators.phone(val),
                       onChanged: (val) {
                         setState(() {
-                          _phone = val;
-                          hasChanges = true;
+                          if (val.length <= 10) {
+                            _phone = val;
+                            hasChanges = val.length == 10;
+                          }
                         });
                       },
                       isEnable: _isPhoneEditable,
@@ -173,12 +178,16 @@ class _EditProfileState extends State<EditProfile> {
                     profileSubText("Date Of Birth"),
                     // DOB TEXT FIELD
                     ProfileTextField(
+                      textInputFormatter: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        DateTextFormatter()
+                      ],
+
                       iconColor: Colors.black38,
                       onTap: () async {
                         DateTime? pickedDate = await showDatePicker(
                             context: context,
-                            initialDate: DateTime.now()
-                                .subtract(const Duration(days: 2555)),
+                            initialDate: DateTime.now().subtract(const Duration(days: 2555)),
                             firstDate: DateTime(1900),
                             lastDate: DateTime(2017));
 
@@ -191,10 +200,17 @@ class _EditProfileState extends State<EditProfile> {
                             _dob =
                                 formattedDate; // store the dob value as a DateTime object
                             hasChanges = true;
+                            _selectedDate = formattedDate.toString() as DateTime?;
 
                             //set output date to TextField value.
                           });
                         }
+                      },
+                      validator: (value){
+                    var year = int.tryParse(value!.substring(4, 8));
+                    if (year == null || year < 1900 || year > (DateTime.now().year - 14)) {
+                      return 'Please select a year below ${(DateTime.now().year - 14)}';
+                    }
                       },
                       onChanged: _dobOnChange,
                       isEnable: _isDobEditable,
@@ -241,7 +257,11 @@ class _EditProfileState extends State<EditProfile> {
                     sizeBoxH45(),
 
                     InkWell(
-                      onTap: () => _updateProfileButton(context),
+                      onTap: () {
+                        editProfileKey.currentState!.validate()
+                            ? _updateProfileButton(context)
+                            : null;
+                      },
                       child: _buildIsUpdatedButtonText(),
                     ),
 
@@ -255,11 +275,11 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   _userNameOnchangedValue(val) {
-          setState(() {
-            _userName = val;
-            hasChanges = true;
-          });
-        }
+    setState(() {
+      _userName = val;
+      hasChanges = true;
+    });
+  }
 
   Container _buildIsUpdatedButtonText() {
     return Container(
@@ -299,25 +319,31 @@ class _EditProfileState extends State<EditProfile> {
 
   Future<void> _updateProfileButton(BuildContext context) async {
     if (isEdit) {
-      isGender = true;
-      isFocus.requestFocus();
       setState(() {
         isEdit = !isEdit;
         _isUsernameEditable = !_isUsernameEditable;
         _isEmailEditable = !_isEmailEditable;
         _isPhoneEditable = !_isPhoneEditable;
         _isDobEditable = !_isDobEditable;
-        _isGenderEditable = !_isGenderEditable;
+        isFocus.requestFocus();
+        editProfileKey.currentState!.validate() ? hasChanges : !hasChanges;
       });
     } else {
       if (hasChanges) {
-        editProfileKey.currentState!.validate();
         await _updateUserProfile(_userName, _email, _phone, _dob, _gender);
         QuickAlert.show(
           context: context,
           type: QuickAlertType.success,
           text: 'Profile Update Successfully',
         );
+        setState(() {
+          isEdit = !isEdit;
+          _isUsernameEditable = !_isUsernameEditable;
+          _isEmailEditable = !_isEmailEditable;
+          _isPhoneEditable = !_isPhoneEditable;
+          _isDobEditable = !_isDobEditable;
+          isFocus.unfocus();
+        });
       } else {
         QuickAlert.show(
           context: context,
@@ -346,4 +372,4 @@ class _EditProfileState extends State<EditProfile> {
   }
 }
 
-enum Gender { male, female, others }
+enum Gender { Male, Female, Others }

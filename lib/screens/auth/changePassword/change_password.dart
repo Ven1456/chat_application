@@ -24,7 +24,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: HexColor.fromHex('#FFFFFF'),
-      appBar: appBar("", context, true),
+      appBar: appBar("Reset Password", context, true,Colors.transparent,Colors.black),
       body: Form(
         key: _resetKey,
         child: SingleChildScrollView(
@@ -69,7 +69,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   obSecureText: !_newPasswordVisible,
                   width: MediaQuery.of(context).size.width * 0.85,
                   textEditingController: newPassTextEditingController,
-                  labelText: "new Password",
+                  labelText: "New Password",
                   prefixIcon: const Icon(Icons.security),
                   suffixIcon: InkWell(
                     onTap: () {

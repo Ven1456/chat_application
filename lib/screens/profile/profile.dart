@@ -7,8 +7,8 @@ import 'package:chat/screens/auth/changePassword/change_password.dart';
 import 'package:chat/screens/auth/fogot_Password/Forgot_Password_screen.dart';
 import 'package:chat/screens/auth/login/login_screen.dart';
 import 'package:chat/screens/profile/EditProfile.dart';
-import 'package:chat/services/auth_service.dart';
-import 'package:chat/services/database_services.dart';
+import 'package:chat/services/authentication_services/auth_service.dart';
+import 'package:chat/services/database_services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -70,7 +70,7 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar("Profile", context, false),
+      appBar: appBar("Profile", context, false,Colors.blue,Colors.white),
       body: SafeArea(
         child: SingleChildScrollView(
           child: ChangeNotifierProvider(
@@ -163,6 +163,7 @@ class _ProfileState extends State<Profile> {
                         width: 120,
                         widget.profilePicTest ?? "",
                         fit: BoxFit.cover,
+                        errorBuilder: (context, url, error) => Image.asset('assets/images/404.jpg', fit: BoxFit.cover),
                         loadingBuilder: (BuildContext context, Widget child,
                             ImageChunkEvent? loadingProgress) {
                           if (loadingProgress == null) {

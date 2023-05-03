@@ -23,8 +23,10 @@ const textInputDecoration = InputDecoration(
 nextPage(context, page) {
   Navigator.push(context, MaterialPageRoute(builder: (context) => page));
 }
-nextPagePushAndRemoveUntil(context, page){
-  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => page), (route) => false);
+
+nextPagePushAndRemoveUntil(context, page) {
+  Navigator.pushAndRemoveUntil(
+      context, MaterialPageRoute(builder: (context) => page), (route) => false);
 }
 
 // REPLACE THE SCREEN
@@ -101,22 +103,50 @@ extension HexColor on Color {
       '${green.toRadixString(16).padLeft(2, '0')}'
       '${blue.toRadixString(16).padLeft(2, '0')}';
 }
+
 // APP BAR
-appBar(String titleText, BuildContext context, bool isBack){
+appBar(String titleText, BuildContext context, bool isBack, Color? color,
+    Color? textStyleColor) {
   return AppBar(
     elevation: 0,
-    title:  Text(
+    backgroundColor: color,
+    title: Text(
       titleText,
-      style: const TextStyle(
-          fontWeight: FontWeight.bold, fontSize: 25, color: Colors.black),
+      style: TextStyle(
+          fontWeight: FontWeight.bold, fontSize: 25, color: textStyleColor),
     ),
-    leading: isBack ?  GestureDetector(
-        onTap: ()=> Navigator.pop(context),
-        child: Icon(Icons.arrow_back_ios,color: Colors.black,)) : null,
+    leading: isBack
+        ? GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+            ))
+        : null,
     centerTitle: true,
   );
 }
 
+backButton(BuildContext context, VoidCallback? onTap) {
+  return Container(
+    height: 30,
+    width: 30,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(10),
+      boxShadow: const [
+        BoxShadow(
+          color: Colors.black12,
+          blurRadius: 12.0,
+          offset: Offset(0, 5),
+        ),
+      ],
+    ),
+    child: InkWell(
+        onTap: onTap,
+        child: const Center(child: Icon(Icons.arrow_back_ios_new_sharp))),
+  );
+}
 
 class AlertBoxReuse extends StatelessWidget {
   final String titleText;
@@ -293,8 +323,15 @@ class IconButtonAlertReuse extends StatelessWidget {
   }
 }
 
-Future<void> alertBoxReuse(BuildContext context,VoidCallback cancelOnTap,VoidCallback leaveOnTap,String titleText,String subTitleText,String leaveTitleText,String cancelTitleText)async{
-  return  showDialog(
+Future<void> alertBoxReuse(
+    BuildContext context,
+    VoidCallback cancelOnTap,
+    VoidCallback leaveOnTap,
+    String titleText,
+    String subTitleText,
+    String leaveTitleText,
+    String cancelTitleText) async {
+  return showDialog(
       barrierDismissible: true,
       context: context,
       builder: (context) {
@@ -478,7 +515,6 @@ profileSubText(String text) {
   );
 }
 
-
 class ProfileTextField extends StatefulWidget {
   final TextEditingController? textEditingController;
   final VoidCallback? onTap;
@@ -486,19 +522,24 @@ class ProfileTextField extends StatefulWidget {
   final List<TextInputFormatter>? textInputFormatter;
   final Widget? icon;
   final bool? isEnable;
+  final int? maxLength;
   final Color? iconColor;
   final Function(String)? onChanged;
   final String? Function(String?)? validator;
 
-  const ProfileTextField(
-      {Key? key,
-      this.textEditingController,
-      this.onTap,
-      this.icon,
-      this.isEnable,
-        this.onChanged, this.textInputType, this.textInputFormatter, this.validator, this.iconColor,
-      })
-      : super(key: key);
+  const ProfileTextField({
+    Key? key,
+    this.textEditingController,
+    this.onTap,
+    this.icon,
+    this.isEnable,
+    this.onChanged,
+    this.textInputType,
+    this.textInputFormatter,
+    this.validator,
+    this.iconColor,
+    this.maxLength,
+  }) : super(key: key);
 
   @override
   State<ProfileTextField> createState() => _ProfileTextFieldState();
@@ -511,109 +552,121 @@ class _ProfileTextFieldState extends State<ProfileTextField> {
       SizedBox(
         width: MediaQuery.of(context).size.width * 0.85,
         child: TextFormField(
-          onChanged: widget.onChanged,
+            maxLength: widget.maxLength,
+            onChanged: widget.onChanged,
             enabled: widget.isEnable,
             onTap: widget.onTap,
-            validator:widget.validator,
+            validator: widget.validator,
             inputFormatters: widget.textInputFormatter,
             keyboardType: widget.textInputType,
             controller: widget.textEditingController,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               suffixIconColor: Colors.grey,
-              errorStyle: TextStyle(color: Colors.red),
-              hintStyle: TextStyle(color: Colors.grey),
-              enabledBorder: OutlineInputBorder(
+              suffixIcon: IconButton(
+                onPressed: widget.onTap,
+                icon: widget.isEnable!
+                    ? const Icon(Icons.done_sharp)
+                    : const Icon(Icons.edit),
+                color: widget.iconColor,
+              ),
+              counter: const SizedBox(),
+              errorStyle: const TextStyle(color: Colors.red),
+              hintStyle: const TextStyle(color: Colors.grey),
+              enabledBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(12.0)),
                 borderSide: BorderSide(color: Colors.blueGrey, width: 2),
               ),
-              border: OutlineInputBorder(
+              border: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(12.0)),
                 borderSide: BorderSide(color: Colors.blueGrey, width: 2),
               ),
-              focusedBorder: OutlineInputBorder(
+              focusedBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
                 borderSide: BorderSide(color: Colors.blueGrey),
               ),
-            )
-        ),
-      ),
-      IconButton(
-        onPressed: widget.onTap,
-        icon: widget.isEnable!
-            ?  const Icon(Icons.done_sharp)
-            :  const Icon(Icons.edit),
-        color: widget.iconColor,
+            )),
       ),
     ]);
   }
 }
+
 //
-loadingAnimation(){
-  return  Container(
+loadingAnimation() {
+  return Container(
       color: Colors.black.withOpacity(0.1),
       child: Center(
         child: Lottie.network(
-            "https://assets4.lottiefiles.com/private_files/lf30_fjjj1m44.json", height: 180),
+            "https://assets4.lottiefiles.com/private_files/lf30_fjjj1m44.json",
+            height: 180),
       ));
 }
-sizeBoxH15(){
+
+sizeBoxH15() {
   return const SizedBox(
     height: 15,
   );
 }
 
-sizeBoxH20(){
+sizeBoxH20() {
   return const SizedBox(
     height: 20,
   );
 }
-sizeBoxH60(){
+
+sizeBoxH60() {
   return const SizedBox(
     height: 60,
   );
 }
-sizeBoxH100(){
+
+sizeBoxH100() {
   return const SizedBox(
     height: 100,
   );
 }
-sizeBoxH80(){
+
+sizeBoxH80() {
   return const SizedBox(
     height: 80,
   );
 }
-sizeBoxH45(){
+
+sizeBoxH45() {
   return const SizedBox(
     height: 45,
   );
 }
-sizeBoxH5(){
+
+sizeBoxH5() {
   return const SizedBox(
     height: 5,
   );
 }
-sizeBoxH10(){
+
+sizeBoxH10() {
   return const SizedBox(
     height: 10,
   );
 }
-sizeBoxH25(){
+
+sizeBoxH25() {
   return const SizedBox(
     height: 25,
   );
 }
-sizeBoxW118(){
+
+sizeBoxW118() {
   return const SizedBox(
     width: 118,
   );
 }
 
-listTile(String text, VoidCallback onTap){
-  return    Padding(
-    padding: const EdgeInsets.only(right: 6.0,left: 6),
+listTile(String text, VoidCallback onTap) {
+  return Padding(
+    padding: const EdgeInsets.only(right: 6.0, left: 6),
     child: Card(
       child: ListTile(
-        title:  Text(text),
+        title: Text(text),
         trailing: const Icon(Icons.arrow_forward_ios_sharp),
         onTap: onTap,
       ),

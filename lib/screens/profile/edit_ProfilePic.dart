@@ -46,6 +46,7 @@ class EditProfilePic extends StatelessWidget {
               width: 120,
               profilePic,
               fit: BoxFit.cover,
+              errorBuilder: (context, url, error) => Image.asset('assets/images/404.jpg', fit: BoxFit.cover),
               loadingBuilder: (BuildContext context, Widget child,
                   ImageChunkEvent? loadingProgress) {
                 if (loadingProgress == null) {

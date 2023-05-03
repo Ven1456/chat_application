@@ -1,4 +1,3 @@
-import 'dart:ffi';
 
 import 'package:chat/resources/widget.dart';
 import 'package:chat/utils/CustomValidators.dart';
@@ -24,6 +23,7 @@ class _FeedBackScreenState extends State<FeedBackScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: appBar("Send Your Feedback",context,true,Colors.transparent,Colors.black),
       body: Form(
         key:feedbackKey,
         child: SafeArea(
@@ -32,37 +32,15 @@ class _FeedBackScreenState extends State<FeedBackScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.only(left: 16.0),
-                        child: Icon(Icons.arrow_back_ios_new_sharp),
-                      ),
-                    ),
-                    const Spacer(),
-                    const Padding(
-                      padding: EdgeInsets.only(right: 16.0),
-                      child: Text(
-                        "Send your Feedback",
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 21),
-                      ),
-                    )
-                  ],
-                ),
                 sizeBoxH60(),
                 const Padding(
-                  padding: EdgeInsets.only(left: 16.0),
+                  padding: EdgeInsets.only(left: 20.0),
                   child: Text("Give  FeedBack",
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                 ),
                 sizeBoxH25(),
                 const Padding(
-                  padding: EdgeInsets.only(left: 16.0),
+                  padding: EdgeInsets.only(left: 20.0),
                   child: Text("How You Feel It ? ",
                       style:
                           TextStyle(fontWeight: FontWeight.normal, fontSize: 15)),
@@ -114,7 +92,7 @@ class _FeedBackScreenState extends State<FeedBackScreen> {
                 ),
                 sizeBoxH25(),
                 const Padding(
-                  padding: EdgeInsets.only(left: 16.0),
+                  padding: EdgeInsets.only(left: 20.0),
                   child: Text("Tell Us More About it",
                       style:
                           TextStyle(fontWeight: FontWeight.normal, fontSize: 15)),
@@ -123,7 +101,7 @@ class _FeedBackScreenState extends State<FeedBackScreen> {
                 Center(
                   child: Container(
                     height: 220,
-                    width: MediaQuery.of(context).size.width * 0.85,
+                    width: MediaQuery.of(context).size.width * 0.90,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(15),

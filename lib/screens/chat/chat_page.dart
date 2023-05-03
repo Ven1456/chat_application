@@ -4,8 +4,8 @@ import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/chat/message_tlle.dart';
-import 'package:chat/services/auth_service.dart';
-import 'package:chat/services/database_services.dart';
+import 'package:chat/services/authentication_services/auth_service.dart';
+import 'package:chat/services/database_services/database_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -310,46 +310,49 @@ class _ChatPageState extends State<ChatPage> {
     return AppBar(
       centerTitle: true,
       elevation: 0,
-      title: Row(
-        children: [
-          ClipRRect(
-              borderRadius: BorderRadius.circular(100),
-              child: (widget.groupPic ?? "").isEmpty
-                  ? const Center(
-                      child: Icon(
-                      Icons.person,
-                      size: 30,
-                    ))
-                  : Image.network(
-                      widget.groupPic.toString(),
-                      height: 50,
-                      width: 50,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (BuildContext context, Widget child,
-                          ImageChunkEvent? loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
-                        );
-                      },
-                    )),
-          const SizedBox(width: 80),
-          Expanded(
-            child: Text(
-              widget.groupName.toString(),
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+      title: Expanded(
+        child: Row(
+          children: [
+            ClipRRect(
+                borderRadius: BorderRadius.circular(100),
+                child: (widget.groupPic ?? "").isEmpty
+                    ? const Center(
+                        child: Icon(
+                        Icons.person,
+                        size: 35,
+                      ))
+                    : Image.network(
+                        widget.groupPic.toString(),
+                        height: 35,
+                        width: 35,
+                        fit: BoxFit.cover,
+
+                        loadingBuilder: (BuildContext context, Widget child,
+                            ImageChunkEvent? loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          );
+                        },
+                      )),
+            const SizedBox(width: 80),
+            Expanded(
+              child: Text(
+                widget.groupName.toString(),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
-              overflow: TextOverflow.ellipsis,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       actions: [
         IconButton(
@@ -480,6 +483,7 @@ class _ChatPageState extends State<ChatPage> {
                               ["userProfile"],
                               type: snapshot.data.docs[index]["Type"],
                             ),
+                            sizeBoxH5()
                           ],
                         );
                       }),

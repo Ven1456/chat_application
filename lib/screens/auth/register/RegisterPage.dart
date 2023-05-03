@@ -2,7 +2,7 @@ import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/auth/login/login_screen.dart';
 import 'package:chat/screens/bottomSheet/BottomSheet.dart';
-import 'package:chat/services/auth_service.dart';
+import 'package:chat/services/authentication_services/auth_service.dart';
 import 'package:chat/utils/CustomValidators.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -41,17 +41,27 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: HexColor.fromHex('#FFFFFF'),
+      //appBar: appBar("", context, true,Colors.white),
       body: Stack(
         children: [
-          SingleChildScrollView(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 65.0),
+          SafeArea(
+            bottom: false,
+            child: SingleChildScrollView(
+              child: Center(
                 child: Form(
                   key: registerFormKey,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
+                     Row(
+                       children: [
+                         Padding(padding: EdgeInsets.only(left: 16,top: 20),
+                           child:     backButton(context,(){
+                             nextPagePushAndRemoveUntil(context, LoginPage());
+                           }),
+                         )
+                       ],
+                     ),
                       //CHAT TEXT
                       boldTitleText("Chats"),
                       sizeBoxH10(),
@@ -124,7 +134,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             DateTime? pickedDate = await showDatePicker(
                                 context: context,
                                 initialDate: DateTime.now()
-                                    .subtract(Duration(days: 2555)),
+                                    .subtract(const Duration(days: 2555)),
                                 firstDate: DateTime(1900),
                                 lastDate: DateTime(2017));
 
@@ -182,7 +192,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       // ALREADY HAVE AN ACCOUNT AND LOGIN TEXT
                       richTextSpan("Already have an Account? ", "Login Now ",
                           () {
-                        nextPage(context, const LoginPage());
+                            nextPagePushAndRemoveUntil(context, const LoginPage());
                       })
                     ],
                   ),

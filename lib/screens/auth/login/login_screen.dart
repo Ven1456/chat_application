@@ -3,8 +3,8 @@ import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/auth/fogot_Password/Forgot_Password_screen.dart';
 import 'package:chat/screens/auth/register/RegisterPage.dart';
 import 'package:chat/screens/bottomSheet/BottomSheet.dart';
-import 'package:chat/services/auth_service.dart';
-import 'package:chat/services/database_services.dart';
+import 'package:chat/services/authentication_services/auth_service.dart';
+import 'package:chat/services/database_services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -113,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
                       // REGISTER AND DON'T HAVE AN ACCOUNT BUTTON TEXT
                       richTextSpan("Don't have An Account? ", "Register ",
                               () {
-                            nextPage(context, const RegisterPage());
+                           nextPagePushAndRemoveUntil(context, const RegisterPage());
                           })
                     ],
                   ),

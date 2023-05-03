@@ -1,8 +1,8 @@
 
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/screens/groups/group_Tile.dart';
-import 'package:chat/services/auth_service.dart';
-import 'package:chat/services/database_services.dart';
+import 'package:chat/services/authentication_services/auth_service.dart';
+import 'package:chat/services/database_services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

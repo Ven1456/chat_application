@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:math';
-import 'package:chat/services/auth_service.dart';
-import 'package:chat/services/database_services.dart';
+import 'package:chat/services/authentication_services/auth_service.dart';
+import 'package:chat/services/database_services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;

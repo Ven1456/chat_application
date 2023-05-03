@@ -71,8 +71,8 @@ class CustomValidators{
 
 
   static String? phone(String? value) {
-    if (value == null || value.isEmpty || value.length != 10) {
-      return 'Please enter a valid 10-digit phone number.';
+    if (value == null || value.isEmpty || value.length < 10) {
+      return 'Mobile Number must be of 10 digit.';
     }
     return null;
   }

@@ -1,4 +1,5 @@
 
+import 'package:chat/resources/widget.dart';
 import 'package:flutter/material.dart';
 
 class FullScreenImagePage extends StatefulWidget {
@@ -31,7 +32,16 @@ class _FullScreenImagePageState extends State<FullScreenImagePage> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Column(
+
         children: [
+          sizeBoxH45(),
+      Row(
+        children: [
+          Padding(padding: const EdgeInsets.only(left: 16,top: 10),
+            child:     backButton(context,(){
+              Navigator.pop(context);
+            }),
+          ),]),
 
           Expanded(
               child: Center(
@@ -56,6 +66,7 @@ class _FullScreenImagePageState extends State<FullScreenImagePage> {
                    //   height: _transformationController.value != Matrix4.identity() ? 700: null,
                       child: Image.network(
                           widget.image,
+
                           loadingBuilder: (context, child, loadingProcess){
                             if(loadingProcess == null) {
                               return child;
@@ -68,7 +79,7 @@ class _FullScreenImagePageState extends State<FullScreenImagePage> {
                           },
                           errorBuilder: (_, a, b) =>
                               Image.asset(
-                                ("assets/images/galley"),
+                                ("assets/images/404.jpg"),
                                 filterQuality: FilterQuality.high,
                               )
                       ),

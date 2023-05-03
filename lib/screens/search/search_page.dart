@@ -1,7 +1,7 @@
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/chat/chat_page.dart';
-import 'package:chat/services/database_services.dart';
+import 'package:chat/services/database_services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -93,6 +93,13 @@ class _SearchState extends State<Search> {
                             errorStyle: const TextStyle(color: Colors.red),
                             hintText: "Search Groups Here....",
                             hintStyle: const TextStyle(color: Colors.grey),
+
+                            focusedErrorBorder: const OutlineInputBorder(
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(12.0)),
+                              borderSide:
+                              BorderSide(color: Colors.red, width: 2),
+                            ),
                             enabledBorder: const OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(12.0)),
@@ -104,31 +111,51 @@ class _SearchState extends State<Search> {
                                   BorderRadius.all(Radius.circular(10.0)),
                               borderSide: BorderSide(color: Colors.blueGrey),
                             ),
-                            suffixIcon: GestureDetector(
-                              onTap: () {
-                                if (searchFromKey.currentState!.validate()) {
-                                  if (!isTextFieldEmpty) {
-                                    setState(() {
-                                      hasUserSearched = true;
-                                    });
-                                    hasUserSearched
-                                        ? initiateSearchMethod()
-                                        : dataNotFound();
+                          suffixIcon: StatefulBuilder(
+                            builder: (BuildContext context, StateSetter setState) {
+                              return IconButton(
+                                icon: searchController.text.isEmpty
+                                    ? const Icon(Icons.search)
+                                    : const Icon(Icons.clear),
+                                onPressed: () {
+                                  if (searchController.text.isEmpty) {
+                                    setState(() {});
+                                    dataNotFound();
+                                  } else {
+                                    searchController.clear();
+                                    setState(() {});
                                   }
-                                }
-                              },
-                              child: Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(21)),
-                                child: const Icon(
-                                  Icons.search,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            )),
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                            // suffixIcon: GestureDetector(
+                            //   onTap: () {
+                            //     if (searchFromKey.currentState!.validate()) {
+                            //       if (!isTextFieldEmpty) {
+                            //         setState(() {
+                            //           hasUserSearched = true;
+                            //         });
+                            //         hasUserSearched
+                            //             ? initiateSearchMethod()
+                            //             : dataNotFound();
+                            //       }
+                            //     }
+                            //   },
+                            //   child: Container(
+                            //     width: 40,
+                            //     height: 40,
+                            //     decoration: BoxDecoration(
+                            //         color: Colors.white.withOpacity(0.2),
+                            //         borderRadius: BorderRadius.circular(21)),
+                            //     child: const Icon(
+                            //       Icons.search,
+                            //       color: Colors.black,
+                            //     ),
+                            //   ),
+                            // )
+
                         validator: (val) {
                           if (val!.isEmpty) {
                             return "Please Enter AtLeast 1 Characters";
@@ -179,7 +206,7 @@ class _SearchState extends State<Search> {
                 shrinkWrap: true,
                 itemCount: searchSnapshot!.docs.length,
                 itemBuilder: (context, index) {
-                  return groupTile(
+                  return searchController.text.isEmpty  ? Container() : groupTile(
                       username,
                       searchSnapshot!.docs[index]["groupId"],
                       searchSnapshot!.docs[index]["groupName"],

@@ -3,8 +3,9 @@ import 'dart:io';
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
+import 'package:chat/screens/bottomSheet/BottomSheet.dart';
 import 'package:chat/screens/homeScreen/homeScreen.dart';
-import 'package:chat/services/database_services.dart';
+import 'package:chat/services/database_services/database_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -187,6 +188,7 @@ class _GroupInfoState extends State<GroupInfo> {
                         width: 150,
                         widget.groupPic ?? "",
                         fit: BoxFit.cover,
+                        errorBuilder: (context, url, error) => Image.asset('assets/images/404.jpg', fit: BoxFit.cover),
                         loadingBuilder: (BuildContext context, Widget child,
                             ImageChunkEvent? loadingProgress) {
                           if (loadingProgress == null) return child;
@@ -255,6 +257,7 @@ class _GroupInfoState extends State<GroupInfo> {
         ),
       ),
       actions: [
+        IconButton(onPressed: (){}, icon: Icon(Icons.delete)),
         IconButtonAlertReuse(
             leaveOnTap: () {
               DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
@@ -264,7 +267,7 @@ class _GroupInfoState extends State<GroupInfo> {
                 widget.groupName,
               )
                   .whenComplete(() {
-                nextPage(context, const HomeScreen());
+                nextPage(context, const BottomSheetTest());
               });
             },
             titleText: "Leave Group?",
@@ -310,12 +313,13 @@ class _GroupInfoState extends State<GroupInfo> {
                                 ),
                                 style: const TextStyle(
                                     fontSize: 15, fontWeight: FontWeight.bold)),
-                            subtitle: Text(
-                              "Your Are In ${widget.groupName} Group",
-                              /*   getId(snapshot.data["members"][index]),*/
-                              style: const TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.bold),
-                            )),
+                            // subtitle: Text(
+                            //   "Your Are In ${widget.groupName} Group",
+                            //   /*   getId(snapshot.data["members"][index]),*/
+                            //   style: const TextStyle(
+                            //       fontSize: 12, fontWeight: FontWeight.bold),
+                            // )
+                        ),
                       );
                     });
               } else {

@@ -1,8 +1,8 @@
 import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/chat/chat_page.dart';
-import 'package:chat/services/auth_service.dart';
-import 'package:chat/services/database_services.dart';
+import 'package:chat/services/authentication_services/auth_service.dart';
+import 'package:chat/services/database_services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -139,6 +139,7 @@ AuthService authService = AuthService();
                     widget.groupPic ?? "",
                     height: 50,
                     width: 50,
+                    errorBuilder:  (context, url, error) => Image.asset('assets/images/404.jpg', fit: BoxFit.cover),
                     fit: BoxFit.cover,
                     loadingBuilder: (BuildContext context, Widget child,
                         ImageChunkEvent? loadingProgress) {

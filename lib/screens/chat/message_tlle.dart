@@ -111,6 +111,8 @@ class _MessageTileState extends State<MessageTile> {
                                   width: 50,
                                   widget.userProfile.toString(),
                                   fit: BoxFit.cover,
+                        //    errorBuilder: (context, url, error) => Image.asset('assets/images/chat.jpg', fit: BoxFit.cover),
+
                                   loadingBuilder: (context, child, loading) {
                                     if (loading == null) return child;
                                     return const Center(
@@ -268,6 +270,7 @@ class _MessageTileState extends State<MessageTile> {
                                 ? Consumer<ProfileController>(
                                     builder: (context, provider, child) {
                                     return ClipRRect(
+                                      borderRadius: BorderRadius.circular(180),
                                         child: provider.image == null
                                             ? (widget.userProfile ?? "").isEmpty
                                                 ? Center(
@@ -284,6 +287,7 @@ class _MessageTileState extends State<MessageTile> {
                                                     height: 50,
                                                     width: 50,
                                                     widget.userProfile ?? '',
+                                          errorBuilder: (context, url, error) => Image.asset('assets/images/404.jpg', fit: BoxFit.cover),
                                                     fit: BoxFit.cover,
                                                     loadingBuilder: (context,
                                                         child, loading) {

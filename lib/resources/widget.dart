@@ -8,16 +8,24 @@ import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 
 // TEXT INPUT DECORATION
-const textInputDecoration = InputDecoration(
-  labelStyle: TextStyle(color: Colors.black),
-  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
-  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
+InputDecoration textInputDecoration = InputDecoration(
+  labelStyle: const TextStyle(color: Colors.black),
+  enabledBorder: OutlineInputBorder(
+      borderSide: const BorderSide(
+        color: Colors.blue,
+      ),
+      borderRadius: BorderRadius.circular(15)),
+  focusedBorder: OutlineInputBorder(
+      borderSide: const BorderSide(
+        color: Colors.blue,
+      ),
+      borderRadius: BorderRadius.circular(15)),
   errorBorder: OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.red),
-  ),
+      borderSide: const BorderSide(color: Colors.red),
+      borderRadius: BorderRadius.circular(15)),
   focusedErrorBorder: OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.red),
-  ),
+      borderSide: const BorderSide(color: Colors.red),
+      borderRadius: BorderRadius.circular(15)),
 );
 // GO TO NEXT PAGE
 nextPage(context, page) {
@@ -36,7 +44,7 @@ void replaceScreen(context, page) {
 }
 
 // SNACK BAR
-void showSnackbar(context, color, message) {
+void showSnackbar({context, color, message}) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     content: Text(message),
     backgroundColor: color,
@@ -47,37 +55,6 @@ void showSnackbar(context, color, message) {
     ),
     duration: const Duration(seconds: 2),
   ));
-}
-
-// TEXT FORMATTERS
-class TrimTextFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
-    return TextEditingValue(
-        text: newValue.text.startsWith(" ")
-            ? newValue.text.replaceAll(" ", "")
-            : newValue.text,
-        selection: newValue.text.startsWith(" ")
-            ? TextSelection.collapsed(
-                offset: newValue.text.replaceAll(" ", "").length)
-            : newValue.selection);
-  }
-}
-
-// TEXT FORMATTERS
-class NewLineTrimTextFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
-    return TextEditingValue(
-        text: newValue.text.startsWith(RegExp('[\n]'))
-            ? newValue.text.trim()
-            : newValue.text,
-        selection: newValue.text.startsWith(RegExp('[\n]'))
-            ? TextSelection.collapsed(offset: newValue.text.trim().length)
-            : newValue.selection);
-  }
 }
 
 extension StringExtension on String {
@@ -105,19 +82,25 @@ extension HexColor on Color {
 }
 
 // APP BAR
-appBar(String titleText, BuildContext context, bool isBack, Color? color,
-    Color? textStyleColor) {
+appBar({
+  String? titleText,
+  required BuildContext context,
+  bool? isBack,
+  Color? color,
+  Color? textStyleColor,
+  Function()? onBack,
+}) {
   return AppBar(
     elevation: 0,
     backgroundColor: color,
     title: Text(
-      titleText,
+      titleText!,
       style: TextStyle(
           fontWeight: FontWeight.bold, fontSize: 25, color: textStyleColor),
     ),
-    leading: isBack
+    leading: isBack!
         ? GestureDetector(
-            onTap: () => Navigator.pop(context),
+            onTap: onBack ?? () => Navigator.pop(context),
             child: const Icon(
               Icons.arrow_back_ios,
               color: Colors.black,
@@ -127,7 +110,7 @@ appBar(String titleText, BuildContext context, bool isBack, Color? color,
   );
 }
 
-backButton(BuildContext context, VoidCallback? onTap) {
+backButton({required BuildContext context, VoidCallback? onTap}) {
   return Container(
     height: 30,
     width: 30,
@@ -324,26 +307,26 @@ class IconButtonAlertReuse extends StatelessWidget {
 }
 
 Future<void> alertBoxReuse(
-    BuildContext context,
-    VoidCallback cancelOnTap,
-    VoidCallback leaveOnTap,
-    String titleText,
-    String subTitleText,
-    String leaveTitleText,
-    String cancelTitleText) async {
+    {BuildContext? context,
+    VoidCallback? cancelOnTap,
+    VoidCallback? leaveOnTap,
+    String? titleText,
+    String? subTitleText,
+    String? leaveTitleText,
+    String? cancelTitleText}) async {
   return showDialog(
       barrierDismissible: true,
-      context: context,
+      context: context!,
       builder: (context) {
         return AlertDialog(
           title: Text(
-            titleText,
+            titleText!,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
             ),
           ),
           content: Text(
-            subTitleText,
+            subTitleText!,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
             ),
@@ -356,7 +339,7 @@ Future<void> alertBoxReuse(
                         borderRadius: BorderRadius.circular(21))),
                 onPressed: cancelOnTap,
                 child: Text(
-                  cancelTitleText,
+                  cancelTitleText!,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -369,7 +352,7 @@ Future<void> alertBoxReuse(
                         borderRadius: BorderRadius.circular(21))),
                 onPressed: leaveOnTap,
                 child: Text(
-                  leaveTitleText,
+                  leaveTitleText!,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -380,7 +363,8 @@ Future<void> alertBoxReuse(
       });
 }
 
-reusableButton(double height, double width, VoidCallback onTap, String text) {
+reusableButton(
+    {double? height, double? width, VoidCallback? onTap, String? text}) {
   return SizedBox(
     height: height,
     width: width,
@@ -389,11 +373,9 @@ reusableButton(double height, double width, VoidCallback onTap, String text) {
             backgroundColor: Colors.cyan,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(21))),
-        onPressed: () {
-          onTap();
-        },
+        onPressed: onTap,
         child: Text(
-          text,
+          text!,
           style: const TextStyle(
               color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
         )),
@@ -455,28 +437,28 @@ class _ReusableTextFieldState extends State<ReusableTextField> {
   }
 }
 
-boldTitleText(String text) {
+boldTitleText({String? text}) {
   return Text(
-    text,
+    text!,
     style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
   );
 }
 
-semiBoldSubTitleText(String text) {
+semiBoldSubTitleText({String? text}) {
   return Text(
-    text,
+    text!,
     style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
   );
 }
 
-imageBuild(String path, double size) {
+imageBuild({String? path, double? size}) {
   return Image.asset(
-    path,
+    path!,
     height: size,
   );
 }
 
-navLinkText(VoidCallback onTap, String text) {
+navLinkText({VoidCallback? onTap, String? text}) {
   return GestureDetector(
     onTap: onTap,
     child: Padding(
@@ -489,7 +471,7 @@ navLinkText(VoidCallback onTap, String text) {
   );
 }
 
-richTextSpan(String text1, String text2, VoidCallback onTap) {
+richTextSpan({String? text1, String? text2, VoidCallback? onTap}) {
   return Text.rich(TextSpan(
       text: text1,
       style: const TextStyle(color: Colors.black, fontSize: 17),
@@ -501,13 +483,13 @@ richTextSpan(String text1, String text2, VoidCallback onTap) {
       ]));
 }
 
-profileSubText(String text) {
+profileSubText({String? text}) {
   return Row(
     children: [
       Padding(
         padding: const EdgeInsets.only(left: 32.0, bottom: 10),
         child: Text(
-          text,
+          text!,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
         ),
       )
@@ -522,6 +504,7 @@ class ProfileTextField extends StatefulWidget {
   final List<TextInputFormatter>? textInputFormatter;
   final Widget? icon;
   final bool? isEnable;
+  final bool? isEdit;
   final int? maxLength;
   final Color? iconColor;
   final Function(String)? onChanged;
@@ -539,6 +522,7 @@ class ProfileTextField extends StatefulWidget {
     this.validator,
     this.iconColor,
     this.maxLength,
+    this.isEdit,
   }) : super(key: key);
 
   @override
@@ -552,8 +536,15 @@ class _ProfileTextFieldState extends State<ProfileTextField> {
       SizedBox(
         width: MediaQuery.of(context).size.width * 0.85,
         child: TextFormField(
+            readOnly: widget.isEdit ?? false,
             maxLength: widget.maxLength,
             onChanged: widget.onChanged,
+            onEditingComplete: () {
+              if (widget.onChanged != null) {
+                widget.onChanged!(
+                    widget.textEditingController?.text.trim() ?? '');
+              }
+            },
             enabled: widget.isEnable,
             onTap: widget.onTap,
             validator: widget.validator,
@@ -661,12 +652,12 @@ sizeBoxW118() {
   );
 }
 
-listTile(String text, VoidCallback onTap) {
+listTile({String? text, VoidCallback? onTap}) {
   return Padding(
     padding: const EdgeInsets.only(right: 6.0, left: 6),
     child: Card(
       child: ListTile(
-        title: Text(text),
+        title: Text(text!),
         trailing: const Icon(Icons.arrow_forward_ios_sharp),
         onTap: onTap,
       ),

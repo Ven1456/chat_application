@@ -67,7 +67,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       backgroundColor: HexColor.fromHex('#FFFFFF'),
       // APP BAR
       // appBar: _buildAppBar(),
-      body:  Stack(
+      body: Stack(
         children: [
           SafeArea(
             bottom: false,
@@ -80,70 +80,85 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     children: [
                       Row(
                         children: [
-                          Padding(padding: EdgeInsets.only(left: 16,top: 20),
-                            child:     backButton(context,(){
-                              nextPagePushAndRemoveUntil(context, LoginPage());
-                            }),
+                          Padding(
+                            padding: EdgeInsets.only(left: 16, top: 20),
+                            child: backButton(
+                                context: context,
+                                onTap: () {
+                                  nextPagePushAndRemoveUntil(
+                                      context, const LoginPage());
+                                }),
                           ),
-
                           const Padding(
-                            padding: EdgeInsets.only(top:20.0,left: 65),
-                            child: Text("Reset Password",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25),),
+                            padding: EdgeInsets.only(top: 20.0, left: 65),
+                            child: Text(
+                              "Reset Password",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 25),
+                            ),
                           )
                         ],
                       ),
                       sizeBoxH80(),
                       // IMAGE
-                      imageBuild("assets/images/forgot.jpg", 200),
-                     sizeBoxH100(),
+                      imageBuild(path: "assets/images/forgot.jpg", size: 200),
+                      sizeBoxH100(),
 
                       SizedBox(
                           width: MediaQuery.of(context).size.width * 0.85,
                           child: isButton
                               ? Container()
                               :
-                          // EMAIL  TEXT FIELD
-                          ReusableTextField(
-                            width: MediaQuery.of(context).size.width * 0.85,
-                            obSecureText: false,
-                            labelText: "Enter Your Email",
-                            prefixIcon: Icon(Icons.email),
-                            onChanged: (val) {
-                              setState(() {
-                                email = val;
-                              });
-                            },
-                            validator:  (val) =>  CustomValidators.email(val),
-                          )),
-                     sizeBoxH15(),
+                              // EMAIL  TEXT FIELD
+                              ReusableTextField(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.85,
+                                  obSecureText: false,
+                                  labelText: "Enter Your Email",
+                                  prefixIcon: Icon(Icons.email),
+                                  onChanged: (val) {
+                                    setState(() {
+                                      email = val;
+                                    });
+                                  },
+                                  validator: (val) =>
+                                      CustomValidators.email(val),
+                                )),
+                      sizeBoxH15(),
                       isButton
                           ? Container()
                           :
-                      // SEND REQUEST BUTTON
-                      reusableButton(40, 130, () {
-                        forgot();
-                      }, "Submit"),
+                          // SEND REQUEST BUTTON
+                          reusableButton(
+                              height: 40,
+                              width: 130,
+                              onTap: () {
+                                forgot();
+                              },
+                              text: "Submit",
+                            ),
                       isButton
                           ? Column(
-                        children: [
-                          // TIMER ICON
-                          _buildTimerIcon(),
-                          // TIMER START ICON
-                          _buildTimeStartText(),
-                          sizeBoxH10(),
-                          // DESCRIPTION TEXT
-                          semiBoldSubTitleText(
-                            "                   Please Check Your Email "
-                                "\n If Link is Not Their Please Check Spam Box"
-                                "\n            Set Must 6 Character Password",
-                          ),
-                          sizeBoxH10(),
-                          // CLOSE ICON
-                          reusableButton(40, 100, () {
-                            Navigator.pop(context);
-                          }, "Close"),
-                        ],
-                      )
+                              children: [
+                                // TIMER ICON
+                                _buildTimerIcon(),
+                                // TIMER START ICON
+                                _buildTimeStartText(),
+                                sizeBoxH10(),
+                                // DESCRIPTION TEXT
+                                semiBoldSubTitleText(
+                                  text:
+                                      "                   Please Check Your Email "
+                                      "\n If Link is Not Their Please Check Spam Box"
+                                      "\n            Set Must 6 Character Password",
+                                ),
+                                sizeBoxH10(),
+                                // CLOSE ICON
+                                reusableButton(height : 40, width:  100,onTap:  () {
+                                  Navigator.pop(context);
+                                }, text:  "Close"),
+                              ],
+                            )
                           : Container()
                     ],
                   ),
@@ -151,13 +166,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
             ),
           ),
-          if(_isLoading)
-        loadingAnimation()
+          if (_isLoading) loadingAnimation()
         ],
       ),
     );
   }
-
 
   // TIMER START TEXT  EXTRACT AS A METHOD
   Text _buildTimeStartText() {
@@ -175,7 +188,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       size: 150,
     ));
   }
-
 
   forgot() async {
     if (formKey.currentState!.validate()) {

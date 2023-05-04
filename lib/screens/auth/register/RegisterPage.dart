@@ -53,23 +53,27 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                     Row(
-                       children: [
-                         Padding(padding: EdgeInsets.only(left: 16,top: 20),
-                           child:     backButton(context,(){
-                             nextPagePushAndRemoveUntil(context, LoginPage());
-                           }),
-                         )
-                       ],
-                     ),
+                      Row(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(left: 16, top: 20),
+                            child: backButton(
+                                context: context,
+                                onTap: () {
+                                  nextPagePushAndRemoveUntil(
+                                      context, const LoginPage());
+                                }),
+                          )
+                        ],
+                      ),
                       //CHAT TEXT
-                      boldTitleText("Chats"),
+                      boldTitleText(text: "Chats"),
                       sizeBoxH10(),
                       // REGISTER TEXT
                       semiBoldSubTitleText(
-                          "Register Now To See What Their Are Talking "),
+                          text: "Register Now To See What Their Are Talking "),
                       // REGISTER IMAGE
-                      imageBuild("assets/images/register.jpg", 180),
+                      imageBuild(path: "assets/images/register.jpg", size: 180),
                       sizeBoxH15(),
                       // FULL NAME TEXT FIELD
                       ReusableTextField(
@@ -81,7 +85,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             fullName = val;
                           });
                         },
-                        validator:(val)=> CustomValidators.fullName(val),
+                        validator: (val) => CustomValidators.fullName(val),
                         prefixIcon: const Icon(Icons.account_circle),
                       ),
                       sizeBoxH15(),
@@ -95,7 +99,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             email = val;
                           });
                         },
-                        validator:(val)=> CustomValidators.email(val),
+                        validator: (val) => CustomValidators.email(val),
                         prefixIcon: const Icon(Icons.email),
                       ),
                       // _buildEmailTextField(),
@@ -123,7 +127,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             password = val;
                           });
                         },
-                        validator:(val)=> CustomValidators.password(val),
+                        validator: (val) => CustomValidators.password(val),
                         prefixIcon: const Icon(Icons.security),
                       ),
                       sizeBoxH15(),
@@ -143,7 +147,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                   DateFormat('dd-MM-yyyy').format(pickedDate);
                               setState(() {
                                 dateinput.text = formattedDate;
-                                dob = formattedDate; //set output date to TextField value.
+                                dob =
+                                    formattedDate; //set output date to TextField value.
                               });
                             }
                           },
@@ -154,7 +159,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             labelText: "Date Of Birth",
                             prefixIcon: const Icon(Icons.calendar_month),
                           ),
-                          validator: (val)=> CustomValidators.dateOfBirth(val),
+                          validator: (val) => CustomValidators.dateOfBirth(val),
                         ),
                       ),
                       sizeBoxH15(),
@@ -183,25 +188,31 @@ class _RegisterPageState extends State<RegisterPage> {
 
                       // REGISTER BUTTON
                       reusableButton(
-                          50, MediaQuery.of(context).size.width * 0.85, () {
-                        register();
-                      }, "Register Now "),
+                        height: 50,
+                        width: MediaQuery.of(context).size.width * 0.85,
+                        onTap: () {
+                          register();
+                        },
+                        text: "Register Now ",
+                      ),
                       const SizedBox(
                         height: 15,
                       ),
                       // ALREADY HAVE AN ACCOUNT AND LOGIN TEXT
-                      richTextSpan("Already have an Account? ", "Login Now ",
-                          () {
-                            nextPagePushAndRemoveUntil(context, const LoginPage());
-                      })
+                      richTextSpan(
+                          text1: "Already have an Account? ",
+                          text2: "Login Now ",
+                          onTap: () {
+                            nextPagePushAndRemoveUntil(
+                                context, const LoginPage());
+                          }),
                     ],
                   ),
                 ),
               ),
             ),
           ),
-          if (_isLoading)
-          loadingAnimation()
+          if (_isLoading) loadingAnimation()
         ],
       ),
     );

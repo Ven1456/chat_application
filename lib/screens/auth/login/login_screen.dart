@@ -38,97 +38,103 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           SingleChildScrollView(
             child: Center(
-            child:Column(
-              children: [
-                Form(
-                  key: formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                     sizeBoxH80(),
-                      // CHAT TEXT
-                      boldTitleText("Chats"),
-                     sizeBoxH10(),
-                      // SUB TITLE TEXT
-                      semiBoldSubTitleText(
-                          "Login Now To See What Their Are Talking "),
-                      sizeBoxH45(),
-                      // IMAGE
-                      imageBuild("assets/images/chat.jpg",180),
-                      sizeBoxH80(),
-                      // EMAIL TEXT FIELD
-                      ReusableTextField(
-                        obSecureText: false,
-                        width: MediaQuery.of(context).size.width * 0.85,
-                        textEditingController: emailTextEditingController,
-                        labelText: "Email",
-                        onChanged: (val) {
-                          setState(() {
-                            email = val;
-                          });
-                        },
-                        prefixIcon: const Icon(Icons.email),
-                        validator:(val)=> CustomValidators.email(val)
-                      ),
-                      sizeBoxH15(),
-                      // PASSWORD TEXT FIELD
-                      ReusableTextField(
-                        obSecureText: !_passwordVisible,
-                        width: MediaQuery.of(context).size.width * 0.85,
-                        textEditingController: passTextEditingController,
-                        labelText: "Password",
-                        prefixIcon: const Icon(Icons.security),
-                        suffixIcon: InkWell(
-                          onTap: () {
+              child: Column(
+                children: [
+                  Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        sizeBoxH80(),
+                        // CHAT TEXT
+                        boldTitleText(text: "Chats"),
+                        sizeBoxH10(),
+                        // SUB TITLE TEXT
+                        semiBoldSubTitleText(
+                            text: "Login Now To See What Their Are Talking "),
+                        sizeBoxH45(),
+                        // IMAGE
+                        imageBuild(path: "assets/images/chat.jpg", size: 180),
+                        sizeBoxH80(),
+                        // EMAIL TEXT FIELD
+                        ReusableTextField(
+                            obSecureText: false,
+                            width: MediaQuery.of(context).size.width * 0.85,
+                            textEditingController: emailTextEditingController,
+                            labelText: "Email",
+                            onChanged: (val) {
+                              setState(() {
+                                email = val;
+                              });
+                            },
+                            prefixIcon: const Icon(Icons.email),
+                            validator: (val) => CustomValidators.email(val)),
+                        sizeBoxH15(),
+                        // PASSWORD TEXT FIELD
+                        ReusableTextField(
+                          obSecureText: !_passwordVisible,
+                          width: MediaQuery.of(context).size.width * 0.85,
+                          textEditingController: passTextEditingController,
+                          labelText: "Password",
+                          prefixIcon: const Icon(Icons.security),
+                          suffixIcon: InkWell(
+                            onTap: () {
+                              setState(() {
+                                _passwordVisible = !_passwordVisible;
+                              });
+                            },
+                            child: Icon(
+                              _passwordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          onChanged: (val) {
                             setState(() {
-                              _passwordVisible = !_passwordVisible;
+                              pass = val;
                             });
                           },
-                          child: Icon(
-                            _passwordVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                            color: Colors.grey,
-                          ),
+                          validator: (val) => CustomValidators.password(val),
                         ),
-                        onChanged: (val) {
-                          setState(() {
-                            pass = val;
-                          });
-                        },
-                        validator: (val)=> CustomValidators.password(val),
-                      ),
-                     sizeBoxH15(),
-                      // FORGOT PASSWORD  TEXT
-                      navLinkText(() {
-                        nextPage(context, const ForgotPasswordScreen());
-                      }, "Forgot Password?"),
-                      sizeBoxH10(),
-                      // SIGN IN BUTTON
-                      reusableButton(
-                          50, MediaQuery.of(context).size.width * 0.85, () {
-                        login();
-                      }, "Sign in "),
-                      sizeBoxH10(),
-                      // REGISTER AND DON'T HAVE AN ACCOUNT BUTTON TEXT
-                      richTextSpan("Don't have An Account? ", "Register ",
-                              () {
-                           nextPagePushAndRemoveUntil(context, const RegisterPage());
-                          })
-                    ],
+                        sizeBoxH15(),
+                        // FORGOT PASSWORD  TEXT
+                        navLinkText(
+                            onTap: () {
+                              nextPage(context, const ForgotPasswordScreen());
+                            },
+                            text: "Forgot Password?"),
+                        sizeBoxH10(),
+                        // SIGN IN BUTTON
+                        reusableButton(
+                          height: 50,
+                          width: MediaQuery.of(context).size.width * 0.85,
+                          onTap: () {
+                            login();
+                          },
+                          text: "Sign in ",
+                        ),
+                        sizeBoxH10(),
+                        // REGISTER AND DON'T HAVE AN ACCOUNT BUTTON TEXT
+                        richTextSpan(
+                            text1: "Don't have An Account? ",
+                            text2: "Register ",
+                            onTap: () {
+                              nextPagePushAndRemoveUntil(
+                                  context, const RegisterPage());
+                            }),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-        ),
           ),
-          if(_isLoading)
-            loadingAnimation()
+          if (_isLoading) loadingAnimation()
         ],
       ),
     );
   }
-
 
   login() async {
     if (formKey.currentState!.validate()) {

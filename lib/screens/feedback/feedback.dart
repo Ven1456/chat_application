@@ -1,12 +1,18 @@
-
 import 'package:chat/resources/widget.dart';
+import 'package:chat/screens/bottomSheet/BottomSheet.dart';
+import 'package:chat/screens/profile/components.dart';
+import 'package:chat/services/database_services/database_services.dart';
 import 'package:chat/utils/CustomValidators.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class FeedBackScreen extends StatefulWidget {
-   FeedBackScreen({Key? key}) : super(key: key);
+  const FeedBackScreen({Key? key, this.userName}) : super(key: key);
+  final String? userName;
 
   @override
   State<FeedBackScreen> createState() => _FeedBackScreenState();
@@ -15,17 +21,23 @@ class FeedBackScreen extends StatefulWidget {
 class _FeedBackScreenState extends State<FeedBackScreen> {
   final TextEditingController textEditingController = TextEditingController();
 
-   final feedbackKey= GlobalKey<FormState>();
+  final feedbackKey = GlobalKey<FormState>();
 
-   double? ratingFeedback;
-
+  double? ratingFeedback;
+  String? message;
+  final user = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar("Send Your Feedback",context,true,Colors.transparent,Colors.black),
+      appBar: appBar(
+          titleText: "Send Your Feedback",
+          context: context,
+          isBack: true,
+          color: Colors.transparent,
+          textStyleColor: Colors.black),
       body: Form(
-        key:feedbackKey,
+        key: feedbackKey,
         child: SafeArea(
           child: SingleChildScrollView(
             child: Column(
@@ -36,14 +48,15 @@ class _FeedBackScreenState extends State<FeedBackScreen> {
                 const Padding(
                   padding: EdgeInsets.only(left: 20.0),
                   child: Text("Give  FeedBack",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                 ),
                 sizeBoxH25(),
                 const Padding(
                   padding: EdgeInsets.only(left: 20.0),
                   child: Text("How You Feel It ? ",
-                      style:
-                          TextStyle(fontWeight: FontWeight.normal, fontSize: 15)),
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal, fontSize: 15)),
                 ),
                 sizeBoxH25(),
                 Center(
@@ -87,15 +100,14 @@ class _FeedBackScreenState extends State<FeedBackScreen> {
                         ratingFeedback = rating;
                       });
                     },
-
                   ),
                 ),
                 sizeBoxH25(),
                 const Padding(
                   padding: EdgeInsets.only(left: 20.0),
                   child: Text("Tell Us More About it",
-                      style:
-                          TextStyle(fontWeight: FontWeight.normal, fontSize: 15)),
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal, fontSize: 15)),
                 ),
                 sizeBoxH15(),
                 Center(
@@ -121,19 +133,25 @@ class _FeedBackScreenState extends State<FeedBackScreen> {
                       ),
                       minLines: 1,
                       maxLines: 11,
-                      validator: (val)=> CustomValidators.empty(val),
+                      onChanged: (val) {
+                        setState(() {
+                          message = val;
+                        });
+                      },
+                      validator: (val) => CustomValidators.empty(val),
                     ),
                   ),
                 ),
                 sizeBoxH25(),
                 Center(
                   child: reusableButton(
-                      50,
-                      MediaQuery.of(context).size.width * 0.75,
-                      () {
-                        publish();
+                      height: 50,
+                      width: MediaQuery.of(context).size.width * 0.75,
+                      onTap: () {
+                         publish();
+
                       },
-                      "Publish Feedback"),
+                      text: "Publish Feedback"),
                 )
               ],
             ),
@@ -143,13 +161,33 @@ class _FeedBackScreenState extends State<FeedBackScreen> {
     );
   }
 
-  void publish(){
-    if(feedbackKey.currentState!.validate()){
-      setState(() {
-        ratingFeedback.toString().isEmpty ? CircularProgressIndicator(): null;
-      });
+  void getFeedback() async {
+    await DatabaseServices(uid: user).createFeedback(
+        user, widget.userName!, message!, ratingFeedback.toString());
+  }
+
+  void publish() {
+    if(ratingFeedback == null){
+      QuickAlert.show(
+        context: context,
+        type: QuickAlertType.error,
+        title: 'Oops...',
+        text: 'Please Give Me A Rating',
+      );
+    }
+    if (feedbackKey.currentState!.validate() && ratingFeedback != null) {
+      getFeedback();
+      QuickAlert.show(
+        onConfirmBtnTap: (){
+          nextPagePushAndRemoveUntil(context, const BottomSheetTest());
+        },
+        context: context,
+        type: QuickAlertType.success,
+        text: 'Feedback Publish Successfully',
+      );
+      textEditingController.clear();
+
 
     }
-
   }
 }

@@ -16,6 +16,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
+import '../../utils/InputFormatters.dart';
 import '../groups/group_info.dart';
 
 // ignore: must_be_immutable
@@ -310,49 +311,47 @@ class _ChatPageState extends State<ChatPage> {
     return AppBar(
       centerTitle: true,
       elevation: 0,
-      title: Expanded(
-        child: Row(
-          children: [
-            ClipRRect(
-                borderRadius: BorderRadius.circular(100),
-                child: (widget.groupPic ?? "").isEmpty
-                    ? const Center(
-                        child: Icon(
-                        Icons.person,
-                        size: 35,
-                      ))
-                    : Image.network(
-                        widget.groupPic.toString(),
-                        height: 35,
-                        width: 35,
-                        fit: BoxFit.cover,
+      title: Row(
+        children: [
+          ClipRRect(
+              borderRadius: BorderRadius.circular(100),
+              child: (widget.groupPic ?? "").isEmpty
+                  ? const Center(
+                      child: Icon(
+                      Icons.person,
+                      size: 35,
+                    ))
+                  : Image.network(
+                      widget.groupPic.toString(),
+                      height: 35,
+                      width: 35,
+                      fit: BoxFit.cover,
 
-                        loadingBuilder: (BuildContext context, Widget child,
-                            ImageChunkEvent? loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Center(
-                            child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                  : null,
-                            ),
-                          );
-                        },
-                      )),
-            const SizedBox(width: 80),
-            Expanded(
-              child: Text(
-                widget.groupName.toString(),
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                overflow: TextOverflow.ellipsis,
+                      loadingBuilder: (BuildContext context, Widget child,
+                          ImageChunkEvent? loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        );
+                      },
+                    )),
+          const SizedBox(width: 80),
+          Expanded(
+            child: Text(
+              widget.groupName.toString(),
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
+              overflow: TextOverflow.ellipsis,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       actions: [
         IconButton(

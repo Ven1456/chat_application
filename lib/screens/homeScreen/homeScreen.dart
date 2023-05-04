@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:toast/toast.dart';
 
+import '../../resources/widget.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -55,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
         await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
             .gettingUserEmail(email);
     setState(() {
-      profilePic = snapshot.docs[0]["profilePic"];
+     // profilePic = snapshot.docs[0]["profilePic"];
     });
   }
 
@@ -96,13 +98,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // APP BAR  EXTRACT AS A METHOD
   AppBar _buildAppBar(BuildContext context) {
-    return AppBar(
-      automaticallyImplyLeading: false,
-      centerTitle: true,
-      title: const Text(
-        "Chats",
-        style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
-      ),
+    return appBar(
+      titleText: "Chats",
+      context: context,
+      isBack: false,
+      textStyleColor: Colors.white,
+      color: Colors.blue,
     );
   }
 

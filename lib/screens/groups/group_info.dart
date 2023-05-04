@@ -257,7 +257,7 @@ class _GroupInfoState extends State<GroupInfo> {
         ),
       ),
       actions: [
-        IconButton(onPressed: (){}, icon: Icon(Icons.delete)),
+        IconButton(onPressed: () {}, icon: Icon(Icons.delete)),
         IconButtonAlertReuse(
             leaveOnTap: () {
               DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
@@ -298,27 +298,27 @@ class _GroupInfoState extends State<GroupInfo> {
                         padding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 5),
                         child: ListTile(
-                            leading: CircleAvatar(
-                              child: Text(
-                                getName(snapshot.data["members"][index])
-                                    .substring(0, 2)
-                                    .toUpperCase(),
-                                style: const TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
-                              ),
+                          leading: CircleAvatar(
+                            child: Text(
+                              getName(snapshot.data["members"][index])
+                                  .substring(0, 2)
+                                  .toUpperCase(),
+                              style: const TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
                             ),
-                            title: Text(
-                                getName(
-                                  snapshot.data["members"][index],
-                                ),
-                                style: const TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.bold)),
-                            // subtitle: Text(
-                            //   "Your Are In ${widget.groupName} Group",
-                            //   /*   getId(snapshot.data["members"][index]),*/
-                            //   style: const TextStyle(
-                            //       fontSize: 12, fontWeight: FontWeight.bold),
-                            // )
+                          ),
+                          title: Text(
+                              getName(
+                                snapshot.data["members"][index],
+                              ),
+                              style: const TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold)),
+                          // subtitle: Text(
+                          //   "Your Are In ${widget.groupName} Group",
+                          //   /*   getId(snapshot.data["members"][index]),*/
+                          //   style: const TextStyle(
+                          //       fontSize: 12, fontWeight: FontWeight.bold),
+                          // )
                         ),
                       );
                     });

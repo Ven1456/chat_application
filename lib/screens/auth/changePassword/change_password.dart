@@ -13,10 +13,11 @@ class ChangePasswordScreen extends StatefulWidget {
 }
 
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
-  String newPass="";
-  String confirmPass="";
-  TextEditingController currentPassTextEditingController =  TextEditingController();
-  TextEditingController newPassTextEditingController =  TextEditingController();
+  String newPass = "";
+  String confirmPass = "";
+  TextEditingController currentPassTextEditingController =
+      TextEditingController();
+  TextEditingController newPassTextEditingController = TextEditingController();
   bool _currentPasswordVisible = false;
   bool _newPasswordVisible = false;
   final _resetKey = GlobalKey<FormState>();
@@ -24,7 +25,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: HexColor.fromHex('#FFFFFF'),
-      appBar: appBar("Reset Password", context, true,Colors.transparent,Colors.black),
+      appBar: appBar(
+        titleText: "Reset Password",
+        context: context,
+        isBack: true,
+        color: Colors.transparent,
+        textStyleColor: Colors.black,
+      ),
       body: Form(
         key: _resetKey,
         child: SingleChildScrollView(
@@ -33,72 +40,71 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 sizeBoxH45(),
-                imageBuild("assets/images/reset.jpg", 220),
+                imageBuild(path: "assets/images/reset.jpg", size: 220),
                 sizeBoxH25(),
-                boldTitleText("Reset Password"),
+                boldTitleText(text: "Reset Password"),
                 sizeBoxH25(),
                 ReusableTextField(
-                  obSecureText: !_currentPasswordVisible,
-                  width: MediaQuery.of(context).size.width * 0.85,
-                  textEditingController: currentPassTextEditingController,
-                  labelText: "Current Password",
-                  prefixIcon: const Icon(Icons.security),
-                  suffixIcon: InkWell(
-                    onTap: () {
+                    obSecureText: !_currentPasswordVisible,
+                    width: MediaQuery.of(context).size.width * 0.85,
+                    textEditingController: currentPassTextEditingController,
+                    labelText: "Current Password",
+                    prefixIcon: const Icon(Icons.security),
+                    suffixIcon: InkWell(
+                      onTap: () {
+                        setState(() {
+                          _currentPasswordVisible = !_currentPasswordVisible;
+                        });
+                      },
+                      child: Icon(
+                        _currentPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    onChanged: (val) {
                       setState(() {
-                        _currentPasswordVisible = !_currentPasswordVisible;
+                        newPass = val;
                       });
                     },
-                    child: Icon(
-                      _currentPasswordVisible
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  onChanged: (val) {
-                    setState(() {
-                      newPass = val;
-                    });
-                  },
-                    validator: (val) => CustomValidators.validatePassword(val)
-                ),
+                    validator: (val) => CustomValidators.validatePassword(val)),
                 sizeBoxH15(),
-
-               ReusableTextField(
-                  obSecureText: !_newPasswordVisible,
-                  width: MediaQuery.of(context).size.width * 0.85,
-                  textEditingController: newPassTextEditingController,
-                  labelText: "New Password",
-                  prefixIcon: const Icon(Icons.security),
-                  suffixIcon: InkWell(
-                    onTap: () {
+                ReusableTextField(
+                    obSecureText: !_newPasswordVisible,
+                    width: MediaQuery.of(context).size.width * 0.85,
+                    textEditingController: newPassTextEditingController,
+                    labelText: "New Password",
+                    prefixIcon: const Icon(Icons.security),
+                    suffixIcon: InkWell(
+                      onTap: () {
+                        setState(() {
+                          _newPasswordVisible = !_newPasswordVisible;
+                        });
+                      },
+                      child: Icon(
+                        _newPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    onChanged: (val) {
                       setState(() {
-                        _newPasswordVisible = !_newPasswordVisible;
+                        confirmPass = val;
                       });
                     },
-                    child: Icon(
-                      _newPasswordVisible
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  onChanged: (val) {
-                    setState(() {
-                      confirmPass = val;
-                    });
-                  },
-                  validator: (val) => CustomValidators.password(val)
-
-                ),
+                    validator: (val) => CustomValidators.password(val)),
                 sizeBoxH25(),
-                reusableButton(50, MediaQuery.of(context).size.width*0.85, () {
-                  _resetKey.currentState!.validate();
-                  _changePassword();
-
-                }, "Update Password")
-
+                reusableButton(
+                  height: 50,
+                  width: MediaQuery.of(context).size.width * 0.85,
+                  onTap: () {
+                    _resetKey.currentState!.validate();
+                    _changePassword();
+                  },
+                  text: "Update Password",
+                )
               ],
             ),
           ),
@@ -132,7 +138,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         text: 'Password Update Successfully',
       );
     } on FirebaseAuthException catch (e) {
-
       // Handle errors
       if (e.code == 'wrong-password') {
         QuickAlert.show(
@@ -159,7 +164,4 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       );
     }
   }
-
-
 }
-

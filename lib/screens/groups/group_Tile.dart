@@ -53,7 +53,6 @@ class _GroupTileState extends State<GroupTile> {
       setState(() {
         profilePic = value ?? "";
         getGroupImage();
-        /*  getGroupPic();*/
       });
     });
   }

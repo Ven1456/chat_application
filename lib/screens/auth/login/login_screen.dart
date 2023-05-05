@@ -47,11 +47,11 @@ class _LoginPageState extends State<LoginPage> {
                       children: [
                         sizeBoxH80(),
                         // CHAT TEXT
-                        boldTitleText(text: "Chats"),
+                        boldText(text: "Chats",size: 30),
                         sizeBoxH10(),
                         // SUB TITLE TEXT
-                        semiBoldSubTitleText(
-                            text: "Login Now To See What Their Are Talking "),
+                        boldText(
+                            text: "Login Now To See What Their Are Talking ",size: 15),
                         sizeBoxH45(),
                         // IMAGE
                         imageBuild(path: "assets/images/chat.jpg", size: 180),

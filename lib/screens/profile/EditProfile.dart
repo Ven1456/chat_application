@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/utils/CustomValidators.dart';
@@ -11,25 +9,19 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
+import "package:chat/utils/InputFormatters.dart";
 
-import '../../utils/InputFormatters.dart';
-import 'edit_ProfilePic.dart';
+import '../../resources/Shared_Preferences.dart';
+import '../bottomSheet/BottomSheet.dart';
+import 'profilePic.dart';
 
 class EditProfile extends StatefulWidget {
-  final String username;
-  final String email;
-  final String phone;
-  final String dob;
   final String? profilePic;
 
-  const EditProfile(
-      {Key? key,
-      required this.username,
-      required this.email,
-      required this.phone,
-      required this.dob,
-      this.profilePic})
-      : super(key: key);
+  const EditProfile({
+    Key? key,
+    this.profilePic,
+  }) : super(key: key);
 
   @override
   State<EditProfile> createState() => _EditProfileState();
@@ -53,32 +45,45 @@ class _EditProfileState extends State<EditProfile> {
   String _gender = "";
   FocusNode isFocus = FocusNode();
   bool hasChanges = false;
-  DateTime? _selectedDate;
+  final editProfileKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
-    _loadSavedData();
-    setState(() {
-      widget.profilePic;
-    });
+    getProfileDetails();
   }
 
-  void _loadSavedData() async {
-    final user = FirebaseAuth.instance.currentUser!.uid;
-    final docSnapshot =
-        await FirebaseFirestore.instance.collection("users").doc(user).get();
-    setState(() {
-      _userName = docSnapshot.get("fullName");
-      _email = docSnapshot.get("email");
-      _phone = docSnapshot.get("phone");
-      _dob = docSnapshot.get("dob");
-      _gender = docSnapshot.get("gender");
-      usernameController = TextEditingController(text: _userName);
-      emailController = TextEditingController(text: _email);
-      phoneController = TextEditingController(text: _phone);
-      dobController = TextEditingController(text: _dob);
+  getProfileDetails() async {
+    await SharedPref.getName().then((value) {
+      setState(() {
+        _userName = value;
+      });
     });
+    await SharedPref.getEmail().then((value) {
+      setState(() {
+        _email = value;
+      });
+    });
+    await SharedPref.getPhone().then((value) {
+      setState(() {
+        _phone = value;
+      });
+    });
+    await SharedPref.getGender().then((value) {
+      setState(() {
+        _gender = value;
+      });
+    });
+    await SharedPref.getDob().then((value) {
+      setState(() {
+        _dob = value;
+      });
+    });
+
+    usernameController = TextEditingController(text: _userName);
+    emailController = TextEditingController(text: _email);
+    phoneController = TextEditingController(text: _phone);
+    dobController = TextEditingController(text: _dob);
   }
 
   Gender? _selectedGender; // default selected gender
@@ -102,13 +107,19 @@ class _EditProfileState extends State<EditProfile> {
     }).toList();
   }
 
-  final editProfileKey = GlobalKey<FormState>();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar(
-          "Edit Profile", context, true, Colors.transparent, Colors.black),
+        titleText: "Edit Profile",
+        context: context,
+        isBack: true,
+        textStyleColor: Colors.black,
+        color: Colors.white,
+        onBack: () {
+          Navigator.pop(context, true);
+        },
+      ),
       body: Form(
         key: editProfileKey,
         child: SingleChildScrollView(
@@ -120,151 +131,71 @@ class _EditProfileState extends State<EditProfile> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     sizeBoxH25(),
-                    EditProfilePic(
+                    // PROFILE PICTURE
+                    ProfilePicWidget(
+                      isEdit: true,
                       provider: provider,
-                      profilePic: widget.profilePic ?? "",
-                      userName: widget.username,
+                      profilePic: widget.profilePic.toString(),
+                      userName: _userName,
                     ),
                     sizeBoxH25(),
-                    profileSubText("Username"),
+                    // USERNAME TEXT
+                    profileSubText(text: "Username"),
                     // USERNAME TEXT FIELD
                     ProfileTextField(
-                      onChanged: _userNameOnchangedValue,
+                      onChanged: _userNameOnChangedValue,
                       validator: (val) => CustomValidators.fullName(val),
                       isEnable: _isUsernameEditable,
                       textEditingController: usernameController,
                     ),
-
                     sizeBoxH15(),
                     // EMAIL
-                    profileSubText("Email"),
+                    profileSubText(text: "Email"),
                     // EMAIL TEXT FIELD
                     ProfileTextField(
-                      onChanged: (val) {
-                        setState(() {
-                          _email = val;
-                          hasChanges = true;
-                        });
-                      },
+                      onChanged: _emailOnChanged,
                       validator: (val) => CustomValidators.email(val),
                       isEnable: _isEmailEditable,
                       textEditingController: emailController,
                     ),
                     sizeBoxH15(),
-
                     // PHONE
-                    profileSubText("Phone"),
+                    profileSubText(text: "Phone"),
                     // PHONE TEXT FIELD
                     ProfileTextField(
                       maxLength: 10,
                       textInputType: TextInputType.phone,
                       textInputFormatter: [
-                        FilteringTextInputFormatter.digitsOnly
+                        FilteringTextInputFormatter.digitsOnly,
                       ],
                       validator: (val) => CustomValidators.phone(val),
-                      onChanged: (val) {
-                        setState(() {
-                          if (val.length <= 10) {
-                            _phone = val;
-                            hasChanges = val.length == 10;
-                          }
-                        });
-                      },
+                      onChanged: _phoneOnChanged,
                       isEnable: _isPhoneEditable,
                       textEditingController: phoneController,
                     ),
                     sizeBoxH15(),
                     // DOB
-                    profileSubText("Date Of Birth"),
+                    profileSubText(text: "Date Of Birth"),
                     // DOB TEXT FIELD
                     ProfileTextField(
+                      isEdit: true,
                       textInputFormatter: [
                         FilteringTextInputFormatter.digitsOnly,
-                        DateTextFormatter()
+                        DateTextFormatter(),
                       ],
-
                       iconColor: Colors.black38,
                       onTap: () async {
-                        DateTime? pickedDate = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now().subtract(const Duration(days: 2555)),
-                            firstDate: DateTime(1900),
-                            lastDate: DateTime(2017));
-
-                        if (pickedDate != null) {
-                          String formattedDate =
-                              DateFormat('dd-MM-yyyy').format(pickedDate);
-
-                          setState(() {
-                            dobController.text = formattedDate;
-                            _dob =
-                                formattedDate; // store the dob value as a DateTime object
-                            hasChanges = true;
-                            _selectedDate = formattedDate.toString() as DateTime?;
-
-                            //set output date to TextField value.
-                          });
-                        }
-                      },
-                      validator: (value){
-                    var year = int.tryParse(value!.substring(4, 8));
-                    if (year == null || year < 1900 || year > (DateTime.now().year - 14)) {
-                      return 'Please select a year below ${(DateTime.now().year - 14)}';
-                    }
+                        await _dateOfBirthOnTapped(context);
                       },
                       onChanged: _dobOnChange,
                       isEnable: _isDobEditable,
                       textEditingController: dobController,
                     ),
                     sizeBoxH15(),
-                    profileSubText("Gender"),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.85,
-                      height: 60,
-                      child: IgnorePointer(
-                        ignoring: isEdit ? true : false,
-                        child: DropdownButtonFormField(
-                          focusNode: isFocus,
-                          hint: Text(
-                            _gender.isEmpty ? "Select Gender" : _gender,
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black.withOpacity(0.7)),
-                          ),
-                          decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                  color: Colors.grey, width: 1),
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            border: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                  color: Colors.blueGrey, width: 1),
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                  color: Colors.blueGrey, width: 2),
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                          ),
-                          items: _buildGenderDropdownItems(),
-                          onChanged: _handleGenderChange,
-                        ),
-                      ),
-                    ),
-
+                    profileSubText(text: "Gender"),
+                    _buildGenderField(context),
                     sizeBoxH45(),
-
-                    InkWell(
-                      onTap: () {
-                        editProfileKey.currentState!.validate()
-                            ? _updateProfileButton(context)
-                            : null;
-                      },
-                      child: _buildIsUpdatedButtonText(),
-                    ),
-
+                    _editAndUpdateButton(context),
                     sizeBoxH45(),
                   ],
                 );
@@ -273,8 +204,103 @@ class _EditProfileState extends State<EditProfile> {
       ),
     );
   }
+  // DATE OF BIRTH ON TAPPED EVENT EXTRACT AS METHOD
+  Future<void> _dateOfBirthOnTapped(BuildContext context) async {
+    DateTime? pickedDate = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now().subtract(const Duration(days: 2555)),
+        firstDate: DateTime(1900),
+        lastDate: DateTime(2017));
 
-  _userNameOnchangedValue(val) {
+    if (pickedDate != null) {
+      String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
+
+      setState(() {
+        dobController.text = formattedDate;
+        _dob = formattedDate; // store the dob value as a DateTime object
+        hasChanges = true;
+        //set output date to TextField value.
+      });
+    }
+  }
+  // PHONE ON CHANGED EVENT EXTRACT AS METHOD
+  _phoneOnChanged(val) {
+    setState(() {
+      if (val.length <= 10) {
+        _phone = val;
+        hasChanges = val.length == 10;
+      }
+    });
+  }
+  // EMAIL ON CHANGED EVENT EXTRACT AS METHOD
+  _emailOnChanged(val) {
+    setState(() {
+      _email = val;
+      hasChanges = true;
+    });
+  }
+  // DOB ON CHANGED EVENT EXTRACT AS METHOD
+  _dobOnChange(val) {
+    setState(() {
+      _dob = val;
+      hasChanges = true;
+    });
+  }
+
+
+// EDIT AND UPDATE BUTTON EXTRACT AS A METHOD
+  InkWell _editAndUpdateButton(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        editProfileKey.currentState!.validate()
+            ? _updateProfileButton(context)
+            : null;
+      },
+      child: _buildIsUpdatedButtonText(),
+    );
+  }
+
+// GENDER EXTRACT AS A METHOD
+  SizedBox _buildGenderField(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.85,
+      height: 60,
+      child: IgnorePointer(
+        ignoring: isEdit ? true : false,
+        child: DropdownButtonFormField(
+          focusNode: isFocus,
+          hint: Text(
+            _gender.isEmpty ? "Select Gender" : _gender,
+            style: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.black.withOpacity(0.7)),
+          ),
+          decoration: InputDecoration(
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                  color: isEdit ? Colors.grey : Colors.blueGrey,
+                  width: isEdit ? 0.5 : 2),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            border: OutlineInputBorder(
+              borderSide: const BorderSide(color: Colors.blueGrey, width: 1),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                  color: isEdit ? Colors.grey : Colors.blueGrey,
+                  width: isEdit ? 0.5 : 2),
+              borderRadius: BorderRadius.circular(15),
+            ),
+          ),
+          items: _buildGenderDropdownItems(),
+          onChanged: _handleGenderChange,
+        ),
+      ),
+    );
+  }
+
+  _userNameOnChangedValue(val) {
     setState(() {
       _userName = val;
       hasChanges = true;
@@ -310,13 +336,6 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
-  _dobOnChange(val) {
-    setState(() {
-      _dob = val;
-      hasChanges = true;
-    });
-  }
-
   Future<void> _updateProfileButton(BuildContext context) async {
     if (isEdit) {
       setState(() {
@@ -330,12 +349,31 @@ class _EditProfileState extends State<EditProfile> {
       });
     } else {
       if (hasChanges) {
-        await _updateUserProfile(_userName, _email, _phone, _dob, _gender);
-        QuickAlert.show(
-          context: context,
-          type: QuickAlertType.success,
-          text: 'Profile Update Successfully',
+        await _updateUserProfile(
+          usernameController.text,
+          emailController.text,
+          phoneController.text,
+          dobController.text,
+          _gender,
         );
+        await SharedPref.saveUserName(usernameController.text);
+        await SharedPref.saveUserEmail(emailController.text);
+        await SharedPref.saveUserGender(_gender);
+        await SharedPref.saveUserDob(dobController.text);
+        await SharedPref.saveUserPhone(phoneController.text);
+        QuickAlert.show(
+            context: context,
+            type: QuickAlertType.success,
+            text: 'Profile Update Successfully',
+            onConfirmBtnTap: () {
+              nextPagePushAndRemoveUntil(
+                  context,
+                  const BottomSheetTest(
+                    screenIndex: 2,
+                    isProfileScreen: true,
+                  ));
+            });
+
         setState(() {
           isEdit = !isEdit;
           _isUsernameEditable = !_isUsernameEditable;

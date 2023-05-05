@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:chat/screens/profile/components.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -437,17 +436,16 @@ class _ReusableTextFieldState extends State<ReusableTextField> {
   }
 }
 
-boldTitleText({String? text}) {
+boldText({String? text,double? size}) {
   return Text(
     text!,
-    style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+    style:  TextStyle(fontSize: size, fontWeight: FontWeight.bold),
   );
 }
-
-semiBoldSubTitleText({String? text}) {
+normalText({String? text,double? size}) {
   return Text(
     text!,
-    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+    style:  TextStyle(fontSize: size, fontWeight: FontWeight.normal),
   );
 }
 
@@ -551,27 +549,27 @@ class _ProfileTextFieldState extends State<ProfileTextField> {
             inputFormatters: widget.textInputFormatter,
             keyboardType: widget.textInputType,
             controller: widget.textEditingController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               suffixIconColor: Colors.grey,
-              suffixIcon: IconButton(
-                onPressed: widget.onTap,
-                icon: widget.isEnable!
-                    ? const Icon(Icons.done_sharp)
-                    : const Icon(Icons.edit),
-                color: widget.iconColor,
-              ),
-              counter: const SizedBox(),
-              errorStyle: const TextStyle(color: Colors.red),
-              hintStyle: const TextStyle(color: Colors.grey),
-              enabledBorder: const OutlineInputBorder(
+              // suffixIcon: IconButton(
+              //   onPressed: widget.onTap,
+              //   icon: widget.isEnable!
+              //       ? const Icon(Icons.done_sharp)
+              //       : const Icon(Icons.edit),
+              //   color: widget.iconColor,
+              // ),
+              counter: SizedBox(),
+              errorStyle: TextStyle(color: Colors.red),
+              hintStyle: TextStyle(color: Colors.grey),
+              enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(12.0)),
                 borderSide: BorderSide(color: Colors.blueGrey, width: 2),
               ),
-              border: const OutlineInputBorder(
+              border: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(12.0)),
                 borderSide: BorderSide(color: Colors.blueGrey, width: 2),
               ),
-              focusedBorder: const OutlineInputBorder(
+              focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
                 borderSide: BorderSide(color: Colors.blueGrey),
               ),
@@ -660,6 +658,34 @@ listTile({String? text, VoidCallback? onTap}) {
         title: Text(text!),
         trailing: const Icon(Icons.arrow_forward_ios_sharp),
         onTap: onTap,
+      ),
+    ),
+  );
+}
+usernameContainer({String? text}){
+  return Container(
+    height: 35,
+    width: 180,
+    decoration: BoxDecoration(
+      color: Colors.cyan[400],
+      borderRadius: BorderRadius.circular(15),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.5),
+          spreadRadius: 2,
+          blurRadius: 5,
+          offset: const Offset(0, 4), // changes position of shadow
+        ),
+      ],
+    ),
+    child: Center(
+      child: Text(
+        text!.toUpperCase(),
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+          color: Colors.black,
+        ),
       ),
     ),
   );

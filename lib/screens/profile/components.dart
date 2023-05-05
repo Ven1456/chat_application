@@ -1,3 +1,3 @@
-export 'edit_ProfilePic.dart';
+export 'profilePic.dart';
 export 'EditProfile.dart';
 export 'profile.dart';

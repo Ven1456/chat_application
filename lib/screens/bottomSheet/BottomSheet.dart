@@ -10,7 +10,11 @@ import 'package:flutter/material.dart';
 import '../../services/database_services/database_services.dart';
 
 class BottomSheetTest extends StatefulWidget {
-  const BottomSheetTest({Key? key}) : super(key: key);
+  final int? screenIndex;
+  final  bool? isProfileScreen;
+   const BottomSheetTest({
+    Key? key, this.screenIndex, this.isProfileScreen
+  }) : super(key: key);
 
   @override
   State<BottomSheetTest> createState() => _BottomSheetTestState();
@@ -27,22 +31,18 @@ class _BottomSheetTestState extends State<BottomSheetTest> {
   @override
   void initState() {
     super.initState();
-    getProfile();
+    if (widget.isProfileScreen != null) {
+      currentIndex = widget.screenIndex ?? 2;
+    } else {
+      currentIndex = 0;
+    }
   }
 
-  List<Widget> pages = [const HomeScreen(),];
-
-  void buildPages() {
-    pages = [
+  buildPages() {
+    return [
       const HomeScreen(),
       const Search(),
-      Profile(
-        profilePicTest: profilePic.toString(),
-        email: email,
-        username: userName,
-        phone: phone,
-        dob: dob,
-      ),
+      Profile(),
     ];
   }
 
@@ -58,22 +58,22 @@ class _BottomSheetTestState extends State<BottomSheetTest> {
   getProfile() async {
     await SharedPref.getName().then((value) {
       setState(() {
-         userName = value ?? "";
+         userName = value;
       });
     });
     await SharedPref.getEmail().then((value) {
       setState(() {
-        email = value ?? "";
+        email = value;
       });
     });
     await SharedPref.getPhone().then((value) {
       setState(() {
-        phone = value ?? "";
+        phone = value;
       });
     });
     await SharedPref.getDob().then((value) {
       setState(() {
-        dob = value ?? "";
+        dob = value;
       });
     });
     await getImage();
@@ -85,12 +85,14 @@ class _BottomSheetTestState extends State<BottomSheetTest> {
   void onTap(int index) {
     setState(() {
       currentIndex = index;
+
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: pages[currentIndex],
+      body: buildPages()[currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         onTap: onTap,

@@ -4,12 +4,10 @@ import 'package:chat/screens/auth/login/login_screen.dart';
 import 'package:chat/screens/bottomSheet/BottomSheet.dart';
 import 'package:chat/services/authentication_services/auth_service.dart';
 import 'package:chat/utils/CustomValidators.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:lottie/lottie.dart';
 import 'package:toast/toast.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -67,11 +65,11 @@ class _RegisterPageState extends State<RegisterPage> {
                         ],
                       ),
                       //CHAT TEXT
-                      boldTitleText(text: "Chats"),
+                      boldText(text: "Chats",size: 30),
                       sizeBoxH10(),
                       // REGISTER TEXT
-                      semiBoldSubTitleText(
-                          text: "Register Now To See What Their Are Talking "),
+                      boldText(
+                          text: "Register Now To See What Their Are Talking ",size: 15),
                       // REGISTER IMAGE
                       imageBuild(path: "assets/images/register.jpg", size: 180),
                       sizeBoxH15(),

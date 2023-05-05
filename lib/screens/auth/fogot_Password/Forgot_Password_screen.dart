@@ -5,7 +5,6 @@ import 'package:chat/screens/auth/login/login_screen.dart';
 import 'package:chat/services/authentication_services/auth_service.dart';
 import 'package:chat/utils/CustomValidators.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:toast/toast.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -146,11 +145,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 _buildTimeStartText(),
                                 sizeBoxH10(),
                                 // DESCRIPTION TEXT
-                                semiBoldSubTitleText(
+                                boldText(
                                   text:
                                       "                   Please Check Your Email "
                                       "\n If Link is Not Their Please Check Spam Box"
                                       "\n            Set Must 6 Character Password",
+                                  size: 15
                                 ),
                                 sizeBoxH10(),
                                 // CLOSE ICON

@@ -10,7 +10,7 @@ export 'homeScreen/homeScreen.dart';
 export 'IntroScreen/IntroScreen.dart';
 export 'profile/profile.dart';
 export 'profile/EditProfile.dart';
-export 'profile/edit_ProfilePic.dart';
+export 'profile/profilePic.dart';
 export 'auth/register/RegisterPage.dart';
 export 'search/search_page.dart';
 export 'spalshScreen/splash_screen.dart';

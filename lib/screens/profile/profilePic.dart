@@ -4,15 +4,16 @@ import 'package:flutter/material.dart';
 
 import '../../../resources/profile_Controller.dart';
 
-class EditProfilePic extends StatelessWidget {
-  const EditProfilePic({
+class ProfilePicWidget extends StatelessWidget {
+  const ProfilePicWidget({
     Key? key,
     required this.provider,
-    required this.profilePic,  this.userName,
+    required this.profilePic,  this.userName, required this.isEdit,
   }) : super(key: key);
   final ProfileController provider;
   final String profilePic;
   final String? userName;
+  final bool isEdit;
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -24,7 +25,7 @@ class EditProfilePic extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(color: Colors.black),
-              color: Colors.orange.shade400,
+              color: Colors.cyan.shade400,
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(100),
@@ -32,9 +33,7 @@ class EditProfilePic extends StatelessWidget {
                 ? (profilePic).isEmpty
                 ? Center(
                 child: Text(
-                 userName!
-                      .toUpperCase()
-                      .substring(0, 2),
+                  userName!.isNotEmpty ? userName!.toUpperCase().substring(0, 2) : "",
                   style: const TextStyle(
                       color: Colors.black,
                       fontSize: 30,
@@ -70,7 +69,7 @@ class EditProfilePic extends StatelessWidget {
             ]),
           ),
         ),
-        GestureDetector(
+        isEdit  ? GestureDetector(
           onTap: () {
             provider.pickImage(context);
           },
@@ -83,7 +82,7 @@ class EditProfilePic extends StatelessWidget {
                     color: Colors.blue, shape: BoxShape.circle),
                 child: const Icon(Icons.edit)),
           ),
-        )
+        ) :  Container()
       ],
     );
   }

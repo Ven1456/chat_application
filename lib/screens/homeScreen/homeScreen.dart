@@ -29,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoading = false;
   String groupName = "";
   String userProfile = "";
+  String groupPic = "";
   final TextEditingController textEditingController = TextEditingController();
 
   @override
@@ -52,12 +53,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return res.substring(res.indexOf("_") + 1);
   }
 
-  getImage() async {
-    QuerySnapshot snapshot =
-        await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
-            .gettingUserEmail(email);
-    setState(() {
-     // profilePic = snapshot.docs[0]["profilePic"];
+  getGroupImage() async {
+    DatabaseServices().getGroupIcon(groupPic).then((value) {
+      setState(() {
+        groupPic= value;
+      });
     });
   }
 
@@ -71,13 +71,13 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     await SharedPref.getName().then((value) {
       setState(() {
-        username = value!;
+        username = value;
       });
     });
     await SharedPref.getEmail().then((value) {
       setState(() {
-        email = value!;
-        getImage();
+        email = value;
+       // getGroupImage();
       });
     });
   }
@@ -131,13 +131,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: (BuildContext context, int index) {
 
                     // reverse the index value
-                    int reverseIndex =
-                        snapshot.data["groups"].length - index - 1;
+                    int reverseIndex = snapshot.data["groups"].length - index - 1;
                     return GroupTile(
                         groupName: getName(snapshot.data["groups"][reverseIndex]),
                         userProfile: snapshot.data["profilePic"],
                         userId: snapshot.data["uid"],
                         username: snapshot.data["fullName"],
+                        // groupPic: groupPic,
                         groupId: getId(snapshot.data["groups"][reverseIndex]));
                   },
                 );

@@ -1,6 +1,5 @@
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/bottomSheet/BottomSheet.dart';
-import 'package:chat/screens/profile/components.dart';
 import 'package:chat/services/database_services/database_services.dart';
 import 'package:chat/utils/CustomValidators.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -45,119 +44,148 @@ class _FeedBackScreenState extends State<FeedBackScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 sizeBoxH60(),
-                const Padding(
-                  padding: EdgeInsets.only(left: 20.0),
-                  child: Text("Give  FeedBack",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                ),
+                // GIVE FEEDBACK TEXT
+                _giveFeedbackText(),
                 sizeBoxH25(),
-                const Padding(
-                  padding: EdgeInsets.only(left: 20.0),
-                  child: Text("How You Feel It ? ",
-                      style: TextStyle(
-                          fontWeight: FontWeight.normal, fontSize: 15)),
-                ),
+                // HOW YOU FEEL IT  TEXT
+                _howYouFeelItText(),
                 sizeBoxH25(),
-                Center(
-                  child: RatingBar.builder(
-                    initialRating: 0,
-                    itemSize: 55,
-                    itemCount: 5,
-                    itemBuilder: (context, index) {
-                      switch (index) {
-                        case 0:
-                          return const Icon(
-                            Icons.sentiment_dissatisfied_outlined,
-                            color: Colors.red,
-                          );
-                        case 1:
-                          return const Icon(
-                            Icons.sentiment_dissatisfied,
-                            color: Colors.redAccent,
-                          );
-                        case 2:
-                          return const Icon(
-                            Icons.sentiment_neutral_rounded,
-                            color: Colors.amber,
-                          );
-                        case 3:
-                          return const Icon(
-                            Icons.sentiment_satisfied_alt,
-                            color: Colors.lightGreen,
-                          );
-                        case 4:
-                          return const Icon(
-                            Icons.sentiment_very_satisfied,
-                            color: Colors.green,
-                          );
-                        default:
-                          return Container();
-                      }
-                    },
-                    onRatingUpdate: (rating) {
-                      setState(() {
-                        ratingFeedback = rating;
-                      });
-                    },
-                  ),
-                ),
+                // EMOJI SYMBOLS
+                _buildEmoji(),
                 sizeBoxH25(),
-                const Padding(
-                  padding: EdgeInsets.only(left: 20.0),
-                  child: Text("Tell Us More About it",
-                      style: TextStyle(
-                          fontWeight: FontWeight.normal, fontSize: 15)),
-                ),
+                // TELL US MORE ABOUT IT TEXT
+                _telUsMoreAboutItText(),
                 sizeBoxH15(),
-                Center(
-                  child: Container(
-                    height: 220,
-                    width: MediaQuery.of(context).size.width * 0.90,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 12.0,
-                          offset: Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    padding: const EdgeInsets.all(20),
-                    child: TextFormField(
-                      controller: textEditingController,
-                      decoration: const InputDecoration.collapsed(
-                        hintText: "Enter Your Feedback",
-                      ),
-                      minLines: 1,
-                      maxLines: 11,
-                      onChanged: (val) {
-                        setState(() {
-                          message = val;
-                        });
-                      },
-                      validator: (val) => CustomValidators.empty(val),
-                    ),
-                  ),
-                ),
+                // FEED BACK TEXT FIELD
+                _feedbackTextField(context),
                 sizeBoxH25(),
-                Center(
-                  child: reusableButton(
-                      height: 50,
-                      width: MediaQuery.of(context).size.width * 0.75,
-                      onTap: () {
-                         publish();
-
-                      },
-                      text: "Publish Feedback"),
-                )
+                // PUBLISH FEEDBACK BUTTON
+                _publishFeedBackButton(context)
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  // PUBLISH BUTTON EXTRACT AS A METHOD
+  Center _publishFeedBackButton(BuildContext context) {
+    return Center(
+      child: reusableButton(
+          height: 50,
+          width: MediaQuery.of(context).size.width * 0.75,
+          onTap: () {
+            publish();
+          },
+          text: "Publish Feedback"),
+    );
+  }
+
+  // FEEDBACK TEXT FIELD EXTRACT AS A METHOD
+  Center _feedbackTextField(BuildContext context) {
+    return Center(
+      child: Container(
+        height: 220,
+        width: MediaQuery.of(context).size.width * 0.90,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 12.0,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(20),
+        child: TextFormField(
+          controller: textEditingController,
+          decoration: const InputDecoration.collapsed(
+            hintText: "Enter Your Feedback",
+          ),
+          minLines: 1,
+          maxLines: 11,
+          onChanged: (val) {
+            setState(() {
+              message = val;
+            });
+          },
+          validator: (val) => CustomValidators.empty(val),
+        ),
+      ),
+    );
+  }
+
+  // TELL US MORE ABOUT IT TEXT EXTRACT AS A METHOD
+  Padding _telUsMoreAboutItText() {
+    return Padding(
+        padding: EdgeInsets.only(left: 20.0),
+        child: normalText(text: "Tell Us More About it"));
+  }
+
+  // EMOJI SYMBOLS EXTRACT AS A METHOD
+  Center _buildEmoji() {
+    return Center(
+      child: RatingBar.builder(
+        initialRating: 0,
+        itemSize: 55,
+        itemCount: 5,
+        itemBuilder: (context, index) {
+          switch (index) {
+            case 0:
+              return const Icon(
+                Icons.sentiment_dissatisfied_outlined,
+                color: Colors.red,
+              );
+            case 1:
+              return const Icon(
+                Icons.sentiment_dissatisfied,
+                color: Colors.redAccent,
+              );
+            case 2:
+              return const Icon(
+                Icons.sentiment_neutral_rounded,
+                color: Colors.amber,
+              );
+            case 3:
+              return const Icon(
+                Icons.sentiment_satisfied_alt,
+                color: Colors.lightGreen,
+              );
+            case 4:
+              return const Icon(
+                Icons.sentiment_very_satisfied,
+                color: Colors.green,
+              );
+            default:
+              return Container();
+          }
+        },
+        onRatingUpdate: (rating) {
+          setState(() {
+            ratingFeedback = rating;
+          });
+        },
+      ),
+    );
+  }
+
+  // HOW YOU FEEL IT TEXT EXTRACT AS A METHOD
+  Padding _howYouFeelItText() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 20.0),
+      child: normalText(text: "How You Feel It ? "),
+    );
+  }
+
+  // GIVE FEEDBACK TEXT EXTRACT AS A METHOD
+  Padding _giveFeedbackText() {
+    return const Padding(
+      padding: EdgeInsets.only(left: 20.0),
+      child: Text("Give  FeedBack",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
     );
   }
 
@@ -167,7 +195,7 @@ class _FeedBackScreenState extends State<FeedBackScreen> {
   }
 
   void publish() {
-    if(ratingFeedback == null){
+    if (ratingFeedback == null) {
       QuickAlert.show(
         context: context,
         type: QuickAlertType.error,
@@ -178,16 +206,19 @@ class _FeedBackScreenState extends State<FeedBackScreen> {
     if (feedbackKey.currentState!.validate() && ratingFeedback != null) {
       getFeedback();
       QuickAlert.show(
-        onConfirmBtnTap: (){
-          nextPagePushAndRemoveUntil(context, const BottomSheetTest());
+        onConfirmBtnTap: () {
+          nextPagePushAndRemoveUntil(
+              context,
+              BottomSheetTest(
+                screenIndex: 2,
+                isProfileScreen: true,
+              ));
         },
         context: context,
         type: QuickAlertType.success,
         text: 'Feedback Publish Successfully',
       );
       textEditingController.clear();
-
-
     }
   }
 }

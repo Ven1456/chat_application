@@ -30,7 +30,7 @@ class _ProfileState extends State<Profile> {
   String? image = "";
   String username = "";
   File? imageFile;
-  bool isDark = false;
+  bool? isOnline;
 
   @override
   void initState() {
@@ -44,6 +44,7 @@ class _ProfileState extends State<Profile> {
         await FirebaseFirestore.instance.collection("users").doc(user).get();
     setState(() {
       image = docSnapshot.get("profilePic");
+      isOnline = docSnapshot.get("onlineStatus");
     });
   }
 
@@ -76,11 +77,13 @@ class _ProfileState extends State<Profile> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     sizeBoxH25(),
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // PROFILE PICTURE
                         ProfilePicWidget(
+                          isOnlineCircle: true,
+                          isOnline: isOnline,
                           userName: username,
                           provider: provider,
                           profilePic: image.toString(),

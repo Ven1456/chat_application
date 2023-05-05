@@ -6,6 +6,7 @@ import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/bottomSheet/BottomSheet.dart';
 import 'package:chat/screens/homeScreen/homeScreen.dart';
 import 'package:chat/services/database_services/database_services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -33,6 +34,7 @@ class _GroupInfoState extends State<GroupInfo> {
   Stream? members;
   String isAdmin = "";
   String username = "";
+  bool? isOnline;
 
   @override
   void initState() {
@@ -55,6 +57,13 @@ class _GroupInfoState extends State<GroupInfo> {
         username = value!;
       });
     });
+  }
+  Stream<bool> getOnlineStatus(String userId) {
+    return FirebaseFirestore.instance
+        .collection("users")
+        .doc(userId)
+        .snapshots()
+        .map((doc) => doc.get("onlineStatus") ?? false);
   }
 
   getMembers() {
@@ -257,7 +266,7 @@ class _GroupInfoState extends State<GroupInfo> {
         ),
       ),
       actions: [
-        IconButton(onPressed: () {}, icon: Icon(Icons.delete)),
+        IconButton(onPressed: () {}, icon: const Icon(Icons.delete)),
         IconButtonAlertReuse(
             leaveOnTap: () {
               DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
@@ -298,14 +307,35 @@ class _GroupInfoState extends State<GroupInfo> {
                         padding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 5),
                         child: ListTile(
-                          leading: CircleAvatar(
-                            child: Text(
-                              getName(snapshot.data["members"][index])
-                                  .substring(0, 2)
-                                  .toUpperCase(),
-                              style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
+                          leading: Stack(
+
+                            children: [
+                              CircleAvatar(
+                                child: Text(
+                                  getName(snapshot.data["members"][index])
+                                      .substring(0, 2)
+                                      .toUpperCase(),
+                                  style: const TextStyle(
+                                      fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              Positioned(
+                                right: 0,
+                                bottom: 2,
+                                child:  StreamBuilder<bool>(
+                                  stream: getOnlineStatus(snapshot.data["members"][index]),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      return snapshot.data == true
+                                          ? const Icon(Icons.circle, color: Colors.green, size: 10,)
+                                          : const Icon(Icons.circle_outlined, color: Colors.black, size: 10);
+                                    } else {
+                                      return const SizedBox();
+                                    }
+                                  },
+                                ),
+                              )
+                            ]
                           ),
                           title: Text(
                               getName(
@@ -313,12 +343,6 @@ class _GroupInfoState extends State<GroupInfo> {
                               ),
                               style: const TextStyle(
                                   fontSize: 15, fontWeight: FontWeight.bold)),
-                          // subtitle: Text(
-                          //   "Your Are In ${widget.groupName} Group",
-                          //   /*   getId(snapshot.data["members"][index]),*/
-                          //   style: const TextStyle(
-                          //       fontSize: 12, fontWeight: FontWeight.bold),
-                          // )
                         ),
                       );
                     });

@@ -27,6 +27,7 @@ class ProfileController extends ChangeNotifier {
   String url = "";
   String userName = "";
   String userProfile = "";
+  String audioFile = "";
   bool isUploading=false;
   // 21/04/23
   String messageUrl ="";
@@ -319,4 +320,5 @@ class ProfileController extends ChangeNotifier {
       notifyListeners();
     }
   }
+
 }

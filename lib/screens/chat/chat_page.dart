@@ -56,7 +56,11 @@ class _ChatPageState extends State<ChatPage> {
   String profilePic = '';
   String groupPicture = "";
   final picker = ImagePicker();
+  bool isPressed = false;
   AuthService authService = AuthService();
+  // late FlutterSoundRecorder _recorder;
+  // final recorder = SoundRecorder();
+
   // 21/04/23
   XFile? _messageImage;
   // 21/04/23
@@ -67,6 +71,7 @@ class _ChatPageState extends State<ChatPage> {
   XFile? get image => _image;
   String getId = "";
   String url = "";
+  String audioMessageUrl = "";
   String userName = "";
   String userProfile = "";
   bool isUploading = false;
@@ -85,6 +90,8 @@ class _ChatPageState extends State<ChatPage> {
     getChatAndAdminName();
     // TODO: implement initState
     super.initState();
+    // _recorder = FlutterSoundRecorder();
+    // recorder.init();
     setState(() {
       isLoadingAnimation = true;
       getImage();
@@ -93,8 +100,10 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
+    // recorder.clear();
     _scrollController.dispose();
     messageController.dispose();
+    // _recorder.closeAudioSession();
     super.dispose();
   }
 
@@ -190,7 +199,8 @@ class _ChatPageState extends State<ChatPage> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(21),topRight: Radius.circular(21)),
+        borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(21), topRight: Radius.circular(21)),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.3),
@@ -202,6 +212,30 @@ class _ChatPageState extends State<ChatPage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          GestureDetector(
+            onLongPress: () {
+              setState(() {
+                isPressed = true;
+              });
+            },
+            onLongPressEnd: (details) {
+              setState(() {
+                isPressed = false;
+              });
+            },
+            child: AnimatedContainer(
+              height: isPressed ? 50 : 40,
+              width:  isPressed ? 50 :40,
+              decoration: BoxDecoration(
+                  color: isPressed ? Colors.grey : Colors.cyan,
+                  borderRadius: BorderRadius.circular(45)),
+              duration: Duration(milliseconds: 200),
+              child: Icon(
+                isPressed ?  CupertinoIcons.stop_circle :  CupertinoIcons.mic,
+                color: Colors.white,
+              ),
+            ),
+          ),
           IconButton(
             onPressed: () {
               setState(() {
@@ -268,7 +302,7 @@ class _ChatPageState extends State<ChatPage> {
           IconButton(
             onPressed: () {
               // 21/04/23
-             pickMessageImage(context);
+              pickMessageImage(context);
             },
             icon: const Icon(
               Icons.photo,
@@ -326,7 +360,6 @@ class _ChatPageState extends State<ChatPage> {
                       height: 35,
                       width: 35,
                       fit: BoxFit.cover,
-
                       loadingBuilder: (BuildContext context, Widget child,
                           ImageChunkEvent? loadingProgress) {
                         if (loadingProgress == null) return child;
@@ -365,6 +398,9 @@ class _ChatPageState extends State<ChatPage> {
                 groupId: widget.groupId,
               ),
             );
+            setState(() {
+
+            });
           },
           icon: const Icon(
             Icons.info_outline_rounded,
@@ -425,77 +461,82 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             snapshot.hasData
                 ? Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                      padding: const EdgeInsets.only(bottom: 28.0),
-                      controller: _scrollController,
-                      itemCount: snapshot.data.docs.length,
-                      itemBuilder: (context, index) {
-                        bool isSameDate = false;
-                        String? newDate = '';
-                        if (index == 0) {
-                          newDate = groupMessageDateAndTime(snapshot
-                              .data.docs[index]["time"]
-                              .toString())
-                              .toString();
-                        } else {
-                          final DateTime date = returnDateAndTimeFormat(
-                              snapshot.data.docs[index]["time"].toString());
-                          final DateTime prevDate = returnDateAndTimeFormat(
-                              snapshot.data.docs[index - 1]["time"]
-                                  .toString());
-                          isSameDate = date.isAtSameMomentAs(prevDate);
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                            padding: const EdgeInsets.only(bottom: 28.0),
+                            controller: _scrollController,
+                            itemCount: snapshot.data.docs.length,
+                            itemBuilder: (context, index) {
+                              bool isSameDate = false;
+                              String? newDate = '';
+                              if (index == 0) {
+                                newDate = groupMessageDateAndTime(snapshot
+                                        .data.docs[index]["time"]
+                                        .toString())
+                                    .toString();
+                              } else {
+                                final DateTime date = returnDateAndTimeFormat(
+                                    snapshot.data.docs[index]["time"]
+                                        .toString());
+                                final DateTime prevDate =
+                                    returnDateAndTimeFormat(snapshot
+                                        .data.docs[index - 1]["time"]
+                                        .toString());
+                                isSameDate = date.isAtSameMomentAs(prevDate);
 
-                          newDate = isSameDate
-                              ? ''
-                              : groupMessageDateAndTime(snapshot
-                              .data.docs[index]["time"]
-                              .toString())
-                              .toString();
-                        }
-                        return Column(
-                          children: [
-                            if (newDate.isNotEmpty)
-                              Padding(
-                                padding:
-                                const EdgeInsets.symmetric(vertical: 10),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.lightGreen,
-                                      borderRadius:
-                                      BorderRadius.circular(20)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(newDate),
+                                newDate = isSameDate
+                                    ? ''
+                                    : groupMessageDateAndTime(snapshot
+                                            .data.docs[index]["time"]
+                                            .toString())
+                                        .toString();
+                              }
+                              return Column(
+                                children: [
+                                  if (newDate.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.lightGreen,
+                                            borderRadius:
+                                                BorderRadius.circular(20)),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(newDate),
+                                        ),
+                                      ),
+                                    ),
+                                  MessageTile(
+                                    message: snapshot.data.docs[index]
+                                        ["message"],
+                                    sendByMe: widget.username ==
+                                        snapshot.data.docs[index]["sender"],
+                                    sender: snapshot.data.docs[index]["sender"],
+                                    time: snapshot.data.docs[index]["time"]
+                                        .toString(),
+                                    userProfile: snapshot.data.docs[index]
+                                        ["userProfile"],
+                                    type: snapshot.data.docs[index]["Type"],
                                   ),
-                                ),
-                              ),
-                            MessageTile(
-                              message: snapshot.data.docs[index]["message"],
-                              sendByMe: widget.username ==
-                                  snapshot.data.docs[index]["sender"],
-                              sender: snapshot.data.docs[index]["sender"],
-                              time: snapshot.data.docs[index]["time"]
-                                  .toString(),
-                              userProfile: snapshot.data.docs[index]
-                              ["userProfile"],
-                              type: snapshot.data.docs[index]["Type"],
-                            ),
-                            sizeBoxH5()
-                          ],
-                        );
-                      }),
-                ),
-              ],
-            ) : Container(),
+                                  sizeBoxH5()
+                                ],
+                              );
+                            }),
+                      ),
+                    ],
+                  )
+                : Container(),
             isUploading
                 ? Container(
-              color: Colors.black.withOpacity(0.3),
-                  child: const Center(child: CircularProgressIndicator(
-              color: Colors.white,
-            )),
-                ) // Show a loading widget
+                    color: Colors.black.withOpacity(0.3),
+                    child: const Center(
+                        child: CircularProgressIndicator(
+                      color: Colors.white,
+                    )),
+                  ) // Show a loading widget
                 : Container(),
           ],
         );
@@ -612,7 +653,6 @@ class _ChatPageState extends State<ChatPage> {
         });
   }
 
-  // 21/04/23
   // IMAGE PICK FROM GALLERY
   Future pickGalleryMessageImage(BuildContext context) async {
     final pickedFile =
@@ -635,7 +675,6 @@ class _ChatPageState extends State<ChatPage> {
     return XFile(croppedImage.path);
   }
 
-  // 21/04/23
   // IMAGE PICK FROM CAMERA
   Future pickCameraMessageImage(BuildContext context) async {
     final pickedFile =
@@ -648,4 +687,70 @@ class _ChatPageState extends State<ChatPage> {
       });
     }
   }
+
+  // void uploadAudio(BuildContext context, String filePath) async {
+  //   getId = (await SharedPref.getGroupId())!;
+  //   // Create a reference to the Firebase Storage location where the voice message will be uploaded
+  //   firebase_storage.Reference reference = storage
+  //       .ref()
+  //       .child('voice_messages')
+  //       .child(getId)
+  //       .child(DateTime.now().toString() + '.mp3');
+  //
+  //   // Upload the file to Firebase Storage
+  //   firebase_storage.UploadTask uploadTask = reference.putFile(File(filePath));
+  //
+  //   // Wait for the upload to complete
+  //   await uploadTask.whenComplete(() {});
+  //
+  //   // Return the download URL for the uploaded file
+  //   String audioUrl = await reference.getDownloadURL();
+  //   String userId = getId;
+  //   DocumentSnapshot snapshot =
+  //       await FirebaseFirestore.instance.collection('groups').doc(userId).get();
+  //   if (snapshot.exists) {
+  //     await FirebaseFirestore.instance.collection('groups').doc(userId).update({
+  //       'recentMessage': audioUrl,
+  //     });
+  //     final user = FirebaseAuth.instance.currentUser!.uid;
+  //     final docSnapshot =
+  //         await FirebaseFirestore.instance.collection("users").doc(user).get();
+  //     userName = docSnapshot.get("fullName");
+  //     userProfile = docSnapshot.get("profilePic");
+  //     audioMessageUrl = audioUrl;
+  //     Map<String, dynamic> chatMessag = {
+  //       "message": audioMessageUrl,
+  //       "sender": userName,
+  //       "time": DateTime.now().microsecondsSinceEpoch,
+  //       "userProfile": userProfile,
+  //       "Type": "Audio",
+  //     };
+  //     DatabaseServices().sendMessage(getId, chatMessag);
+  //   }
+  // }
+  //
+  // Widget micIcon() {
+  //   var isRecording = recorder.isRecording;
+  //   return GestureDetector(
+  //     onLongPress: () async {
+  //       isRecording = await recorder.toggledRecording();
+  //       setState(() {});
+  //     },
+  //     onLongPressEnd: (details) {
+  //       setState(() {});
+  //     },
+  //     child: AnimatedContainer(
+  //       height: isRecording ? 50 : 40,
+  //       width: isRecording ? 50 : 40,
+  //       decoration: BoxDecoration(
+  //           color: isRecording ? Colors.grey : Colors.cyan,
+  //           borderRadius: BorderRadius.circular(45)),
+  //       duration: Duration(milliseconds: 200),
+  //       child: Icon(
+  //         CupertinoIcons.mic,
+  //         color: Colors.white,
+  //       ),
+  //     ),
+  //   );
+  // }
 }

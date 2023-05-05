@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:chat/resources/Constants.dart';
+import 'package:chat/screens/chat/checkOnlineStatus.dart';
 import 'package:chat/screens/spalshScreen/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -28,7 +29,6 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool isLogin = false;
-
   @override
   Widget build(BuildContext context) {
 

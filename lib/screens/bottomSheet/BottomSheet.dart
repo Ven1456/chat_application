@@ -1,4 +1,5 @@
 import 'package:chat/resources/Shared_Preferences.dart';
+import 'package:chat/screens/chat/checkOnlineStatus.dart';
 import 'package:chat/screens/homeScreen/homeScreen.dart';
 import 'package:chat/screens/profile/profile.dart';
 import 'package:chat/screens/search/search_page.dart';
@@ -20,7 +21,7 @@ class BottomSheetTest extends StatefulWidget {
   State<BottomSheetTest> createState() => _BottomSheetTestState();
 }
 
-class _BottomSheetTestState extends State<BottomSheetTest> {
+class _BottomSheetTestState extends State<BottomSheetTest> with WidgetsBindingObserver{
   String email = "";
   String phone = "";
   String dob = "";
@@ -31,6 +32,8 @@ class _BottomSheetTestState extends State<BottomSheetTest> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    setStatus(true);
     if (widget.isProfileScreen != null) {
       currentIndex = widget.screenIndex ?? 2;
     } else {
@@ -45,6 +48,25 @@ class _BottomSheetTestState extends State<BottomSheetTest> {
       Profile(),
     ];
   }
+
+  void setStatus(bool status) async {
+    final user = FirebaseAuth.instance.currentUser!.uid;
+    await FirebaseFirestore.instance.collection("users").doc(user).update(
+        {"onlineStatus": status});
+    print(status);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      setStatus(true);
+    } else {
+      setStatus(false);
+    }
+  }
+
+
+
 
   getImage() async {
     QuerySnapshot snapshot =

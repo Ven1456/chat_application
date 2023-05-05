@@ -20,6 +20,7 @@ class DatabaseServices {
     return await userCollection.doc(uid).set({
       "fullName": fullName,
       "email": email,
+      "onlineStatus":"",
       "phone": phone,
       "dob": dob,
       "gender": "",

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:chat/resources/widget.dart';
+import 'package:chat/screens/chat/checkOnlineStatus.dart';
 import 'package:chat/screens/screens.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -53,6 +54,7 @@ class _SplashScreenState extends State<SplashScreen> {
         isLogin = value;
       }
     });
+
   }
   @override
   Widget build(BuildContext context) {

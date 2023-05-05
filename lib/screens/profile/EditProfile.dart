@@ -86,12 +86,10 @@ class _EditProfileState extends State<EditProfile> {
     dobController = TextEditingController(text: _dob);
   }
 
-  Gender? _selectedGender; // default selected gender
 
 // function to handle gender selection
   void _handleGenderChange(Gender? value) {
     setState(() {
-      _selectedGender = value;
       hasChanges = true;
     });
     _gender = value.toString().split('.').last;
@@ -132,12 +130,18 @@ class _EditProfileState extends State<EditProfile> {
                   children: [
                     sizeBoxH25(),
                     // PROFILE PICTURE
-                    ProfilePicWidget(
-                      isEdit: true,
-                      provider: provider,
-                      profilePic: widget.profilePic.toString(),
-                      userName: _userName,
-                    ),
+                   Row(
+                     mainAxisAlignment: MainAxisAlignment.center,
+                     children: [
+                       ProfilePicWidget(
+                         isOnlineCircle: false,
+                         isEdit: true,
+                         provider: provider,
+                         profilePic: widget.profilePic.toString(),
+                         userName: _userName,
+                       ),
+                     ],
+                   ),
                     sizeBoxH25(),
                     // USERNAME TEXT
                     profileSubText(text: "Username"),

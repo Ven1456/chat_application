@@ -83,6 +83,7 @@ class DatabaseServices {
       "members": [],
       "groupId": "",
       "recentMessage": "",
+      "recentMessageId":"",
       "recentMessageSender": "",
       // 24/04/23
       "userProfile": "",
@@ -99,6 +100,21 @@ class DatabaseServices {
           FieldValue.arrayUnion(["${groupDocumentReference.id}_$groupName"])
     });
   }
+
+  Future<void> deleteGroup(String groupId, String groupName) async {
+    // Step 1: Retrieve the DocumentReference of the group to be deleted
+    DocumentReference groupDocRef = groupCollection.doc(groupId);
+
+    // Step 2: Delete the group document
+    await groupDocRef.delete();
+
+    // Step 3: Remove the group from the user's groups array
+    DocumentReference userDocRef = userCollection.doc(uid);
+    await userDocRef.update({
+      "groups": FieldValue.arrayRemove(["${groupId}_$groupName"])
+    });
+  }
+
 
 // GETTING CHARTS
   Future getCharts(String groupId) async {
@@ -215,6 +231,7 @@ class DatabaseServices {
     groupCollection.doc(groupId).collection("messages").add(chatMessageData);
     groupCollection.doc(groupId).update({
       "recentMessage": chatMessageData["message"],
+      "recentMessageId" : chatMessageData["messageId"],
       "recentMessageSender": chatMessageData["sender"],
       "recentMessageTime": chatMessageData["time"].toString(),
       /*"groupIcon": chatMessageData["groupPic"].toString(),*/

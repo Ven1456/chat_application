@@ -2,21 +2,25 @@ import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/chat/image_Viewer.dart';
+import 'package:chat/services/database_services/database_services.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
 class MessageTile extends StatefulWidget {
   String message;
   String sender;
+  String? messageId;
+  String? groupId;
   String time;
   bool sendByMe;
   String? userProfile;
   String? type;
   MessageTile({
     Key? key,
+    this.messageId,
+    this.groupId,
     this.type,
     this.userProfile,
     required this.time,
@@ -44,16 +48,9 @@ class _MessageTileState extends State<MessageTile> {
     });
   }
 
-/*  getImage() async {
-    QuerySnapshot snapshot = await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
-        .gettingUserEmail(email);
-    setState(() {
-
-    });
-  }*/
   getProfilePic() async {
     await SharedPref.getEmail().then((value) {
-      email = value!;
+      email = value;
     });
   }
 
@@ -188,51 +185,80 @@ class _MessageTileState extends State<MessageTile> {
                                       //   bottomRight: Radius.circular(18),
                                       // )
                                       ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              if (widget.type.toString() == "text")
-                                Text(
-                                  widget.message,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              else
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: GestureDetector(
-                                        onTap: ()=>nextPage(context, FullScreenImagePage( image: widget.message,)),
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.only(
-                                              bottomLeft: widget.sendByMe
-                                                  ? const Radius.circular(18)
-                                                  : const Radius.circular(0),
-                                              topRight: const Radius.circular(18),
-                                              topLeft: const Radius.circular(18),
-                                              bottomRight: widget.sendByMe
-                                                  ? const Radius.circular(0)
-                                                  : const Radius.circular(18)),
-                                          child: FadeInImage.assetNetwork(
-                                            placeholder: 'assets/images/gallery.jpg',
-                                            placeholderErrorBuilder: (context, url, error) => Image.asset('assets/images/404.jpg', fit: BoxFit.cover),
-                                            image: widget.message,
-                                            height: 200,
-                                            width: 150,
-                                            fit: BoxFit.cover,
-                                            imageErrorBuilder: (context, url, error) => Image.asset('assets/images/error.jpg', fit: BoxFit.cover),
+                          child: GestureDetector(
+                            onLongPress: (){
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text('Delete Message'),
+                                    content: Text('Are you sure you want to delete this message?'),
+                                    actions: <Widget>[
+                                      ElevatedButton(
+                                        child: Text('Cancel'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                      ElevatedButton(
+                                        child: Text('Delete'),
+                                        onPressed: () {
+                                          deleteMessage(widget.groupId!,widget.messageId.toString(),);
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+
+                            },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                if (widget.type.toString() == "text")
+                                  Text(
+                                    widget.message,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                else
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: ()=>nextPage(context, FullScreenImagePage( image: widget.message,)),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.only(
+                                                bottomLeft: widget.sendByMe
+                                                    ? const Radius.circular(18)
+                                                    : const Radius.circular(0),
+                                                topRight: const Radius.circular(18),
+                                                topLeft: const Radius.circular(18),
+                                                bottomRight: widget.sendByMe
+                                                    ? const Radius.circular(0)
+                                                    : const Radius.circular(18)),
+                                            child: FadeInImage.assetNetwork(
+                                              placeholder: 'assets/images/gallery.jpg',
+                                              placeholderErrorBuilder: (context, url, error) => Image.asset('assets/images/404.jpg', fit: BoxFit.cover),
+                                              image: widget.message,
+                                              height: 200,
+                                              width: 150,
+                                              fit: BoxFit.cover,
+                                              imageErrorBuilder: (context, url, error) => Image.asset('assets/images/error.jpg', fit: BoxFit.cover),
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              const SizedBox(height: 4.0),
-                            ],
+                                    ],
+                                  ),
+                                const SizedBox(height: 4.0),
+                              ],
+                            ),
                           ),
                         ),
                         widget.sendByMe ? const SizedBox() : const Spacer(),
@@ -311,5 +337,15 @@ class _MessageTileState extends State<MessageTile> {
             ],
           );
         }));
+  }
+  void deleteMessage(String groupId, String messageId) {
+    if (null != groupId && groupId.isNotEmpty &&
+        messageId != null && messageId.isNotEmpty) {
+      DatabaseServices().groupCollection
+          .doc(groupId)
+          .collection('messages')
+          .doc(messageId)
+          .delete();
+    }
   }
 }

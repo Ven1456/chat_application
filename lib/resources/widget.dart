@@ -234,6 +234,7 @@ class IconButtonAlertReuse extends StatelessWidget {
   final String cancelTitleText;
   final VoidCallback leaveOnTap;
   final VoidCallback cancelOnTap;
+  final IconData icon;
 
   const IconButtonAlertReuse({
     Key? key,
@@ -242,7 +243,7 @@ class IconButtonAlertReuse extends StatelessWidget {
     required this.subTitleText,
     required this.leaveTitleText,
     required this.cancelTitleText,
-    required this.cancelOnTap,
+    required this.cancelOnTap, required this.icon,
   }) : super(key: key);
 
   @override
@@ -301,7 +302,7 @@ class IconButtonAlertReuse extends StatelessWidget {
                 );
               });
         },
-        child: const Icon(Icons.exit_to_app));
+        child: Icon(icon));
   }
 }
 

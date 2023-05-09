@@ -3,7 +3,7 @@ import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/chat/chat_page.dart';
 import 'package:chat/services/authentication_services/auth_service.dart';
 import 'package:chat/services/database_services/database_services.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
@@ -31,6 +31,7 @@ class GroupTile extends StatefulWidget {
 
 class _GroupTileState extends State<GroupTile> {
   String profilePic = "";
+  String adminName = "";
   @override
   void initState() {
     super.initState();
@@ -47,6 +48,11 @@ class _GroupTileState extends State<GroupTile> {
         widget.groupPic = value;
       });
     });
+    DatabaseServices().getGroupAdmin(widget.groupId).then((value) {
+      setState(() {
+        adminName = value;
+      });
+    });
   }
   getImage() async {
     await SharedPref.getGroupPic().then((value) {
@@ -57,7 +63,9 @@ class _GroupTileState extends State<GroupTile> {
     });
   }
 
-
+  String getName(String res) {
+    return res.substring(res.indexOf("_") + 1);
+  }
 
 AuthService authService = AuthService();
   @override
@@ -89,13 +97,14 @@ AuthService authService = AuthService();
             items: [
               PopupMenuItem(
                 onTap: () async {
-                  String? getId = await (SharedPref.getGroupId());
-                  setState(() {
-                    FirebaseFirestore.instance
-                        .collection('groups')
-                        .doc(getId)
-                        .delete();
+                  DatabaseServices().deleteGroup(widget.groupId, widget.groupName,).whenComplete(() {
                   });
+                  DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
+                      .toggleGroupJoin(
+                    widget.groupId,
+                    getName(adminName),
+                    widget.groupName,
+                  );
                 },
                 child: const Text("Delete"),
               ),

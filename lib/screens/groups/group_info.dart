@@ -4,7 +4,6 @@ import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/bottomSheet/BottomSheet.dart';
-import 'package:chat/screens/homeScreen/homeScreen.dart';
 import 'package:chat/services/database_services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -54,7 +53,7 @@ class _GroupInfoState extends State<GroupInfo> {
     });
     await SharedPref.getName().then((value) {
       setState(() {
-        username = value!;
+        username = value;
       });
     });
   }
@@ -266,8 +265,31 @@ class _GroupInfoState extends State<GroupInfo> {
         ),
       ),
       actions: [
-        IconButton(onPressed: () {}, icon: const Icon(Icons.delete)),
+        isAdmin == username
+            ?   IconButtonAlertReuse(
+    icon: Icons.delete,
+        leaveOnTap: () {
+        DatabaseServices().deleteGroup(widget.groupId, widget.groupName,).whenComplete(() {
+          nextPagePushAndRemoveUntil(context, BottomSheetTest());
+        });
+        DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
+            .toggleGroupJoin(
+          widget.groupId,
+          getName(widget.adminName),
+          widget.groupName,
+        );
+        },
+          titleText: "Delete Group?",
+        subTitleText: "Are you sure you want to delete this group ?",
+        leaveTitleText: "DELETE",
+        cancelTitleText: "CANCEL",
+        cancelOnTap: () {
+          Navigator.pop(context);
+        }) : SizedBox(),
+        isAdmin == username
+            ?    SizedBox(width: 10,):SizedBox(width: 0,),
         IconButtonAlertReuse(
+          icon: Icons.exit_to_app,
             leaveOnTap: () {
               DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
                   .toggleGroupJoin(

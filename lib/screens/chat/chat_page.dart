@@ -82,6 +82,7 @@ class _ChatPageState extends State<ChatPage> {
           bucket: 'gs://chatapp-4f907.appspot.com');
   // 21/04/23
   String messageChatUrl = "";
+  String messageChatId = "";
 
   @override
   void initState() {
@@ -225,13 +226,13 @@ class _ChatPageState extends State<ChatPage> {
             },
             child: AnimatedContainer(
               height: isPressed ? 50 : 40,
-              width:  isPressed ? 50 :40,
+              width: isPressed ? 50 : 40,
               decoration: BoxDecoration(
                   color: isPressed ? Colors.grey : Colors.cyan,
                   borderRadius: BorderRadius.circular(45)),
               duration: Duration(milliseconds: 200),
               child: Icon(
-                isPressed ?  CupertinoIcons.stop_circle :  CupertinoIcons.mic,
+                isPressed ? CupertinoIcons.stop_circle : CupertinoIcons.mic,
                 color: Colors.white,
               ),
             ),
@@ -398,9 +399,7 @@ class _ChatPageState extends State<ChatPage> {
                 groupId: widget.groupId,
               ),
             );
-            setState(() {
-
-            });
+            setState(() {});
           },
           icon: const Icon(
             Icons.info_outline_rounded,
@@ -471,6 +470,7 @@ class _ChatPageState extends State<ChatPage> {
                               bool isSameDate = false;
                               String? newDate = '';
                               if (index == 0) {
+                                messageChatId = snapshot.data.docs[index].id;
                                 newDate = groupMessageDateAndTime(snapshot
                                         .data.docs[index]["time"]
                                         .toString())
@@ -510,6 +510,8 @@ class _ChatPageState extends State<ChatPage> {
                                       ),
                                     ),
                                   MessageTile(
+                                    messageId: snapshot.data.docs[index].id,
+                                    groupId: widget.groupId,
                                     message: snapshot.data.docs[index]
                                         ["message"],
                                     sendByMe: widget.username ==
@@ -551,16 +553,15 @@ class _ChatPageState extends State<ChatPage> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
-
       // 21/04/23
       ProfileController().messageUrl;
       Map<String, dynamic> chatMessageMap = {
         "message": messageController.text.trim(),
         "sender": widget.username,
         "time": DateTime.now().microsecondsSinceEpoch,
-        /* "groupPic":groupPicture,*/
         "userProfile": widget.userProfile,
         "Type": "text",
+        "messageId":messageChatId,
       };
       DatabaseServices().sendMessage(widget.groupId, chatMessageMap);
       setState(() {
@@ -615,6 +616,7 @@ class _ChatPageState extends State<ChatPage> {
         "time": DateTime.now().microsecondsSinceEpoch,
         "userProfile": userProfile,
         "Type": "Image",
+        "messageId" : messageChatId,
       };
       DatabaseServices().sendMessage(getId, chatMessag);
     }

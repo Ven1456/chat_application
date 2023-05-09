@@ -42,7 +42,7 @@ class _SearchState extends State<Search> {
 
   getCurrentUserIdAndName() async {
     await SharedPref.getName().then((value) {
-      username = value!;
+      username = value;
     });
     user = FirebaseAuth.instance.currentUser;
   }
@@ -186,7 +186,20 @@ class _SearchState extends State<Search> {
                             height: 150,
                             width: 100,
                             child: Lottie.network(
-                                "https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")),
+                                "https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json",
+                              errorBuilder: (BuildContext context,
+                                  Object exception,
+                                  StackTrace? stackTrace) {
+                                return Image.asset(
+                                  'assets/images/404.jpg',
+                                  height: 35,
+                                  width: 35,
+                                  fit: BoxFit.cover,
+                                );
+                              },
+                            ),
+
+                        ),
                         // child: CircularProgressIndicator(),
                       ),
                     )

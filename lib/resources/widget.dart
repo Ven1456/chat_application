@@ -5,6 +5,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 // TEXT INPUT DECORATION
 InputDecoration textInputDecoration = InputDecoration(
@@ -590,7 +592,15 @@ loadingAnimation() {
             height: 180),
       ));
 }
-
+loadingAnimationWithReUse(String url) {
+  return Container(
+      color: Colors.black.withOpacity(0.1),
+      child: Center(
+        child: Lottie.network(
+            url,
+            height: 100),
+      ));
+}
 sizeBoxH15() {
   return const SizedBox(
     height: 15,
@@ -690,4 +700,17 @@ usernameContainer({String? text}){
       ),
     ),
   );
+}
+connection(BuildContext context){
+  OverlayState? overlayState = Overlay.of(context);
+  if (overlayState != null) {
+    showTopSnackBar(
+      overlayState,
+
+      const CustomSnackBar.error(
+        message: "You are not connected to the internet",
+      ),
+      displayDuration: const Duration(milliseconds: 100),
+    );
+  }
 }

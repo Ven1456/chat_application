@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'package:chat/resources/widget.dart';
-import 'package:chat/screens/chat/checkOnlineStatus.dart';
 import 'package:chat/screens/screens.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -64,7 +62,18 @@ class _SplashScreenState extends State<SplashScreen> {
             height: 850,
             width: 550,
             child: Lottie.network(
-                "https://assets10.lottiefiles.com/packages/lf20_SLZG2B.json")),
+                "https://assets10.lottiefiles.com/packages/lf20_SLZG2B.json",
+              errorBuilder: (BuildContext context,
+                  Object exception,
+                  StackTrace? stackTrace) {
+                return Image.asset(
+                  'assets/images/register.jpg',
+                  height: 15,
+                  width: 15,
+                  fit: BoxFit.cover,
+                );
+              },
+            )),
       ),
     );
   }

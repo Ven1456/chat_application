@@ -12,6 +12,7 @@ class GroupTile extends StatefulWidget {
   String username;
   String groupName;
   String? groupPic;
+  bool? isInternetConnected;
   String? userId;
   String userProfile;
 
@@ -22,7 +23,7 @@ class GroupTile extends StatefulWidget {
       required this.userProfile,
       required this.groupName,
       required this.username,
-      required this.groupId})
+      required this.groupId, this.isInternetConnected})
       : super(key: key);
 
   @override
@@ -76,6 +77,7 @@ AuthService authService = AuthService();
         await nextPage(
             context,
             ChatPage(
+              isInternetConnected: widget.isInternetConnected,
               userId: widget.userId,
               groupPic: widget.groupPic,
               username: widget.username,

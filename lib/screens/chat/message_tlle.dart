@@ -108,8 +108,14 @@ class _MessageTileState extends State<MessageTile> {
                                   width: 50,
                                   widget.userProfile.toString(),
                                   fit: BoxFit.cover,
-                        //    errorBuilder: (context, url, error) => Image.asset('assets/images/chat.jpg', fit: BoxFit.cover),
-
+                            errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                              return Image.asset(
+                                'assets/images/404.jpg',
+                                height: 35,
+                                width: 35,
+                                fit: BoxFit.cover,
+                              );
+                            },
                                   loadingBuilder: (context, child, loading) {
                                     if (loading == null) return child;
                                     return const Center(
@@ -261,7 +267,7 @@ class _MessageTileState extends State<MessageTile> {
                             ),
                           ),
                         ),
-                        widget.sendByMe ? const SizedBox() : const Spacer(),
+                         widget.sendByMe ? const SizedBox() : const Spacer(),
                         widget.sendByMe
                             ? const SizedBox()
                             : Padding(

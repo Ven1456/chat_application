@@ -13,7 +13,8 @@ import 'package:toast/toast.dart';
 import '../../resources/widget.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  final bool? isConnected;
+  const HomeScreen({Key? key, this.isConnected}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -37,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     textEditingController;
       gettingUserData();
+
   }
 
   @override
@@ -133,11 +135,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     // reverse the index value
                     int reverseIndex = snapshot.data["groups"].length - index - 1;
                     return GroupTile(
+                      isInternetConnected: widget.isConnected,
                         groupName: getName(snapshot.data["groups"][reverseIndex]),
                         userProfile: snapshot.data["profilePic"],
                         userId: snapshot.data["uid"],
                         username: snapshot.data["fullName"],
-                        // groupPic: groupPic,
                         groupId: getId(snapshot.data["groups"][reverseIndex]));
                   },
                 );

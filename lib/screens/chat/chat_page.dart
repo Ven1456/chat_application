@@ -28,6 +28,7 @@ class ChatPage extends StatefulWidget {
   String? userProfile;
   String? userId;
   String? messageImageUrl;
+  bool? isInternetConnected;
 
   ChatPage(
       {Key? key,
@@ -35,6 +36,7 @@ class ChatPage extends StatefulWidget {
       this.messageImageUrl,
       this.groupPic,
       this.userProfile,
+      this.isInternetConnected,
       required this.username,
       required this.groupName,
       required this.groupId})
@@ -48,6 +50,8 @@ class _ChatPageState extends State<ChatPage> {
   final ScrollController _scrollController = ScrollController();
   Stream<QuerySnapshot>? chats;
   String adminName = "";
+  String groupsUsersProfile = "";
+  bool? groupsender;
   bool isLoadingAnimation = false;
   final TextEditingController messageController = TextEditingController();
   double minHeight = 60;
@@ -93,6 +97,7 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
     // _recorder = FlutterSoundRecorder();
     // recorder.init();
+    print("shdfghjdfsgjdfgs $widget.isInternetConnected");
     setState(() {
       isLoadingAnimation = true;
       getImage();
@@ -141,8 +146,8 @@ class _ChatPageState extends State<ChatPage> {
       setState(() {
         profilePic = value ?? "";
         getGroupImage();
-        /*  getGroupPic();*/
       });
+      widget.isInternetConnected == true  ? connection(context) :  SizedBox();
     });
   }
 
@@ -360,6 +365,14 @@ class _ChatPageState extends State<ChatPage> {
                       widget.groupPic.toString(),
                       height: 35,
                       width: 35,
+                errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                  return Image.asset(
+                    'assets/images/404.jpg',
+                    height: 35,
+                    width: 35,
+                    fit: BoxFit.cover,
+                  );
+                },
                       fit: BoxFit.cover,
                       loadingBuilder: (BuildContext context, Widget child,
                           ImageChunkEvent? loadingProgress) {
@@ -393,10 +406,13 @@ class _ChatPageState extends State<ChatPage> {
             nextPage(
               context,
               GroupInfo(
+               currentUser: widget.username,
+               userProfile: groupsUsersProfile,
                 groupPic: groupPicture,
                 adminName: adminName,
                 groupName: widget.groupName,
                 groupId: widget.groupId,
+                sender: groupsender.toString(),
               ),
             );
             setState(() {});
@@ -469,6 +485,9 @@ class _ChatPageState extends State<ChatPage> {
                             itemBuilder: (context, index) {
                               bool isSameDate = false;
                               String? newDate = '';
+                       //       print("popopoop $groupsUsersProfile");
+                              groupsUsersProfile = snapshot.data.docs[index]["userProfile"];
+                              groupsender = widget.username == snapshot.data.docs[index]["sender"];
                               if (index == 0) {
                                 messageChatId = snapshot.data.docs[index].id;
                                 newDate = groupMessageDateAndTime(snapshot
@@ -534,12 +553,27 @@ class _ChatPageState extends State<ChatPage> {
             isUploading
                 ? Container(
                     color: Colors.black.withOpacity(0.3),
-                    child: const Center(
-                        child: CircularProgressIndicator(
-                      color: Colors.white,
-                    )),
-                  ) // Show a loading widget
+                    child:  Center(
+                        child: loadingAnimationWithReUse("https://assets8.lottiefiles.com/packages/lf20_jsuj2bs7.json")
+                    ),
+                  )
                 : Container(),
+            Positioned(
+              bottom: 16.0,
+              right: 16.0,
+              child: FloatingActionButton(
+                mini: true,
+                backgroundColor: Colors.cyan.withOpacity(0.7),
+                onPressed: () {
+                  _scrollController.animateTo(
+                    _scrollController.position.maxScrollExtent,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeInOutExpo,
+                  );
+                },
+                child: Icon(Icons.arrow_downward),
+              ),
+            ),
           ],
         );
       },

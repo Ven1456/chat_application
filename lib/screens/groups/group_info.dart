@@ -9,18 +9,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 // ignore: must_be_immutable
 class GroupInfo extends StatefulWidget {
   String groupName;
+  String currentUser;
+  String sender;
   String groupId;
   String adminName;
+  String userProfile;
   String? groupPic;
 
   GroupInfo(
       {Key? key,
       this.groupPic,
       required this.adminName,
+      required this.sender,
+      required this.currentUser,
+      required this.userProfile,
       required this.groupName,
       required this.groupId})
       : super(key: key);
@@ -34,14 +42,16 @@ class _GroupInfoState extends State<GroupInfo> {
   String isAdmin = "";
   String username = "";
   bool? isOnline;
-
+  bool isDelete = false;
   @override
   void initState() {
     SharedPref.saveGroupId(widget.groupId);
     // TODO: implement initState
     super.initState();
     isAdmin = getName(widget.adminName);
+    print("fghjgfh ${widget.userProfile}");
     getMembers();
+    isDelete = true;
     setState(() {});
   }
 
@@ -57,6 +67,7 @@ class _GroupInfoState extends State<GroupInfo> {
       });
     });
   }
+
   Stream<bool> getOnlineStatus(String userId) {
     return FirebaseFirestore.instance
         .collection("users")
@@ -105,7 +116,7 @@ class _GroupInfoState extends State<GroupInfo> {
                     _buildGroupAndAdminNameText(),
                     const SizedBox(height: 20),
                     // MEMBERS IN THAT GROUP
-                    memberList()
+                    isDelete ? memberList() : Container()
                   ],
                 ),
               ),
@@ -196,7 +207,9 @@ class _GroupInfoState extends State<GroupInfo> {
                         width: 150,
                         widget.groupPic ?? "",
                         fit: BoxFit.cover,
-                        errorBuilder: (context, url, error) => Image.asset('assets/images/404.jpg', fit: BoxFit.cover),
+                        errorBuilder: (context, url, error) => Image.asset(
+                            'assets/images/404.jpg',
+                            fit: BoxFit.cover),
                         loadingBuilder: (BuildContext context, Widget child,
                             ImageChunkEvent? loadingProgress) {
                           if (loadingProgress == null) return child;
@@ -266,30 +279,51 @@ class _GroupInfoState extends State<GroupInfo> {
       ),
       actions: [
         isAdmin == username
-            ?   IconButtonAlertReuse(
-    icon: Icons.delete,
-        leaveOnTap: () {
-        DatabaseServices().deleteGroup(widget.groupId, widget.groupName,).whenComplete(() {
-          nextPagePushAndRemoveUntil(context, BottomSheetTest());
-        });
-        DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
-            .toggleGroupJoin(
-          widget.groupId,
-          getName(widget.adminName),
-          widget.groupName,
-        );
-        },
-          titleText: "Delete Group?",
-        subTitleText: "Are you sure you want to delete this group ?",
-        leaveTitleText: "DELETE",
-        cancelTitleText: "CANCEL",
-        cancelOnTap: () {
-          Navigator.pop(context);
-        }) : SizedBox(),
+            ? IconButtonAlertReuse(
+                icon: Icons.delete,
+                leaveOnTap: () {
+                  setState(() {
+                    isDelete = false;
+                  });
+                  DatabaseServices()
+                      .deleteGroup(
+                    widget.groupId,
+                    widget.groupName,
+                  )
+                      .whenComplete(() {
+                    QuickAlert.show(
+                        context: context,
+                        type: QuickAlertType.success,
+                        text: 'Group Deleted Successfully',
+                        onConfirmBtnTap: () {
+                          nextPagePushAndRemoveUntil(
+                              context, const BottomSheetTest());
+                        });
+                  });
+                  DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
+                      .toggleGroupJoin(
+                    widget.groupId,
+                    getName(widget.adminName),
+                    widget.groupName,
+                  );
+                },
+                titleText: "Delete Group?",
+                subTitleText: "Are you sure you want to delete this group ?",
+                leaveTitleText: "DELETE",
+                cancelTitleText: "CANCEL",
+                cancelOnTap: () {
+                  Navigator.pop(context);
+                })
+            : SizedBox(),
         isAdmin == username
-            ?    SizedBox(width: 10,):SizedBox(width: 0,),
+            ? const SizedBox(
+                width: 10,
+              )
+            : const SizedBox(
+                width: 0,
+              ),
         IconButtonAlertReuse(
-          icon: Icons.exit_to_app,
+            icon: Icons.exit_to_app,
             leaveOnTap: () {
               DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
                   .toggleGroupJoin(
@@ -299,6 +333,11 @@ class _GroupInfoState extends State<GroupInfo> {
               )
                   .whenComplete(() {
                 nextPage(context, const BottomSheetTest());
+                QuickAlert.show(
+                  context: context,
+                  type: QuickAlertType.success,
+                  text: 'Group Leave Successfully',
+                );
               });
             },
             titleText: "Leave Group?",
@@ -325,40 +364,87 @@ class _GroupInfoState extends State<GroupInfo> {
                     shrinkWrap: true,
                     itemCount: snapshot.data["members"].length,
                     itemBuilder: (context, index) {
+                      String memberName = getName(snapshot.data["members"][index]);
+                      bool isCurrentUser = memberName == widget.currentUser; // replace with your own matching criteria
+                      String userProfileUrl = isCurrentUser ? widget.userProfile:"";
+                      print(widget.userProfile);
                       return Container(
                         padding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 5),
                         child: ListTile(
-                          leading: Stack(
-
-                            children: [
-                              CircleAvatar(
-                                child: Text(
-                                  getName(snapshot.data["members"][index])
-                                      .substring(0, 2)
-                                      .toUpperCase(),
-                                  style: const TextStyle(
-                                      fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
+                          leading: Stack(children: [
+                            CircleAvatar(
+                              child: userProfileUrl.isEmpty
+                                  ? Text(
+                                    memberName
+                                          .substring(0, 2)
+                                          .toUpperCase(),
+                                      style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    )
+                                  : ClipRRect(
+                                borderRadius: BorderRadius.circular(150),
+                                    child: Image.network(
+                                      userProfileUrl,
+                                        height: 35,
+                                        width: 35,
+                                        fit: BoxFit.cover,
+                                        loadingBuilder: (BuildContext context,
+                                            Widget child,
+                                            ImageChunkEvent? loadingProgress) {
+                                          if (loadingProgress == null) {
+                                            return child;
+                                          }
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                              value: loadingProgress
+                                                          .expectedTotalBytes !=
+                                                      null
+                                                  ? loadingProgress
+                                                          .cumulativeBytesLoaded /
+                                                      loadingProgress
+                                                          .expectedTotalBytes!
+                                                  : null,
+                                            ),
+                                          );
+                                        },
+                                        errorBuilder: (BuildContext context,
+                                            Object exception,
+                                            StackTrace? stackTrace) {
+                                          return Image.asset(
+                                            'assets/images/404.jpg',
+                                            height: 35,
+                                            width: 35,
+                                            fit: BoxFit.cover,
+                                          );
+                                        },
+                                      ),
+                                  ),
+                            ),
+                            Positioned(
+                              right: 0,
+                              bottom: 2,
+                              child: StreamBuilder<bool>(
+                                stream: getOnlineStatus(
+                                    snapshot.data["members"][index]),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    return snapshot.data == true
+                                        ? const Icon(
+                                            Icons.circle,
+                                            color: Colors.green,
+                                            size: 10,
+                                          )
+                                        : const Icon(Icons.circle_outlined,
+                                            color: Colors.black, size: 10);
+                                  } else {
+                                    return const SizedBox();
+                                  }
+                                },
                               ),
-                              Positioned(
-                                right: 0,
-                                bottom: 2,
-                                child:  StreamBuilder<bool>(
-                                  stream: getOnlineStatus(snapshot.data["members"][index]),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      return snapshot.data == true
-                                          ? const Icon(Icons.circle, color: Colors.green, size: 10,)
-                                          : const Icon(Icons.circle_outlined, color: Colors.black, size: 10);
-                                    } else {
-                                      return const SizedBox();
-                                    }
-                                  },
-                                ),
-                              )
-                            ]
-                          ),
+                            )
+                          ]),
                           title: Text(
                               getName(
                                 snapshot.data["members"][index],

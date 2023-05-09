@@ -47,9 +47,11 @@ dependencies:
   awesome_snackbar_content: ^0.1.2
   curved_navigation_bar: ^1.0.3
   flutter_sound_lite: ^8.5.0
+  connectivity_plus: ^3.0.6
   persistent_bottom_nav_bar: ^5.0.2
   permission_handler: ^10.2.0
   intl_phone_field: ^3.1.0
+  top_snackbar_flutter: ^3.0.0+1
   introduction_screen: ^3.1.1
   flutter_sound_record: ^3.2.1
   quickalert: ^1.0.1

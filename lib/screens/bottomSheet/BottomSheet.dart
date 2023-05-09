@@ -1,14 +1,17 @@
-import 'package:chat/resources/Shared_Preferences.dart';
-import 'package:chat/screens/chat/checkOnlineStatus.dart';
+import 'dart:async';
+
 import 'package:chat/screens/homeScreen/homeScreen.dart';
 import 'package:chat/screens/profile/profile.dart';
 import 'package:chat/screens/search/search_page.dart';
+import 'dart:developer' as developer;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-import '../../services/database_services/database_services.dart';
+import '../../resources/widget.dart';
 
 class BottomSheetTest extends StatefulWidget {
   final int? screenIndex;
@@ -22,16 +25,19 @@ class BottomSheetTest extends StatefulWidget {
 }
 
 class _BottomSheetTestState extends State<BottomSheetTest> with WidgetsBindingObserver{
-  String email = "";
-  String phone = "";
-  String dob = "";
-  String profilePic = "";
-  String userName = "";
   int currentIndex = 0;
+  // final internetChecker = InternetConnectivityObserver();
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  ConnectivityResult result = ConnectivityResult.none;
 
   @override
   void initState() {
     super.initState();
+    initConnectivity();
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     WidgetsBinding.instance.addObserver(this);
     setStatus(true);
     if (widget.isProfileScreen != null) {
@@ -40,10 +46,15 @@ class _BottomSheetTestState extends State<BottomSheetTest> with WidgetsBindingOb
       currentIndex = 0;
     }
   }
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
+  }
 
   buildPages() {
     return [
-      const HomeScreen(),
+       HomeScreen(isConnected:result == _connectionStatus),
       const Search(),
       Profile(),
     ];
@@ -64,51 +75,11 @@ class _BottomSheetTestState extends State<BottomSheetTest> with WidgetsBindingOb
       setStatus(false);
     }
   }
-
-
-
-
-  getImage() async {
-    QuerySnapshot snapshot =
-        await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
-            .gettingUserEmail(email);
-    setState(() {
-      profilePic = snapshot.docs[0]["profilePic"];
-    });
-  }
-
-  getProfile() async {
-    await SharedPref.getName().then((value) {
-      setState(() {
-         userName = value;
-      });
-    });
-    await SharedPref.getEmail().then((value) {
-      setState(() {
-        email = value;
-      });
-    });
-    await SharedPref.getPhone().then((value) {
-      setState(() {
-        phone = value;
-      });
-    });
-    await SharedPref.getDob().then((value) {
-      setState(() {
-        dob = value;
-      });
-    });
-    await getImage();
-
-    buildPages();
-
-  }
-
   void onTap(int index) {
     setState(() {
       currentIndex = index;
-
     });
+    (result == _connectionStatus )? initConnectivity() : SizedBox();
   }
 
   @override
@@ -141,4 +112,29 @@ class _BottomSheetTestState extends State<BottomSheetTest> with WidgetsBindingOb
       ),
     );
   }
+  Future<void> initConnectivity() async {
+    late ConnectivityResult result;
+    try {
+      result = await _connectivity.checkConnectivity();
+      if (result == _connectionStatus) {
+        // ignore: use_build_context_synchronously
+        connection(context);
+      }
+    } on PlatformException catch (e) {
+      developer.log('Couldn\'t check connectivity status', error: e);
+      return;
+    }
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+    });
+  }
 }
+

@@ -93,6 +93,7 @@ appBar({
 }) {
   return AppBar(
     elevation: 0,
+    automaticallyImplyLeading: false,
     backgroundColor: color,
     title: Text(
       titleText!,
@@ -673,30 +674,14 @@ listTile({String? text, VoidCallback? onTap}) {
     ),
   );
 }
-usernameContainer({String? text}){
-  return Container(
-    height: 35,
-    width: 180,
-    decoration: BoxDecoration(
-      color: Colors.cyan[400],
-      borderRadius: BorderRadius.circular(15),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.grey.withOpacity(0.5),
-          spreadRadius: 2,
-          blurRadius: 5,
-          offset: const Offset(0, 4), // changes position of shadow
-        ),
-      ],
-    ),
-    child: Center(
-      child: Text(
-        text!.toUpperCase(),
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 18,
-          color: Colors.black,
-        ),
+Center userName({String? text}){
+  return Center(
+    child: Text(
+      text!,
+      style: const TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 18,
+        color: Colors.black,
       ),
     ),
   );

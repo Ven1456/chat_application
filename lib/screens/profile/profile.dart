@@ -93,7 +93,7 @@ class _ProfileState extends State<Profile> {
                     ),
                     sizeBoxH15(),
                     // USERNAME CONTAINER
-                    usernameContainer(text: username),
+                    userName(text: username),
                     sizeBoxH25(),
                     // EDIT PROFILE
                     listTile(

@@ -41,6 +41,7 @@ class _GroupInfoState extends State<GroupInfo> {
   Stream? members;
   String isAdmin = "";
   String username = "";
+  String userProfile = "";
   bool? isOnline;
   bool isDelete = false;
   @override
@@ -49,7 +50,6 @@ class _GroupInfoState extends State<GroupInfo> {
     // TODO: implement initState
     super.initState();
     isAdmin = getName(widget.adminName);
-    print("fghjgfh ${widget.userProfile}");
     getMembers();
     isDelete = true;
     setState(() {});
@@ -67,6 +67,13 @@ class _GroupInfoState extends State<GroupInfo> {
       });
     });
   }
+  getUserProfileImage() async {
+    final user = FirebaseAuth.instance.currentUser!.uid;
+    final docSnapshot = await FirebaseFirestore.instance.collection("users").doc(user).get();
+    setState(() {
+      userProfile = docSnapshot.get("profilePic");
+    });
+  }
 
   Stream<bool> getOnlineStatus(String userId) {
     return FirebaseFirestore.instance
@@ -81,6 +88,7 @@ class _GroupInfoState extends State<GroupInfo> {
       setState(() {
         members = value;
         getImage();
+        getUserProfileImage();
       });
     });
   }

@@ -119,8 +119,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       height: 50,
       width: MediaQuery.of(context).size.width * 0.85,
       onTap: () {
-        _resetKey.currentState!.validate();
-        _changePassword();
+        if(_resetKey.currentState!.validate()) {
+          _changePassword();
+        }
       },
       text: "Update Password",
     );
@@ -160,12 +161,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           text: 'The current password is incorrect',
         ) :  Container();
       } else {
-        _resetKey.currentState!.validate() ?   QuickAlert.show(
+        QuickAlert.show(
           context: context,
           type: QuickAlertType.error,
           title: 'Error...',
           text: 'Error changing password: ${e.message}',
-        ) :  Container();
+        );
       }
     } catch (e) {
       // Handle other errors

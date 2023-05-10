@@ -4,6 +4,7 @@ import 'package:chat/resources/Shared_Preferences.dart';
 import 'package:chat/resources/profile_Controller.dart';
 import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/chat/message_tlle.dart';
+import 'package:chat/screens/chat/replyMessageWidget.dart';
 import 'package:chat/services/authentication_services/auth_service.dart';
 import 'package:chat/services/database_services/database_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:swipe_to/swipe_to.dart';
 
 import '../../utils/InputFormatters.dart';
 import '../groups/group_info.dart';
@@ -49,9 +51,12 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final ScrollController _scrollController = ScrollController();
   Stream<QuerySnapshot>? chats;
+  final FocusNode textFieldFocus = FocusNode();
   String adminName = "";
   String groupsUsersProfile = "";
   bool? groupsender;
+  bool isSwipe = false;
+  bool isSend = false;
   bool isLoadingAnimation = false;
   final TextEditingController messageController = TextEditingController();
   double minHeight = 60;
@@ -59,9 +64,12 @@ class _ChatPageState extends State<ChatPage> {
   int maxLines = 10;
   String profilePic = '';
   String groupPicture = "";
+  String message = "";
+  String swipeUserName = "";
   final picker = ImagePicker();
   bool isPressed = false;
   AuthService authService = AuthService();
+  static final inputTopRadius = Radius.circular(1);
   // late FlutterSoundRecorder _recorder;
   // final recorder = SoundRecorder();
 
@@ -87,6 +95,7 @@ class _ChatPageState extends State<ChatPage> {
   // 21/04/23
   String messageChatUrl = "";
   String messageChatId = "";
+  String isReplyMessage = "";
 
   @override
   void initState() {
@@ -97,7 +106,6 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
     // _recorder = FlutterSoundRecorder();
     // recorder.init();
-    print("shdfghjdfsgjdfgs $widget.isInternetConnected");
     setState(() {
       isLoadingAnimation = true;
       getImage();
@@ -147,7 +155,7 @@ class _ChatPageState extends State<ChatPage> {
         profilePic = value ?? "";
         getGroupImage();
       });
-      widget.isInternetConnected == true  ? connection(context) :  SizedBox();
+      widget.isInternetConnected == true ? connection(context) : SizedBox();
     });
   }
 
@@ -200,147 +208,175 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   // SEND MESSAGE BUTTON EXTRACT AS A METHOD
-  Container _buildSendMessageButton(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(21), topRight: Radius.circular(21)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
+  Column _buildSendMessageButton(BuildContext context) {
+    return Column(
+      children: [
+        isSwipe ?   Container(
+          width: MediaQuery.of(context).size.width * 0.96,
+          padding: EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.grey.withOpacity(0.2),
+            borderRadius: BorderRadius.only(
+              topLeft: inputTopRadius,
+              bottomLeft: inputTopRadius,
+              bottomRight: inputTopRadius,
+              topRight: inputTopRadius,
+            ),
           ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          GestureDetector(
-            onLongPress: () {
-              setState(() {
-                isPressed = true;
-              });
+          child: ReplyMessageWidget(
+            message: message,
+            colorWhite: false,
+            onCancelReply: () {
+             setState(() {
+               isSwipe = false;
+             });
             },
-            onLongPressEnd: (details) {
-              setState(() {
-                isPressed = false;
-              });
-            },
-            child: AnimatedContainer(
-              height: isPressed ? 50 : 40,
-              width: isPressed ? 50 : 40,
-              decoration: BoxDecoration(
-                  color: isPressed ? Colors.grey : Colors.cyan,
-                  borderRadius: BorderRadius.circular(45)),
-              duration: Duration(milliseconds: 200),
-              child: Icon(
-                isPressed ? CupertinoIcons.stop_circle : CupertinoIcons.mic,
-                color: Colors.white,
+            username: swipeUserName,
+          ),
+        ) : SizedBox(),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(21), topRight: Radius.circular(21)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.3),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
               ),
-            ),
+            ],
           ),
-          IconButton(
-            onPressed: () {
-              setState(() {
-                _isShowEmoji = !_isShowEmoji;
-              });
-            },
-            icon: const Icon(
-              CupertinoIcons.smiley,
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Container(
-              constraints: BoxConstraints(
-                minHeight: minHeight,
-                maxHeight: maxHeight,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onLongPress: () {
+                  setState(() {
+                    isPressed = true;
+                  });
+                },
+                onLongPressEnd: (details) {
+                  setState(() {
+                    isPressed = false;
+                  });
+                },
+                child: AnimatedContainer(
+                  height: isPressed ? 50 : 40,
+                  width: isPressed ? 50 : 40,
+                  decoration: BoxDecoration(
+                      color: isPressed ? Colors.grey : Colors.cyan,
+                      borderRadius: BorderRadius.circular(45)),
+                  duration: Duration(milliseconds: 200),
+                  child: Icon(
+                    isPressed ? CupertinoIcons.stop_circle : CupertinoIcons.mic,
+                    color: Colors.white,
+                  ),
+                ),
               ),
-              child: TextFormField(
-                  onTap: () {
-                    if (_isShowEmoji) {
-                      setState(() {
-                        _isShowEmoji = !_isShowEmoji;
-                      });
-                    }
-                  },
-                  maxLines: null,
-                  inputFormatters: [
-                    TrimTextFormatter(),
-                    NewLineTrimTextFormatter(),
-                  ],
-                  onChanged: (value) {
-                    final lines = value.split('\n').length;
-                    if (lines < 2) {
-                      setState(() {
-                        minHeight = 60;
-                        maxHeight = 150;
-                      });
-                    } else if (lines < 6) {
-                      setState(() {
-                        minHeight = 66;
-                        maxHeight = 150;
-                      });
-                    } else if (lines <= 10) {
-                      setState(() {
-                        minHeight = 60 + (5 - 1) * 20;
-                        maxHeight = 150 + (lines - 5) * 20;
-                        maxLines = lines;
-                      });
-                    } else {
-                      setState(() {
-                        maxLines = maxLines;
-                      });
-                    }
-                  },
-                  keyboardType: TextInputType.multiline,
-                  controller: messageController,
-                  decoration: const InputDecoration(
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      hintText: "Send Message")),
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              // 21/04/23
-              pickMessageImage(context);
-            },
-            icon: const Icon(
-              Icons.photo,
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(width: 5),
-          GestureDetector(
-            onTap: () {
-              if (chatFromKey.currentState!.validate()) {
-                sendMessages();
-                resetHeight();
-              }
-            },
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.blue,
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _isShowEmoji = !_isShowEmoji;
+                  });
+                },
+                icon: const Icon(
+                  CupertinoIcons.smiley,
+                  color: Colors.grey,
+                ),
               ),
-              child: const Icon(
-                Icons.send,
-                color: Colors.white,
+              const SizedBox(width: 10),
+              Expanded(
+                child: Container(
+                  constraints: BoxConstraints(
+                    minHeight: minHeight,
+                    maxHeight: maxHeight,
+                  ),
+                  child: TextFormField(
+                      focusNode: textFieldFocus,
+                      onTap: () {
+                        if (_isShowEmoji) {
+                          setState(() {
+                            _isShowEmoji = !_isShowEmoji;
+                          });
+                        }
+                      },
+                      maxLines: null,
+                      inputFormatters: [
+                        TrimTextFormatter(),
+                        NewLineTrimTextFormatter(),
+                      ],
+                      onChanged: (value) {
+                        final lines = value.split('\n').length;
+                        if (lines < 2) {
+                          setState(() {
+                            minHeight = 60;
+                            maxHeight = 150;
+                          });
+                        } else if (lines < 6) {
+                          setState(() {
+                            minHeight = 66;
+                            maxHeight = 150;
+                          });
+                        } else if (lines <= 10) {
+                          setState(() {
+                            minHeight = 60 + (5 - 1) * 20;
+                            maxHeight = 150 + (lines - 5) * 20;
+                            maxLines = lines;
+                          });
+                        } else {
+                          setState(() {
+                            maxLines = maxLines;
+                          });
+                        }
+                      },
+                      keyboardType: TextInputType.multiline,
+                      controller: messageController,
+                      decoration: const InputDecoration(
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          hintText: "Send Message")),
+                ),
               ),
-            ),
+              IconButton(
+                onPressed: () {
+                  // 21/04/23
+                  pickMessageImage(context);
+                },
+                icon: const Icon(
+                  Icons.photo,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(width: 5),
+              GestureDetector(
+                onTap: () {
+                  if (chatFromKey.currentState!.validate()) {
+                    sendMessages();
+                    isSwipe = false;
+                    resetHeight();
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.blue,
+                  ),
+                  child: const Icon(
+                    Icons.send,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  // CHAT MESSAGE  EXTRACT AS A METHOD
   Expanded _buildChatMessages() {
     return Expanded(
       child: chatMessages(),
@@ -365,14 +401,15 @@ class _ChatPageState extends State<ChatPage> {
                       widget.groupPic.toString(),
                       height: 35,
                       width: 35,
-                errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                  return Image.asset(
-                    'assets/images/404.jpg',
-                    height: 35,
-                    width: 35,
-                    fit: BoxFit.cover,
-                  );
-                },
+                      errorBuilder: (BuildContext context, Object exception,
+                          StackTrace? stackTrace) {
+                        return Image.asset(
+                          'assets/images/404.jpg',
+                          height: 35,
+                          width: 35,
+                          fit: BoxFit.cover,
+                        );
+                      },
                       fit: BoxFit.cover,
                       loadingBuilder: (BuildContext context, Widget child,
                           ImageChunkEvent? loadingProgress) {
@@ -485,9 +522,7 @@ class _ChatPageState extends State<ChatPage> {
                             itemBuilder: (context, index) {
                               bool isSameDate = false;
                               String? newDate = '';
-                       //       print("popopoop $groupsUsersProfile");
-                              groupsUsersProfile = snapshot.data.docs[index]["userProfile"];
-                              groupsender = widget.username == snapshot.data.docs[index]["sender"];
+
                               if (index == 0) {
                                 messageChatId = snapshot.data.docs[index].id;
                                 newDate = groupMessageDateAndTime(snapshot
@@ -528,19 +563,33 @@ class _ChatPageState extends State<ChatPage> {
                                         ),
                                       ),
                                     ),
-                                  MessageTile(
-                                    messageId: snapshot.data.docs[index].id,
-                                    groupId: widget.groupId,
-                                    message: snapshot.data.docs[index]
-                                        ["message"],
-                                    sendByMe: widget.username ==
-                                        snapshot.data.docs[index]["sender"],
-                                    sender: snapshot.data.docs[index]["sender"],
-                                    time: snapshot.data.docs[index]["time"]
-                                        .toString(),
-                                    userProfile: snapshot.data.docs[index]
-                                        ["userProfile"],
-                                    type: snapshot.data.docs[index]["Type"],
+                                  SwipeTo(
+                                    onRightSwipe: () {
+                                      replyMessage(snapshot.data.docs[index]["message"]);
+                                      textFieldFocus.requestFocus();
+                                      setState(() {
+                                        isSwipe = true;
+                                      });
+                                      message = snapshot.data.docs[index]["message"];
+                                      swipeUserName =  snapshot.data.docs[index]["sender"];
+                                    },
+                                    child: MessageTile(
+                                      isReply: snapshot.data.docs[index]
+                                      ["replyMessage"],
+                                      messageId: snapshot.data.docs[index].id,
+                                      groupId: widget.groupId,
+                                      message: snapshot.data.docs[index]
+                                          ["message"],
+                                      sendByMe: widget.username ==
+                                          snapshot.data.docs[index]["sender"],
+                                      sender: snapshot.data.docs[index]
+                                          ["sender"],
+                                      time: snapshot.data.docs[index]["time"]
+                                          .toString(),
+                                      userProfile: snapshot.data.docs[index]
+                                          ["userProfile"],
+                                      type: snapshot.data.docs[index]["Type"],
+                                    ),
                                   ),
                                   sizeBoxH5()
                                 ],
@@ -553,9 +602,9 @@ class _ChatPageState extends State<ChatPage> {
             isUploading
                 ? Container(
                     color: Colors.black.withOpacity(0.3),
-                    child:  Center(
-                        child: loadingAnimationWithReUse("https://assets8.lottiefiles.com/packages/lf20_jsuj2bs7.json")
-                    ),
+                    child: Center(
+                        child: loadingAnimationWithReUse(
+                            "https://assets8.lottiefiles.com/packages/lf20_jsuj2bs7.json")),
                   )
                 : Container(),
             Positioned(
@@ -580,6 +629,12 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  void replyMessage(String message) {
+    setState(() {
+      message = message;
+    });
+  }
+
   sendMessages() {
     if (messageController.text.isNotEmpty) {
       _scrollController.animateTo(
@@ -595,7 +650,8 @@ class _ChatPageState extends State<ChatPage> {
         "time": DateTime.now().microsecondsSinceEpoch,
         "userProfile": widget.userProfile,
         "Type": "text",
-        "messageId":messageChatId,
+        "messageId": messageChatId,
+        "replyMessage" : isSwipe  ? messageController.text.trim() :"",
       };
       DatabaseServices().sendMessage(widget.groupId, chatMessageMap);
       setState(() {
@@ -650,11 +706,13 @@ class _ChatPageState extends State<ChatPage> {
         "time": DateTime.now().microsecondsSinceEpoch,
         "userProfile": userProfile,
         "Type": "Image",
-        "messageId" : messageChatId,
+        "messageId": messageChatId,
+        "replyMessage" : isSwipe  ?messageUrl :"",
       };
       DatabaseServices().sendMessage(getId, chatMessag);
     }
   }
+
 // MESSAGE IMAGE
   void pickMessageImage(context) {
     showDialog(

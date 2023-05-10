@@ -177,17 +177,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   maxHeight: 85,
                   maxWidth: 150,
                 ),
-                child: Column(
+                child: Stack(
                   children: [
-                    _isLoading
-                        ? Center(
-                            child: SizedBox(
-                                height: 50,
-                                width: 50,
-                                child: Lottie.network(
-                                    "https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")),
-                          )
-                        : Form(
+                  Form(
                             key: valFormKey,
                             child: TextFormField(
                               /*inputFormatters: [
@@ -229,7 +221,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                         const BorderSide(color: Colors.blue)),
                               ),
                             ),
-                          )
+                          ),
+                    _isLoading
+                        ?   Center(
+                      child: SizedBox(
+                          height: 50,
+                          width: 50,
+                          child: Lottie.network(
+                              "https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json")),
+                    ):  const SizedBox(),
                   ],
                 ),
               ),

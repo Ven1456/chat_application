@@ -43,7 +43,7 @@ class ProfilePicWidget extends StatelessWidget {
                     ? Center(
                         child: Text(
                         userName!.isNotEmpty
-                            ? userName!.toUpperCase().substring(0, 2)
+                            ? userName!
                             : "",
                         style: const TextStyle(
                             color: Colors.black,

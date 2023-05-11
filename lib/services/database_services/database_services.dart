@@ -85,7 +85,9 @@ class DatabaseServices {
       "recentMessage": "",
       "recentMessageId":"",
       "recentMessageSender": "",
+      "replyMessageType":"",
       "replyMessage":"",
+      "repliedMessageId":"",
       // 24/04/23
       "userProfile": "",
       "Type": "",
@@ -247,6 +249,8 @@ class DatabaseServices {
     groupCollection.doc(groupId).update({
       "recentMessage": chatMessageData["message"],
       "replyMessage": chatMessageData["replyMessage"],
+      "replyMessageType": chatMessageData["replyMessageType"],
+      "repliedMessageId": chatMessageData["repliedMessageId"],
       "recentMessageId" : chatMessageData["messageId"],
       "recentMessageSender": chatMessageData["sender"],
       "recentMessageTime": chatMessageData["time"].toString(),

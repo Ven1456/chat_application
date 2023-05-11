@@ -65,11 +65,13 @@ class _ChatPageState extends State<ChatPage> {
   String profilePic = '';
   String groupPicture = "";
   String message = "";
+  String messageType = "";
+  String replyMessage = "";
   String swipeUserName = "";
   final picker = ImagePicker();
   bool isPressed = false;
   AuthService authService = AuthService();
-  static final inputTopRadius = Radius.circular(1);
+  static const inputTopRadius = Radius.circular(21);
   // late FlutterSoundRecorder _recorder;
   // final recorder = SoundRecorder();
 
@@ -93,7 +95,8 @@ class _ChatPageState extends State<ChatPage> {
       firebase_storage.FirebaseStorage.instanceFor(
           bucket: 'gs://chatapp-4f907.appspot.com');
   // 21/04/23
-  String messageChatUrl = "";
+  String repliedMessageId = "";
+  String replyMessageType = "";
   String messageChatId = "";
   String isReplyMessage = "";
 
@@ -216,22 +219,26 @@ class _ChatPageState extends State<ChatPage> {
           padding: EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: Colors.grey.withOpacity(0.2),
-            borderRadius: BorderRadius.only(
-              topLeft: inputTopRadius,
+            borderRadius: const BorderRadius.only(
+              topLeft:inputTopRadius,
               bottomLeft: inputTopRadius,
               bottomRight: inputTopRadius,
               topRight: inputTopRadius,
             ),
           ),
           child: ReplyMessageWidget(
-            message: message,
+            previousMessage: message,
             colorWhite: false,
+            messageType:replyMessageType ,
+            isReplyMessage: replyMessage.isNotEmpty ? true : false,
+            isPreviousMessage: replyMessage.isEmpty ? true : false,
             onCancelReply: () {
-             setState(() {
-               isSwipe = false;
-             });
+              setState(() {
+                isSwipe = false;
+              });
             },
             username: swipeUserName,
+            replyMessage:replyMessage,
           ),
         ) : SizedBox(),
         Container(
@@ -565,15 +572,21 @@ class _ChatPageState extends State<ChatPage> {
                                     ),
                                   SwipeTo(
                                     onRightSwipe: () {
-                                      replyMessage(snapshot.data.docs[index]["message"]);
+                                      // replyMessage(snapshot.data.docs[index]["message"]);
                                       textFieldFocus.requestFocus();
                                       setState(() {
                                         isSwipe = true;
+                                        repliedMessageId = snapshot.data.docs[index].id;
                                       });
                                       message = snapshot.data.docs[index]["message"];
+                                      messageType= snapshot.data.docs[index]["Type"];
+                                      replyMessageType= messageType;
+                                      replyMessage = snapshot.data.docs[index]["replyMessage"];
                                       swipeUserName =  snapshot.data.docs[index]["sender"];
                                     },
                                     child: MessageTile(
+                                      replyMessageType: snapshot.data.docs[index]
+                                      ["replyMessageType"],
                                       isReply: snapshot.data.docs[index]
                                       ["replyMessage"],
                                       messageId: snapshot.data.docs[index].id,
@@ -600,12 +613,7 @@ class _ChatPageState extends State<ChatPage> {
                   )
                 : Container(),
             isUploading
-                ? Container(
-                    color: Colors.black.withOpacity(0.3),
-                    child: Center(
-                        child: loadingAnimationWithReUse(
-                            "https://assets8.lottiefiles.com/packages/lf20_jsuj2bs7.json")),
-                  )
+                ? loadingAnimation()
                 : Container(),
             Positioned(
               bottom: 16.0,
@@ -629,11 +637,11 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  void replyMessage(String message) {
-    setState(() {
-      message = message;
-    });
-  }
+  // void replyMessage(String message) {
+  //   setState(() {
+  //     message = message;
+  //   });
+  // }
 
   sendMessages() {
     if (messageController.text.isNotEmpty) {
@@ -645,13 +653,15 @@ class _ChatPageState extends State<ChatPage> {
       // 21/04/23
       ProfileController().messageUrl;
       Map<String, dynamic> chatMessageMap = {
-        "message": messageController.text.trim(),
+        "message": isSwipe  ? message :  messageController.text.trim(),
         "sender": widget.username,
         "time": DateTime.now().microsecondsSinceEpoch,
         "userProfile": widget.userProfile,
         "Type": "text",
         "messageId": messageChatId,
         "replyMessage" : isSwipe  ? messageController.text.trim() :"",
+        'repliedMessageId' : repliedMessageId,
+        'replyMessageType' : replyMessageType,
       };
       DatabaseServices().sendMessage(widget.groupId, chatMessageMap);
       setState(() {
@@ -707,9 +717,12 @@ class _ChatPageState extends State<ChatPage> {
         "userProfile": userProfile,
         "Type": "Image",
         "messageId": messageChatId,
-        "replyMessage" : isSwipe  ?messageUrl :"",
+        "replyMessage" : isSwipe  ? messageController.text.trim() :"",
+        'repliedMessageId' : repliedMessageId,
+        'replyMessageType' : replyMessageType,
       };
       DatabaseServices().sendMessage(getId, chatMessag);
+
     }
   }
 

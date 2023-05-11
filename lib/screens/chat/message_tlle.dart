@@ -17,12 +17,14 @@ class MessageTile extends StatefulWidget {
   String time;
   bool sendByMe;
   String isReply;
+  String? replyMessageType;
   String? userProfile;
   String? type;
 
   MessageTile({
     Key? key,
     this.messageId,
+    this.replyMessageType,
     required this.isReply,
     this.groupId,
     this.type,
@@ -386,8 +388,12 @@ class _MessageTileState extends State<MessageTile> {
         child: Column(
           children: [
             ReplyMessageWidget(
+              messageType: widget.replyMessageType,
               colorWhite: false,
-              message: replyMessage,
+              isReplyMessage: true,
+              isPreviousMessage: true,
+              replyMessage: widget.isReply,
+              previousMessage: replyMessage,
               username: widget.sender,
             ),
           ],

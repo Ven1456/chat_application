@@ -1,9 +1,6 @@
 import 'dart:io';
-import 'dart:math';
 import 'package:chat/services/authentication_services/auth_service.dart';
-import 'package:chat/services/database_services/database_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -189,7 +186,6 @@ class ProfileController extends ChangeNotifier {
     if (_groupImage == null) {
       return;
     }
-
     getId =(await SharedPref.getGroupId())!;
     firebase_storage.Reference reference = firebase_storage
         .FirebaseStorage.instance
@@ -209,115 +205,6 @@ class ProfileController extends ChangeNotifier {
     });
       url = downloadUrl;
      /* await SharedPref.saveGroupPic(downloadUrl);*/
-    }
-  }
-
-  // 21/04/23
-  // MESSAGE UPLOAD IMAGE
-  void uploadMessageImage(BuildContext context) async {
-    if (_messageImage == null) {
-      return;
-    }
-    isUploading = true;
-    notifyListeners();
-    if(isUploading == true) {
-     const CircularProgressIndicator();
-    }
-    String fileName = '${DateTime.now().microsecondsSinceEpoch}.jpg';
-    // @ 24/04/23
-    getId =(await SharedPref.getAllGroupId())!;
-    firebase_storage.Reference reference = firebase_storage
-        .FirebaseStorage.instance
-        .ref()
-        .child("/messagePhoto")
-        .child(getId).child(fileName);
-    firebase_storage.UploadTask uploadTask =
-    reference.putFile(File(_messageImage!.path).absolute);
-    await Future.value(uploadTask);
-    uploadTask.whenComplete((){
-    print("uploadfgdhs");
-    });
-
-    String downloadUrl = await reference.getDownloadURL();
-    String userId = getId;
-    DocumentSnapshot snapshot =
-    await FirebaseFirestore.instance.collection('groups').doc(userId).get();
-    if (snapshot.exists) {
-      await FirebaseFirestore.instance.collection('groups').doc(userId).update({
-        'recentMessage': downloadUrl,
-      });
-      final user = FirebaseAuth.instance.currentUser!.uid;
-      final docSnapshot = await FirebaseFirestore.instance.collection("users").doc(user).get();
-      userName = docSnapshot.get("fullName");
-      userProfile = docSnapshot.get("profilePic");
-      messageUrl = downloadUrl;
-      Map<String, dynamic> chatMessag = {
-        "message": messageUrl,
-        "sender":userName,
-        "time": DateTime.now().microsecondsSinceEpoch,
-        "userProfile": userProfile,
-        "Type":"Image",
-      };
-      DatabaseServices().sendMessage(getId, chatMessag);
-    }
-  }
-  // 21/04/23
-// MESSAGE IMAGE
-  void pickMessageImage(context) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            content: SizedBox(
-              height: 120,
-              width: 120,
-              child: Column(
-                children: [
-                  ListTile(
-                    onTap: () {
-                      pickCameraMessageImage(context);
-                      Navigator.pop(context);
-                    },
-                    leading: const Icon(Icons.camera),
-                    title: const Text("Camera"),
-                  ),
-                  ListTile(
-                    onTap: () {
-                      pickGalleryMessageImage(context);
-                      Navigator.pop(context);
-                    },
-                    leading: const Icon(Icons.image),
-                    title: const Text("Image"),
-                  )
-                ],
-              ),
-            ),
-          );
-        });
-  }
-  // 21/04/23
-  // IMAGE PICK FROM GALLERY
-  Future pickGalleryMessageImage(BuildContext context) async {
-    final pickedFile = await picker.pickImage(
-        source: ImageSource.gallery, imageQuality: 100);
-    if (pickedFile != null) {
-      _messageImage = XFile(pickedFile.path);
-      _messageImage = await _CropImage(imageFile: _messageImage);
-      // ignore: use_build_context_synchronously
-      uploadMessageImage(context);
-      notifyListeners();
-    }
-  }
-  // 21/04/23
-  // IMAGE PICK FROM CAMERA
-  Future pickCameraMessageImage(BuildContext context) async {
-    final pickedFile =
-    await picker.pickImage(source: ImageSource.camera, imageQuality: 100);
-    if (pickedFile != null) {
-      _messageImage = XFile(pickedFile.path);
-      // ignore: use_build_context_synchronously
-      uploadMessageImage(context);
-      notifyListeners();
     }
   }
 

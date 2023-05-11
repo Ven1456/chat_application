@@ -11,19 +11,11 @@ class SharedPref {
   static String dob = "dob";
   static String gender = "gender";
   static String saveAllGroupId = "SaveAllGroupId";
-  static String messageUrl= "messageUrl";
 
   // SAVE THE USER LOGIN STATUS SHARED PREFERENCE
   static Future<bool?> saveUserLoginStatus(bool isUserLogged) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setBool(userLogin, isUserLogged);
-    return null;
-  }
-  // 21/04/23
-  // SAVE THE MESSAGE URL STATUS SHARED PREFERENCE
-  static Future<bool?> saveMessageUrl(String isMessageUrl) async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.setString(messageUrl, isMessageUrl);
     return null;
   }
   static Future<void> saveUserGender(String isGender) async {
@@ -56,11 +48,6 @@ class SharedPref {
   static Future<bool?> saveProfilePic(String profile) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return await sharedPreferences.setString(profilePic, profile);
-  }
-// SAVE THE USER GROUP PIC STATUS SHARED PREFERENCE
-  static Future<bool?> saveGroupPic(String profile) async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    return await sharedPreferences.setString(groupPic, profile);
   }
   // SAVE GROUP ID
   static Future<bool?> saveGroupId(String groupIdString) async {
@@ -109,17 +96,6 @@ class SharedPref {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return sharedPreferences.getString(groupPic);
   }
-  // GET THE PROFILE PIC STATUS SHARED PREFERENCE
-  static Future<String?> getProfilePic() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    return sharedPreferences.getString(profilePic);
-  }
-  // 21/04/23
-  static Future<String?> getMessageUrl() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    return sharedPreferences.getString(messageUrl);
-  }
-
   static Future<String?> getGroupId() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return sharedPreferences.getString(groupId);

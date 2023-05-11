@@ -1,4 +1,5 @@
 
+import 'package:chat/resources/widget.dart';
 import 'package:chat/screens/homeScreen/homeScreen.dart';
 import 'package:chat/screens/screens.dart';
 import 'package:flutter/material.dart';
@@ -63,7 +64,7 @@ class _IntroScreenState extends State<IntroScreen> {
       body: IntroductionScreen(
         done:  const Text("Done" ,style: TextStyle(fontSize: 22,color: Colors.cyan),),
         onDone: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+        nextPagePushAndRemoveUntil(context, const LoginPage());
         },
         pages:getPages(),
         globalBackgroundColor: Colors.white,

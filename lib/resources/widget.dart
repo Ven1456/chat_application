@@ -83,7 +83,7 @@ extension HexColor on Color {
 }
 
 // APP BAR
-appBar({
+AppBar appBar({
   String? titleText,
   required BuildContext context,
   bool? isBack,
@@ -112,7 +112,7 @@ appBar({
   );
 }
 
-backButton({required BuildContext context, VoidCallback? onTap}) {
+Container backButton({required BuildContext context, VoidCallback? onTap}) {
   return Container(
     height: 30,
     width: 30,
@@ -366,7 +366,7 @@ Future<void> alertBoxReuse(
       });
 }
 
-reusableButton(
+SizedBox reusableButton(
     {double? height, double? width, VoidCallback? onTap, String? text}) {
   return SizedBox(
     height: height,
@@ -440,27 +440,27 @@ class _ReusableTextFieldState extends State<ReusableTextField> {
   }
 }
 
-boldText({String? text,double? size}) {
+Text boldText({String? text,double? size}) {
   return Text(
     text!,
     style:  TextStyle(fontSize: size, fontWeight: FontWeight.bold),
   );
 }
-normalText({String? text,double? size}) {
+Text normalText({String? text,double? size}) {
   return Text(
     text!,
     style:  TextStyle(fontSize: size, fontWeight: FontWeight.normal),
   );
 }
 
-imageBuild({String? path, double? size}) {
+Image imageBuild({String? path, double? size}) {
   return Image.asset(
     path!,
     height: size,
   );
 }
 
-navLinkText({VoidCallback? onTap, String? text}) {
+GestureDetector navLinkText({VoidCallback? onTap, String? text}) {
   return GestureDetector(
     onTap: onTap,
     child: Padding(
@@ -473,7 +473,7 @@ navLinkText({VoidCallback? onTap, String? text}) {
   );
 }
 
-richTextSpan({String? text1, String? text2, VoidCallback? onTap}) {
+Text richTextSpan({String? text1, String? text2, VoidCallback? onTap}) {
   return Text.rich(TextSpan(
       text: text1,
       style: const TextStyle(color: Colors.black, fontSize: 17),
@@ -485,7 +485,7 @@ richTextSpan({String? text1, String? text2, VoidCallback? onTap}) {
       ]));
 }
 
-profileSubText({String? text}) {
+Row profileSubText({String? text}) {
   return Row(
     children: [
       Padding(
@@ -584,7 +584,7 @@ class _ProfileTextFieldState extends State<ProfileTextField> {
 }
 
 //
-loadingAnimation() {
+Container loadingAnimation() {
   return Container(
       color: Colors.black.withOpacity(0.1),
       child: Center(
@@ -593,7 +593,7 @@ loadingAnimation() {
             height: 180),
       ));
 }
-loadingAnimationWithReUse(String url) {
+Container loadingAnimationWithReUse(String url) {
   return Container(
       color: Colors.black.withOpacity(0.1),
       child: Center(
@@ -602,67 +602,67 @@ loadingAnimationWithReUse(String url) {
             height: 100),
       ));
 }
-sizeBoxH15() {
+SizedBox sizeBoxH15() {
   return const SizedBox(
     height: 15,
   );
 }
 
-sizeBoxH20() {
+SizedBox sizeBoxH20() {
   return const SizedBox(
     height: 20,
   );
 }
 
-sizeBoxH60() {
+SizedBox sizeBoxH60() {
   return const SizedBox(
     height: 60,
   );
 }
 
-sizeBoxH100() {
+SizedBox sizeBoxH100() {
   return const SizedBox(
     height: 100,
   );
 }
 
-sizeBoxH80() {
+SizedBox sizeBoxH80() {
   return const SizedBox(
     height: 80,
   );
 }
 
-sizeBoxH45() {
+SizedBox sizeBoxH45() {
   return const SizedBox(
     height: 45,
   );
 }
 
-sizeBoxH5() {
+SizedBox sizeBoxH5() {
   return const SizedBox(
     height: 5,
   );
 }
 
-sizeBoxH10() {
+SizedBox sizeBoxH10() {
   return const SizedBox(
     height: 10,
   );
 }
 
-sizeBoxH25() {
+SizedBox sizeBoxH25() {
   return const SizedBox(
     height: 25,
   );
 }
 
-sizeBoxW118() {
+SizedBox sizeBoxW118() {
   return const SizedBox(
     width: 118,
   );
 }
 
-listTile({String? text, VoidCallback? onTap}) {
+Padding listTile({String? text, VoidCallback? onTap}) {
   return Padding(
     padding: const EdgeInsets.only(right: 6.0, left: 6),
     child: Card(

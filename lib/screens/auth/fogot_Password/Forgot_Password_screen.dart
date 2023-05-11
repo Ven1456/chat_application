@@ -64,8 +64,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: HexColor.fromHex('#FFFFFF'),
-      // APP BAR
-      // appBar: _buildAppBar(),
       body: Stack(
         children: [
           SafeArea(

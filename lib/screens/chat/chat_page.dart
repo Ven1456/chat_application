@@ -622,7 +622,7 @@ class _ChatPageState extends State<ChatPage> {
                                         type: snapshot.data.docs[index]["Type"],
                                       ),
                                       context: context,
-                                      onTap: () {
+                                      onDeletedButtonTap: () {
                                         deleteMessage(
                                           widget.groupId,
                                           snapshot.data.docs[index].id

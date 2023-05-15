@@ -700,7 +700,7 @@ connection(BuildContext context){
     );
   }
 }
-showDeleteDialogue({required BuildContext context,required VoidCallback onTap,Widget? child, VoidCallback? onSingleTap,}){
+showDeleteDialogue({required BuildContext context,required VoidCallback onDeletedButtonTap,Widget? child, VoidCallback? onSingleTap,}){
   return GestureDetector(
       onLongPress: () {
     showDialog(
@@ -719,7 +719,7 @@ showDeleteDialogue({required BuildContext context,required VoidCallback onTap,Wi
             ),
             ElevatedButton(
               child: Text('Delete'),
-              onPressed: onTap
+              onPressed: onDeletedButtonTap
             ),
           ],
         );

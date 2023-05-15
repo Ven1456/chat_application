@@ -40,6 +40,7 @@ class GroupInfo extends StatefulWidget {
 class _GroupInfoState extends State<GroupInfo> {
   Stream? members;
   String isAdmin = "";
+  String admin = "";
   String username = "";
   String userProfile = "";
   bool? isOnline;
@@ -72,6 +73,7 @@ class _GroupInfoState extends State<GroupInfo> {
     final docSnapshot = await FirebaseFirestore.instance.collection("users").doc(user).get();
     setState(() {
       userProfile = docSnapshot.get("profilePic");
+      admin = docSnapshot.get("fullName");
     });
   }
 
@@ -168,7 +170,7 @@ class _GroupInfoState extends State<GroupInfo> {
                 ),
               ),
               Text(
-                "Admin : ${getName(widget.adminName)}",
+                "Admin : $admin ",
                 style: const TextStyle(
                   fontSize: 16,
                   color: Colors.black,
@@ -239,7 +241,7 @@ class _GroupInfoState extends State<GroupInfo> {
                   ]),
           ),
         ),
-        isAdmin == username
+        admin == username
             ? GestureDetector(
                 onTap: () {
                   provider.pickGroupImage(context);
@@ -286,7 +288,7 @@ class _GroupInfoState extends State<GroupInfo> {
         ),
       ),
       actions: [
-        isAdmin == username
+        admin == username
             ? IconButtonAlertReuse(
                 icon: Icons.delete,
                 leaveOnTap: () {
@@ -323,7 +325,7 @@ class _GroupInfoState extends State<GroupInfo> {
                   Navigator.pop(context);
                 })
             : SizedBox(),
-        isAdmin == username
+        admin == username
             ? const SizedBox(
                 width: 10,
               )

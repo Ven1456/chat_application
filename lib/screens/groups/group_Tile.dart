@@ -178,7 +178,7 @@ AuthService authService = AuthService();
 
   // SUB TITLE TEXT EXTRACT AS A METHOD
   Text _buildSubTitleText() {
-    return Text("Join the Conversation as the ${widget.username.toString()}",
+    return Text("Join the Conversation with  ${widget.groupName.toString()}",
         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13));
   }
 

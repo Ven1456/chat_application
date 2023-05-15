@@ -105,20 +105,6 @@ class DatabaseServices {
     });
   }
 
-  Future<void> updateMemberFields(String id,String username) async {
-    DocumentReference userDocumentReference = userCollection.doc(uid);
-    DocumentReference groupDocumentReference = groupCollection.doc(groupId);
-    DocumentSnapshot documentSnapshot = await userDocumentReference.get();
-    List<dynamic> groups = await documentSnapshot["groups"];
-    if (groups.contains("$groupId")) {
-      await groupDocumentReference.update({
-        "members": FieldValue.arrayUnion(["${uid}_$username"])
-      });
-    }
-  }
-
-
-
   Future<void> deleteGroup(String groupId, String groupName) async {
     // Step 1: Retrieve the DocumentReference of the group to be deleted
     DocumentReference groupDocRef = groupCollection.doc(groupId);
@@ -156,7 +142,6 @@ class DatabaseServices {
     DocumentSnapshot documentSnapshot = await documentReference.get();
     return documentSnapshot["admin"];
   }
-
   Future getGroupIcon(String? groupId) async {
     DocumentReference documentReference = groupCollection.doc(groupId);
     DocumentSnapshot documentSnapshot = await documentReference.get();

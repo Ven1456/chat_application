@@ -104,6 +104,9 @@ class _EditProfileState extends State<EditProfile> {
       );
     }).toList();
   }
+  String getName(String res) {
+    return res.substring(res.indexOf("_") + 1);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -360,6 +363,7 @@ class _EditProfileState extends State<EditProfile> {
           dobController.text,
           _gender,
         );
+        await _updateGroupUserProfile(usernameController.text);
         await SharedPref.saveUserName(usernameController.text);
         await SharedPref.saveUserEmail(emailController.text);
         await SharedPref.saveUserGender(_gender);
@@ -401,8 +405,7 @@ class _EditProfileState extends State<EditProfile> {
   Future<void> _updateUserProfile(String userName, String email, String phone,
       String dob, String gender) async {
     final user = FirebaseAuth.instance.currentUser;
-    final docRef =
-        FirebaseFirestore.instance.collection('users').doc(user!.uid);
+    final docRef = FirebaseFirestore.instance.collection('users').doc(user!.uid);
 
     await docRef.update({
       "fullName": userName,
@@ -412,6 +415,33 @@ class _EditProfileState extends State<EditProfile> {
       "gender": gender,
     });
   }
+  // UPDATE THE GROUP INFO USER NAME
+  Future<void> _updateGroupUserProfile(String userName) async {
+    String getId = (await SharedPref.getGroupId())!;
+    final groupId = getId;
+    final docRef = FirebaseFirestore.instance.collection('groups').doc(groupId);
+    String user = FirebaseAuth.instance.currentUser!.uid;
+    final groupSnapshot = await docRef.get();
+
+    if (groupSnapshot.exists) {
+      final data = groupSnapshot.data()!;
+      List<String> members = List<String>.from(data['members']);
+      final index = members.indexWhere((member) => member.startsWith(user));
+
+      if (index != -1) {
+        members[index] = "${user}_$userName";
+        await docRef.update({"members": members});
+      } else {
+        await docRef.update({
+          "admin": "${user}_$userName",
+          "members": FieldValue.arrayUnion(["${user}_$userName"]),
+        });
+      }
+    }
+  }
+
 }
+
+
 
 enum Gender { Male, Female, Others }

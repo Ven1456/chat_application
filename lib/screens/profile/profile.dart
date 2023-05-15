@@ -40,8 +40,7 @@ class _ProfileState extends State<Profile> {
 
   getImage() async {
     final user = FirebaseAuth.instance.currentUser!.uid;
-    final docSnapshot =
-        await FirebaseFirestore.instance.collection("users").doc(user).get();
+    final docSnapshot = await FirebaseFirestore.instance.collection("users").doc(user).get();
     setState(() {
       image = docSnapshot.get("profilePic");
       isOnline = docSnapshot.get("onlineStatus");

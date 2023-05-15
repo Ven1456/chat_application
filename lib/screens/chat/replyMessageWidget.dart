@@ -28,7 +28,7 @@ class ReplyMessageWidget extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              color: Colors.green,
+              color: Colors.black,
               width: 4,
             ),
             const SizedBox(width: 8),
@@ -52,10 +52,10 @@ class ReplyMessageWidget extends StatelessWidget {
               ),
               if (onCancelReply != null)
                 GestureDetector(
+                  onTap: onCancelReply,
                   child: Icon(Icons.close,
                       size: 16,
                       color: colorWhite! ? Colors.white : Colors.black),
-                  onTap: onCancelReply,
                 )
             ],
           ),

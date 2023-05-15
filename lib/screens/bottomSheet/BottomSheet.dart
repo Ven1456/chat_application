@@ -64,7 +64,6 @@ class _BottomSheetTestState extends State<BottomSheetTest> with WidgetsBindingOb
     final user = FirebaseAuth.instance.currentUser!.uid;
     await FirebaseFirestore.instance.collection("users").doc(user).update(
         {"onlineStatus": status});
-    print(status);
   }
 
   @override

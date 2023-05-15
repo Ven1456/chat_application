@@ -584,13 +584,14 @@ class _ProfileTextFieldState extends State<ProfileTextField> {
 }
 
 //
-Container loadingAnimation() {
+Container loadingAnimation({double? size}) {
   return Container(
       color: Colors.black.withOpacity(0.1),
       child: Center(
         child: Lottie.network(
             "https://assets4.lottiefiles.com/private_files/lf30_fjjj1m44.json",
-            height: 180),
+            height: size,
+        ),
       ));
 }
 Container loadingAnimationWithReUse(String url) {
@@ -698,4 +699,34 @@ connection(BuildContext context){
       displayDuration: const Duration(milliseconds: 100),
     );
   }
+}
+showDeleteDialogue({required BuildContext context,required VoidCallback onTap,Widget? child, VoidCallback? onSingleTap,}){
+  return GestureDetector(
+      onLongPress: () {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Message'),
+          content: const Text(
+              'Are you sure you want to delete this message?'),
+          actions: <Widget>[
+            ElevatedButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: Text('Delete'),
+              onPressed: onTap
+            ),
+          ],
+        );
+      },
+    );
+  },
+    onTap: onSingleTap,
+  child: child,
+  );
 }

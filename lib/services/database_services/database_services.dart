@@ -87,6 +87,7 @@ class DatabaseServices {
       "recentMessageSender": "",
       "replyMessageType":"",
       "replyMessage":"",
+      "isReplyMessage":"",
       "repliedMessageId":"",
       // 24/04/23
       "userProfile": "",
@@ -250,6 +251,7 @@ class DatabaseServices {
       "recentMessage": chatMessageData["message"],
       "replyMessage": chatMessageData["replyMessage"],
       "replyMessageType": chatMessageData["replyMessageType"],
+      "isReplyMessage": chatMessageData["isReplyMessage"],
       "repliedMessageId": chatMessageData["repliedMessageId"],
       "recentMessageId" : chatMessageData["messageId"],
       "recentMessageSender": chatMessageData["sender"],

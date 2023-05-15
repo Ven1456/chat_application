@@ -130,7 +130,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-          if (_isLoading) loadingAnimation()
+          if (_isLoading) loadingAnimation(size: 180)
         ],
       ),
     );

@@ -164,7 +164,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
             ),
           ),
-          if (_isLoading) loadingAnimation()
+          if (_isLoading) loadingAnimation(size: 180)
         ],
       ),
     );

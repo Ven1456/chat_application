@@ -97,6 +97,7 @@ class _ChatPageState extends State<ChatPage> {
   // 21/04/23
   String repliedMessageId = "";
   String replyMessageType = "";
+  bool isReplyMsg = false;
   String messageChatId = "";
   String isReplyMessage = "";
 
@@ -214,33 +215,35 @@ class _ChatPageState extends State<ChatPage> {
   Column _buildSendMessageButton(BuildContext context) {
     return Column(
       children: [
-        isSwipe ?   Container(
-          width: MediaQuery.of(context).size.width * 0.96,
-          padding: EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.grey.withOpacity(0.2),
-            borderRadius: const BorderRadius.only(
-              topLeft:inputTopRadius,
-              bottomLeft: inputTopRadius,
-              bottomRight: inputTopRadius,
-              topRight: inputTopRadius,
-            ),
-          ),
-          child: ReplyMessageWidget(
-            previousMessage: message,
-            colorWhite: false,
-            messageType:replyMessageType ,
-            isReplyMessage: replyMessage.isNotEmpty ? true : false,
-            isPreviousMessage: replyMessage.isEmpty ? true : false,
-            onCancelReply: () {
-              setState(() {
-                isSwipe = false;
-              });
-            },
-            username: swipeUserName,
-            replyMessage:replyMessage,
-          ),
-        ) : SizedBox(),
+        isSwipe
+            ? Container(
+                width: MediaQuery.of(context).size.width * 0.96,
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.2),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: inputTopRadius,
+                    bottomLeft: inputTopRadius,
+                    bottomRight: inputTopRadius,
+                    topRight: inputTopRadius,
+                  ),
+                ),
+                child: ReplyMessageWidget(
+                  previousMessage: message,
+                  colorWhite: false,
+                  messageType: replyMessageType,
+                  isReplyMessage: replyMessage.isNotEmpty ? true : false,
+                  isPreviousMessage: replyMessage.isEmpty ? true : false,
+                  onCancelReply: () {
+                    setState(() {
+                      isSwipe = false;
+                    });
+                  },
+                  username: swipeUserName,
+                  replyMessage: replyMessage,
+                ),
+              )
+            : const SizedBox(),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           decoration: BoxDecoration(
@@ -450,8 +453,8 @@ class _ChatPageState extends State<ChatPage> {
             nextPage(
               context,
               GroupInfo(
-               currentUser: widget.username,
-               userProfile: groupsUsersProfile,
+                currentUser: widget.username,
+                userProfile: groupsUsersProfile,
                 groupPic: groupPicture,
                 adminName: adminName,
                 groupName: widget.groupName,
@@ -516,6 +519,14 @@ class _ChatPageState extends State<ChatPage> {
                 }
               })
             : "";
+        if (!snapshot.hasData || snapshot.data.docs.length == 0) {
+          return const Center(
+            child: Text(
+              "No Chat Available",
+              style: TextStyle(fontSize: 21, fontWeight: FontWeight.w600),
+            ),
+          );
+        }
         return Stack(
           children: [
             snapshot.hasData
@@ -576,32 +587,49 @@ class _ChatPageState extends State<ChatPage> {
                                       textFieldFocus.requestFocus();
                                       setState(() {
                                         isSwipe = true;
-                                        repliedMessageId = snapshot.data.docs[index].id;
+                                        repliedMessageId =
+                                            snapshot.data.docs[index].id;
+                                        isReplyMsg = true;
                                       });
-                                      message = snapshot.data.docs[index]["message"];
-                                      messageType= snapshot.data.docs[index]["Type"];
-                                      replyMessageType= messageType;
-                                      replyMessage = snapshot.data.docs[index]["replyMessage"];
-                                      swipeUserName =  snapshot.data.docs[index]["sender"];
+                                      message =
+                                          snapshot.data.docs[index]["message"];
+                                      messageType =
+                                          snapshot.data.docs[index]["Type"];
+                                      replyMessageType = messageType;
+                                      replyMessage = snapshot.data.docs[index]
+                                          ["replyMessage"];
+                                      swipeUserName =
+                                          snapshot.data.docs[index]["sender"];
                                     },
-                                    child: MessageTile(
-                                      replyMessageType: snapshot.data.docs[index]
-                                      ["replyMessageType"],
-                                      isReply: snapshot.data.docs[index]
-                                      ["replyMessage"],
-                                      messageId: snapshot.data.docs[index].id,
-                                      groupId: widget.groupId,
-                                      message: snapshot.data.docs[index]
-                                          ["message"],
-                                      sendByMe: widget.username ==
-                                          snapshot.data.docs[index]["sender"],
-                                      sender: snapshot.data.docs[index]
-                                          ["sender"],
-                                      time: snapshot.data.docs[index]["time"]
-                                          .toString(),
-                                      userProfile: snapshot.data.docs[index]
-                                          ["userProfile"],
-                                      type: snapshot.data.docs[index]["Type"],
+                                    child: showDeleteDialogue(
+                                      child: MessageTile(
+                                        replyMessageType: snapshot.data
+                                            .docs[index]["replyMessageType"],
+                                        isReply: snapshot.data.docs[index]
+                                            ["replyMessage"],
+                                        messageId: snapshot.data.docs[index].id,
+                                        groupId: widget.groupId,
+                                        message: snapshot.data.docs[index]
+                                            ["message"],
+                                        sendByMe: widget.username ==
+                                            snapshot.data.docs[index]["sender"],
+                                        sender: snapshot.data.docs[index]
+                                            ["sender"],
+                                        time: snapshot.data.docs[index]["time"]
+                                            .toString(),
+                                        userProfile: snapshot.data.docs[index]
+                                            ["userProfile"],
+                                        type: snapshot.data.docs[index]["Type"],
+                                      ),
+                                      context: context,
+                                      onTap: () {
+                                        deleteMessage(
+                                          widget.groupId,
+                                          snapshot.data.docs[index].id
+                                              .toString(),
+                                        );
+                                        Navigator.of(context).pop();
+                                      },
                                     ),
                                   ),
                                   sizeBoxH5()
@@ -612,56 +640,61 @@ class _ChatPageState extends State<ChatPage> {
                     ],
                   )
                 : Container(),
-            isUploading
-                ? loadingAnimation()
-                : Container(),
-            Positioned(
-              bottom: 16.0,
-              right: 16.0,
-              child: FloatingActionButton(
-                mini: true,
-                backgroundColor: Colors.cyan.withOpacity(0.7),
-                onPressed: () {
-                  _scrollController.animateTo(
-                    _scrollController.position.maxScrollExtent,
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeInOutExpo,
-                  );
-                },
-                child: Icon(Icons.arrow_downward),
-              ),
-            ),
+            isUploading ? loadingAnimation(size: 150) : Container(),
+            (_scrollController.hasClients &&
+                    _scrollController.position.maxScrollExtent > 0 &&
+                    snapshot.data.docs.length > 0)
+                ? Positioned(
+                    bottom: 16.0,
+                    right: 16.0,
+                    child: FloatingActionButton(
+                      mini: true,
+                      backgroundColor: Colors.cyan.withOpacity(0.7),
+                      onPressed: () {
+                        if (_scrollController.hasClients &&
+                            _scrollController.position.maxScrollExtent > 0 &&
+                            snapshot.data.docs.length > 0) {
+                          _scrollController.animateTo(
+                            _scrollController.position.maxScrollExtent,
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.easeInOutExpo,
+                          );
+                        }
+                      },
+                      child: const Icon(Icons.arrow_downward),
+                    ),
+                  )
+                : SizedBox(),
           ],
         );
       },
     );
   }
 
-  // void replyMessage(String message) {
-  //   setState(() {
-  //     message = message;
-  //   });
-  // }
-
   sendMessages() {
     if (messageController.text.isNotEmpty) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
+      // _scrollController.animateTo(
+      //   _scrollController.position.maxScrollExtent,
+      //   duration: const Duration(milliseconds: 300),
+      //   curve: Curves.easeOut,
+      // );
       // 21/04/23
       ProfileController().messageUrl;
       Map<String, dynamic> chatMessageMap = {
-        "message": isSwipe  ? message :  messageController.text.trim(),
+        "message": isSwipe
+            ? replyMessage.isEmpty
+                ? message
+                : replyMessage
+            : messageController.text.trim(),
         "sender": widget.username,
         "time": DateTime.now().microsecondsSinceEpoch,
         "userProfile": widget.userProfile,
         "Type": "text",
         "messageId": messageChatId,
-        "replyMessage" : isSwipe  ? messageController.text.trim() :"",
-        'repliedMessageId' : repliedMessageId,
-        'replyMessageType' : replyMessageType,
+        "replyMessage": isSwipe ? messageController.text.trim() : "",
+        'repliedMessageId': repliedMessageId,
+        'replyMessageType': replyMessageType,
+        'isReplyMessage': isReplyMsg,
       };
       DatabaseServices().sendMessage(widget.groupId, chatMessageMap);
       setState(() {
@@ -711,18 +744,22 @@ class _ChatPageState extends State<ChatPage> {
       userProfile = docSnapshot.get("profilePic");
       messageUrl = downloadUrl;
       Map<String, dynamic> chatMessag = {
-        "message": messageUrl,
+        "message": isSwipe
+            ? replyMessage.isEmpty
+                ? message
+                : replyMessage
+            : messageUrl,
         "sender": userName,
         "time": DateTime.now().microsecondsSinceEpoch,
         "userProfile": userProfile,
         "Type": "Image",
         "messageId": messageChatId,
-        "replyMessage" : isSwipe  ? messageController.text.trim() :"",
-        'repliedMessageId' : repliedMessageId,
-        'replyMessageType' : replyMessageType,
+        "replyMessage": isSwipe ? messageController.text.trim() : "",
+        'repliedMessageId': repliedMessageId,
+        'replyMessageType': replyMessageType,
+        'isReplyMessage': isReplyMsg,
       };
       DatabaseServices().sendMessage(getId, chatMessag);
-
     }
   }
 

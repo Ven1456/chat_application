@@ -198,99 +198,67 @@ class _MessageTileState extends State<MessageTile> {
                                       //   bottomRight: Radius.circular(18),
                                       // )
                                       ),
-                          child: GestureDetector(
-                            onLongPress: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text('Delete Message'),
-                                    content: Text(
-                                        'Are you sure you want to delete this message?'),
-                                    actions: <Widget>[
-                                      ElevatedButton(
-                                        child: Text('Cancel'),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                      ElevatedButton(
-                                        child: Text('Delete'),
-                                        onPressed: () {
-                                          deleteMessage(
-                                            widget.groupId!,
-                                            widget.messageId.toString(),
-                                          );
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                if (widget.type.toString() == "text")
-                                  widget.isReply.isNotEmpty ? buildReplyMessage() :  Text(
-                                          widget.message,
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                else
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () => nextPage(
-                                              context,
-                                              FullScreenImagePage(
-                                                image: widget.message,
-                                              )),
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.only(
-                                                bottomLeft: widget.sendByMe
-                                                    ? const Radius.circular(18)
-                                                    : const Radius.circular(0),
-                                                topRight:
-                                                    const Radius.circular(18),
-                                                topLeft:
-                                                    const Radius.circular(18),
-                                                bottomRight: widget.sendByMe
-                                                    ? const Radius.circular(0)
-                                                    : const Radius.circular(
-                                                        18)),
-                                            child: FadeInImage.assetNetwork(
-                                              placeholder:
-                                                  'assets/images/gallery.jpg',
-                                              placeholderErrorBuilder: (context,
-                                                      url, error) =>
-                                                  Image.asset(
-                                                      'assets/images/404.jpg',
-                                                      fit: BoxFit.cover),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              if (widget.type.toString() == "text")
+                                widget.isReply.isNotEmpty ? buildReplyMessage() :  Text(
+                                        widget.message,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                              else
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () => nextPage(
+                                            context,
+                                            FullScreenImagePage(
                                               image: widget.message,
-                                              height: 200,
-                                              width: 150,
-                                              fit: BoxFit.cover,
-                                              imageErrorBuilder: (context, url,
-                                                      error) =>
-                                                  Image.asset(
-                                                      'assets/images/error.jpg',
-                                                      fit: BoxFit.cover),
-                                            ),
+                                            )),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.only(
+                                              bottomLeft: widget.sendByMe
+                                                  ? const Radius.circular(18)
+                                                  : const Radius.circular(0),
+                                              topRight:
+                                                  const Radius.circular(18),
+                                              topLeft:
+                                                  const Radius.circular(18),
+                                              bottomRight: widget.sendByMe
+                                                  ? const Radius.circular(0)
+                                                  : const Radius.circular(
+                                                      18)),
+                                          child: FadeInImage.assetNetwork(
+                                            placeholder:
+                                                'assets/images/gallery.jpg',
+                                            placeholderErrorBuilder: (context,
+                                                    url, error) =>
+                                                Image.asset(
+                                                    'assets/images/404.jpg',
+                                                    fit: BoxFit.cover),
+                                            image: widget.message,
+                                            height: 200,
+                                            width: 150,
+                                            fit: BoxFit.cover,
+                                            imageErrorBuilder: (context, url,
+                                                    error) =>
+                                                Image.asset(
+                                                    'assets/images/error.jpg',
+                                                    fit: BoxFit.cover),
                                           ),
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                const SizedBox(height: 4.0),
-                              ],
-                            ),
+                                    ),
+                                  ],
+                                ),
+                              const SizedBox(height: 4.0),
+                            ],
                           ),
                         ),
                         widget.sendByMe ? const SizedBox() : const Spacer(),

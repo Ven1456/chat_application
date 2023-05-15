@@ -210,7 +210,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
           ),
-          if (_isLoading) loadingAnimation()
+          if (_isLoading) loadingAnimation(size: 180)
         ],
       ),
     );

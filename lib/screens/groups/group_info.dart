@@ -43,6 +43,8 @@ class _GroupInfoState extends State<GroupInfo> {
   String admin = "";
   String username = "";
   String userProfile = "";
+  //ADDING NEW
+  String uid = "";
   bool? isOnline;
   bool isDelete = false;
   @override
@@ -74,6 +76,10 @@ class _GroupInfoState extends State<GroupInfo> {
     setState(() {
       userProfile = docSnapshot.get("profilePic");
       admin = docSnapshot.get("fullName");
+      //ADDING NEW
+      isOnline = docSnapshot.get("onlineStatus");
+      //ADDING NEW
+      uid = docSnapshot.get("uid");
     });
   }
 

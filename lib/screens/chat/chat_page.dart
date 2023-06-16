@@ -641,6 +641,7 @@ class _ChatPageState extends State<ChatPage> {
                   )
                 : Container(),
             isUploading ? loadingAnimation(size: 150) : Container(),
+            // DOWN ARROW
             (_scrollController.hasClients &&
                     _scrollController.position.maxScrollExtent > 0 &&
                     snapshot.data.docs.length > 0)

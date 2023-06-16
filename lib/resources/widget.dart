@@ -309,14 +309,15 @@ class IconButtonAlertReuse extends StatelessWidget {
   }
 }
 
-Future<void> alertBoxReuse(
-    {BuildContext? context,
-    VoidCallback? cancelOnTap,
-    VoidCallback? leaveOnTap,
-    String? titleText,
-    String? subTitleText,
-    String? leaveTitleText,
-    String? cancelTitleText}) async {
+Future<void> alertBoxReuse({
+  BuildContext? context,
+  VoidCallback? cancelOnTap,
+  VoidCallback? leaveOnTap,
+  String? titleText,
+  String? subTitleText,
+  String? leaveTitleText,
+  String? cancelTitleText,
+}) async {
   return showDialog(
       barrierDismissible: true,
       context: context!,
@@ -440,16 +441,16 @@ class _ReusableTextFieldState extends State<ReusableTextField> {
   }
 }
 
-Text boldText({String? text,double? size}) {
+Text boldText({String? text, double? size}) {
   return Text(
     text!,
-    style:  TextStyle(fontSize: size, fontWeight: FontWeight.bold),
+    style: TextStyle(fontSize: size, fontWeight: FontWeight.bold),
   );
 }
-Text normalText({String? text,double? size}) {
+Text normalText({String? text, double? size}) {
   return Text(
     text!,
-    style:  TextStyle(fontSize: size, fontWeight: FontWeight.normal),
+    style: TextStyle(fontSize: size, fontWeight: FontWeight.normal),
   );
 }
 
@@ -589,20 +590,20 @@ Container loadingAnimation({double? size}) {
       color: Colors.black.withOpacity(0.1),
       child: Center(
         child: Lottie.network(
-            "https://assets4.lottiefiles.com/private_files/lf30_fjjj1m44.json",
-            height: size,
+          "https://assets4.lottiefiles.com/private_files/lf30_fjjj1m44.json",
+          height: size,
         ),
       ));
 }
+
 Container loadingAnimationWithReUse(String url) {
   return Container(
       color: Colors.black.withOpacity(0.1),
       child: Center(
-        child: Lottie.network(
-            url,
-            height: 100),
+        child: Lottie.network(url, height: 100),
       ));
 }
+
 SizedBox sizeBoxH15() {
   return const SizedBox(
     height: 15,
@@ -675,7 +676,8 @@ Padding listTile({String? text, VoidCallback? onTap}) {
     ),
   );
 }
-Center userName({String? text}){
+
+Center userName({String? text}) {
   return Center(
     child: Text(
       text!,
@@ -687,12 +689,12 @@ Center userName({String? text}){
     ),
   );
 }
-connection(BuildContext context){
+
+connection(BuildContext context) {
   OverlayState? overlayState = Overlay.of(context);
   if (overlayState != null) {
     showTopSnackBar(
       overlayState,
-
       const CustomSnackBar.error(
         message: "You are not connected to the internet",
       ),
@@ -700,33 +702,37 @@ connection(BuildContext context){
     );
   }
 }
-showDeleteDialogue({required BuildContext context,required VoidCallback onDeletedButtonTap,Widget? child, VoidCallback? onSingleTap,}){
+
+showDeleteDialogue({
+  required BuildContext context,
+  required VoidCallback onDeletedButtonTap,
+  Widget? child,
+  VoidCallback? onSingleTap,
+}) {
   return GestureDetector(
-      onLongPress: () {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Delete Message'),
-          content: const Text(
-              'Are you sure you want to delete this message?'),
-          actions: <Widget>[
-            ElevatedButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ElevatedButton(
-              child: Text('Delete'),
-              onPressed: onDeletedButtonTap
-            ),
-          ],
-        );
-      },
-    );
-  },
+    onLongPress: () {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Delete Message'),
+            content:
+                const Text('Are you sure you want to delete this message?'),
+            actions: <Widget>[
+              ElevatedButton(
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              ElevatedButton(
+                  child: Text('Delete'), onPressed: onDeletedButtonTap),
+            ],
+          );
+        },
+      );
+    },
     onTap: onSingleTap,
-  child: child,
+    child: child,
   );
 }
